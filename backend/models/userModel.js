@@ -1,16 +1,18 @@
 const sequelize = require("../database/database");
 const { DataTypes } = require("sequelize");
 
+const Address = require("./addressModel");
+const Company = require("./companyModel");
 
 const User = sequelize.define(
     "user",
     {
         id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
+            type: DataTypes.INTEGER,
             primaryKey: true,
-            allowNull: false,
-        },
+            autoIncrement: true,
+            allowNull: false
+          },
         firstName: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -28,18 +30,6 @@ const User = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        country: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        city: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        street: {
-            type: DataTypes.TEXT,
-            allowNull: false,
-        },
         refreshToken: {
             type: DataTypes.STRING,
             allowNull: true,
@@ -48,6 +38,22 @@ const User = sequelize.define(
             type: DataTypes.ENUM("admin, user"),
             defaultValue: null,
             allowNull: true,
+        },
+        addressId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: Address,
+                key: "id",
+            },
+        },
+        companyId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: Company,
+                key: "id",
+            },
         },
     },
     {

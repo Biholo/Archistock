@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from './pages/Login/Login';
 
 import './App.css'
 
@@ -6,8 +8,21 @@ function App() {
 
   return (
     <>
-    <button className="btn btn-primary">test</button>
-     
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/login"
+            element
+          />
+
+          <Route
+            path="/register"
+            element
+          />
+        </Routes>
+      </BrowserRouter>
+
+
     </>
   )
 }
