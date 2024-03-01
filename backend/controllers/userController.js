@@ -28,12 +28,12 @@ exports.register = async (req, res) => {
       }
     );
 
-    // Generate a refresh token with expiration (e.g., 7 days)
+    // Generate a refresh token with expiration
     const refreshToken = jwt.sign({ email: user.email }, process.env.REFRESH_SECRET_KEY, {
       expiresIn: "7d",
     });
 
-    // Update the refresh token in the database (this is an example, you should adjust according to your data model)
+    // Update the refresh token in the database
     user.refreshToken = refreshToken;
     await user.save();
 
@@ -67,7 +67,7 @@ exports.login = async (req, res) => {
     // Generate a refresh token
     const refreshToken = jwt.sign({ email: existingUser.email }, process.env.REFRESH_SECRET_KEY);
 
-    // Update the refresh token in the database (this is an example, you should adjust according to your data model)
+    // Update the refresh token in the database
     existingUser.refreshToken = refreshToken;
     await existingUser.save();
 
@@ -131,7 +131,7 @@ exports.verifyAccessToken = async (req, res) => {
     // Check the validity of the access token
     const decoded = jwt.verify(accessToken, process.env.SECRET_KEY);
 
-    // Find the user in the database by their email (or another identifier)
+    // Find the user in the database by their email
     const user = await User.findOne({ where: { email: decoded.email } });
 
     if (!user) {
@@ -217,7 +217,7 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    const userId = req.params.id; // Assume the user ID to be deleted is passed in the URL parameters
+    const userId = req.params.id;
 
     // Check if the user to delete exists in the database
     const userToDelete = await User.findByPk(userId);
