@@ -1,3 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+    background-color: #CBE3FF !important;
+}
+
+body {
+    font-family: 'Noto Sans', sans-serif;
+}
+
+.bg-white-100 {
+    background: linear-gradient(115deg, rgba(255, 255, 255, 0.40) 0%, rgba(255, 255, 255, 0.40) 35%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0.40) 75%, rgba(255, 255, 255, 0.40) 100%);
+    border-radius: 10px;
+}
