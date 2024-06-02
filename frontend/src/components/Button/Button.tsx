@@ -5,6 +5,7 @@ function Button({label, onClick, color} : {label: string, onClick: any, color: s
     const [state, setState] = useState('');
 
     useEffect(() => {
+        console.log(color);
         switch(color) {
             case 'primary':
                 setState('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded');

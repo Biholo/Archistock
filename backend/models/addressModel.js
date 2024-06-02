@@ -28,10 +28,6 @@ const Address = sequelize.define(
                 key: "id",
             },
         },
-        number: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
         postalCode: {
             type: DataTypes.STRING(50),
             allowNull: false,
