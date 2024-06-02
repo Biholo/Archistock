@@ -1,0 +1,21 @@
+.aside-item {
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+    &:hover {
+        background-color: #e4f7ffdf;
+    }
+    &.active {
+        background-color: #F1FBFFdf;
+    }
+    &.active:hover {
+        background-color: #e2f6fddf;
+    }
+    .icon {
+        font-size: 20px;
+        margin-right: 10px;
+    }
+    .title {
+        font-size: 16px;
+    }
+}
