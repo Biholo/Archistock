@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Input.scss';
 
-function Input({label, labelWeight, placeholder, pattern, value, onChange, type, name, required, disabled, color} : {label: string, labelWeight: string, placeholder: string, pattern: string, value: string, onChange: any, type: string, name: string, required: boolean, disabled: boolean, color: string}) {
+function Input({label, labelWeight, placeholder, pattern, value, onChange, type, name, required, disabled, color, css} : {label: string, labelWeight: string, placeholder: string, pattern: string, value: string, onChange: any, type: string, name: string, required: boolean, disabled: boolean, color: string, css: string}) {
 
     const [state , setState] = useState('');
 
@@ -44,7 +44,7 @@ function Input({label, labelWeight, placeholder, pattern, value, onChange, type,
     }
 
     return (
-        <React.Fragment>
+       <div className={css}>
             <label className={`block text-sm mb-2 font-${labelWeight}`} htmlFor={name}>
                 {label} {required ? <span className='text-red-400'>*</span> : ''}
             </label>
@@ -60,7 +60,7 @@ function Input({label, labelWeight, placeholder, pattern, value, onChange, type,
                 required={required}
                 disabled={disabled}
             />
-        </React.Fragment>
+        </div>
     )
 }
 
