@@ -32,3 +32,7 @@ const Company = sequelize.define(
 );
 
 module.exports = Company;
+
+//relations
+Company.hasOne(Address, { foreignKey: "addressId" });
+Address.belongsTo(Company, { foreignKey: "addressId" });
