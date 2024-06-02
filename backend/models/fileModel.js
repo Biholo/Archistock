@@ -1,7 +1,7 @@
 const sequelize = require("../database/database");
 const { DataTypes } = require("sequelize");
 
-const Subscription = require("./subscribeModel");
+const Subscription = require("./userSubscriptionModel");
 
 const File = sequelize.define(
     "file",
@@ -41,3 +41,9 @@ const File = sequelize.define(
 );
 
 module.exports = File;
+
+//relations
+File.belongsTo(Subscription, { foreignKey: "subscribtionId" });
+Subscription.hasMany(File, { foreignKey: "subscribtionId" });
+
+

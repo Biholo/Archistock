@@ -1,9 +1,8 @@
 const sequelize = require("../database/database");
 const { DataTypes } = require("sequelize");
 
-
-const Subscribe = sequelize.define(
-    "subscribe",
+const Country = sequelize.define(
+    "country",
     {
         id: {
             type: DataTypes.INTEGER,
@@ -12,18 +11,13 @@ const Subscribe = sequelize.define(
             allowNull: false
           },
         name: {
-            type: DataTypes.STRING(45),
+            type: DataTypes.STRING(50),
             allowNull: false,
         },
-        space: {
-            type: DataTypes.INTEGER,
+        code: {
+            type: DataTypes.STRING(50),
             allowNull: false,
         },
-        price: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        
     },
     {
         sequelize,
@@ -31,4 +25,4 @@ const Subscribe = sequelize.define(
     }
 );
 
-module.exports = Subscribe;
+module.exports = Country;

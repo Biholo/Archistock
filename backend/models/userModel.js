@@ -2,7 +2,6 @@ const sequelize = require("../database/database");
 const { DataTypes } = require("sequelize");
 
 const Address = require("./addressModel");
-const Company = require("./companyModel");
 
 const User = sequelize.define(
     "user",
@@ -26,6 +25,10 @@ const User = sequelize.define(
             unique: true,
             allowNull: false,
         },
+        phoneNumner: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         password: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -47,14 +50,6 @@ const User = sequelize.define(
                 key: "id",
             },
         },
-        companyId: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            references: {
-                model: Company,
-                key: "id",
-            },
-        },
     },
     {
         sequelize,
@@ -63,3 +58,7 @@ const User = sequelize.define(
 );
 
 module.exports = User;
+
+//relations one user have one adress
+User.hasOne(Address, { foreignKey: "addressId" });
+Address.belongsTo(User, { foreignKey: "addressId" });

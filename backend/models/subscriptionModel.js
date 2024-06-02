@@ -1,9 +1,6 @@
 const sequelize = require("../database/database");
 const { DataTypes } = require("sequelize");
 
-const Subscribe = require("./subscribeModel");
-const User = require("./userModel");
-
 const Subscription = sequelize.define(
     "subscription",
     {
@@ -17,31 +14,22 @@ const Subscription = sequelize.define(
             type: DataTypes.STRING(45),
             allowNull: false,
         },
-        space: {
-            type: DataTypes.INTEGER,
+        size: {
+            type: DataTypes.FLOAT,
             allowNull: false,
         },
         price: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.FLOAT,
             allowNull: false,
         },
-        subscribeId: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            references: {
-                model: Subscribe,
-                key: "id",
-            },
+        features: {
+            type: DataTypes.TEXT,
+            allowNull: false,
         },
-        userId: {
+        duration: {
             type: DataTypes.INTEGER,
-            allowNull: true,
-            references: {
-                model: User,
-                key: "id",
-            },
-        },
-        
+            allowNull: false,
+        },        
     },
     {
         sequelize,
