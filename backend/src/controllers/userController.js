@@ -298,7 +298,7 @@ exports.resetPassword = async (req, res) => {
         }
 
         // Generate a temporary link
-        mailer.sendPasswordResetEmail(email, user.id);
+        mailer.sendPasswordResetEmail(email, user);
         res.status(200).json({ message: "Password reset email sent" });
     }
     catch (error) {

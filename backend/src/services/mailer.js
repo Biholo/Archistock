@@ -1,5 +1,8 @@
 const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken");
+const TemplateService = require('./templateService');
+const path = require('path');
+
 
 class Mailer {
     constructor() {
@@ -12,9 +15,10 @@ class Mailer {
               pass: 'p6$5Bgu65'
             }
           };
-
+    
+        this.templateService = new TemplateService(path.join(__dirname, '../emailTemplates'));
         this.transporter = nodemailer.createTransport(smtpConfig);
-        this.baseUrl = 'http://localhost:5174/';
+        this.baseUrl = 'http://localhost:5174';
         this.senderEmail = 'archistock@fiddle.fr';
     }
 
@@ -44,13 +48,15 @@ class Mailer {
     }
 
     // Méthode pour envoyer un e-mail de réinitialisation de mot de passe
-    sendPasswordResetEmail(to, userId) {
-        const resetLink = this.generateTemporaryLink(userId, '1h', 'reset-password');
+    sendPasswordResetEmail(to, user) {
+        const resetLink = this.generateTemporaryLink(user.id, '1h', 'reset-password');
         const subject = 'Réinitialisation de mot de passe';
-        const text = `Bonjour,\n\nVous avez demandé la réinitialisation de votre mot de passe. Veuillez cliquer sur le lien suivant pour réinitialiser votre mot de passe :\n${resetLink}\n\nCordialement, L'équipe du site`;
-        const html = `<p>Bonjour,</p><p>Vous avez demandé la réinitialisation de votre mot de passe. Veuillez cliquer sur le lien suivant pour réinitialiser votre mot de passe :</p><p><a href="${resetLink}">${resetLink}</a></p><p>Cordialement,<br>L'équipe du site</p>`;
-        return this.sendMail( this.senderEmail, to, subject, text, html);
+        const html = this.templateService.renderTemplate('resetPasswordTemplate', { firstName: user.firstName, lastName: user.lastName, resetLink });
+
+        return this.sendMail(this.senderEmail, to, subject, '', html);
     }
+
+
 
     // Méthode pour envoyer un e-mail de confirmation de compte
     sendAccountConfirmationEmail(to, userId) {
