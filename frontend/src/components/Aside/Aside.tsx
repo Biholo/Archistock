@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import AsideItem from '../AsideItem/AsideItem'
-import { Cloud, Lightning, UploadSimple , Sliders, Cube } from '@phosphor-icons/react'
+import { useAuth } from '../../contexts/AuthContext'
+import { Cloud, Lightning, UploadSimple , Sliders, Cube, User, X } from '@phosphor-icons/react'
 
 export default function Aside() {
 
+  const { handleLogout } = useAuth()
   const [active, setActive] = useState('storage' as string)
 
   useEffect(() => {
@@ -30,6 +32,8 @@ export default function Aside() {
           <AsideItem title='Upload files' icon={<UploadSimple size={20} weight="bold" />} link='upload' active={active === 'upload'} onClick={() => handleChangeItem('upload')}></AsideItem>
           <AsideItem title='Settings' icon={<Sliders size={20} />} link='settings' active={active === 'settings'} onClick={() => handleChangeItem('settings')}></AsideItem>
           <AsideItem title='Components' icon={<Cube size={20} />} link='components' active={active === 'components'} onClick={() => handleChangeItem('components')}></AsideItem>
+          <AsideItem title='Profil' icon={<User size={20} />} link='profile' active={active === 'profile'} onClick={() => handleChangeItem('profile')}></AsideItem>
+          <AsideItem title="Logout" icon={<X size={20} />} link="/" active={active === 'logout'} onClick={() => handleLogout()} isLogout={true}></AsideItem>
         </div>
     </React.Fragment>
   )

@@ -60,5 +60,6 @@ const User = sequelize.define(
 module.exports = User;
 
 //relations one user have one adress
-User.hasOne(Address, { foreignKey: "addressId" });
-Address.belongsTo(User, { foreignKey: "addressId" });
+User.belongsTo(Address, { foreignKey: "addressId", as: "address" });
+Address.hasOne(User, { foreignKey: "addressId", as: "user" });
+

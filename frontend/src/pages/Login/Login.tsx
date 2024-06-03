@@ -7,7 +7,7 @@ import ArchistockApiService from "../../services/ArchistockApiService";
 import { useAuth } from "../../contexts/AuthContext";
 
 const Login = () => {
-    const {loggedIn, setUser} = useAuth();
+    const {loggedIn, setUser, setLoggedIn} = useAuth();
     const archistockApiService = new ArchistockApiService();
     const navigate = useNavigate();
     const [loginUser, setLoginUser] = useState({
@@ -35,6 +35,7 @@ const Login = () => {
                 localStorage.setItem('accessToken', res.accessToken);
                 localStorage.setItem('refreshToken', res.refreshToken);
                 setUser(res.user);
+                setLoggedIn(true);
                 navigate("/user/storage");
             }
         })
@@ -61,7 +62,7 @@ const Login = () => {
                     <Input value={loginUser.email} onChange={e => handleChangeInput(e)} css={'w-full mb-3'} name="email" label="Email" type="email" labelWeight="bold" placeholder="Veuillez renseigner votre adresse email" required={true}/>
                     <Input value={loginUser.password} onChange={e => handleChangeInput(e)} css={'w-full mb-3'} name="password" label="Mot de passe" type="password" labelWeight="bold" placeholder="Veuillez renseigner votre mot de passe" required={true}/>
                     <button onClick={e => handleLogin()} className="w-full py-2">Se connecter</button>
-                    <p className="text-center mt-3">mot de passe oublié</p>
+                    <p onClick={e => navigate('/forgot-password')} className="text-center mt-3 p-password-forgot">mot de passe oublié</p>
                 </div>
                 <div className="flex flex-col items-center py-4 bottom">
                     <button className="py-1" onClick={handleRegisterClick}>Créer un compte</button>

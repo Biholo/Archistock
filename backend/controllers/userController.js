@@ -2,11 +2,12 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const Address = require("../models/addressModel");
+const Mailer = require("../services/mailer");
 const multer = require('multer');
 require("dotenv").config();
 
 const { v4: uuidv4 } = require('uuid');
-
+const mailer = new Mailer();
 //--------- Create a user ---------//
 
 exports.register = async (req, res) => {
@@ -68,7 +69,17 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
         console.log(email, password);
-        const existingUser = await User.findOne({ where: { email: email } });
+        const existingUser = await User.findOne({ where: 
+            { 
+                email: email 
+            },
+            include: [
+                {
+                    model: Address,
+                    as: "address"
+                }
+            ]
+        });
 
         if (!existingUser) {
             return res.status(401).json({ message: "Incorrect email." });
@@ -229,7 +240,14 @@ exports.getProfile = async (req, res) => {
                     email: 
                     decoded.email 
                 },
+                include: [
+                    {
+                        model: Address,
+                        as: "address"
+                    }
+                ]
             });
+        console.log(user);
         res.status(200).json(user);
     } catch (error) {
         console.error("Error recovering user by token:", error);
@@ -267,3 +285,74 @@ exports.refreshToken = async (req, res) => {
         res.status(500).json({ message: "Error refreshing token" });
     }
 };
+
+
+//--------- Reset password ---------//
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ where: { email: email } });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Generate a temporary link
+        mailer.sendPasswordResetEmail(email, user.id);
+        res.status(200).json({ message: "Password reset email sent" });
+    }
+    catch (error) {
+        console.error("Error while resetting password: ", error);
+        res.status(500).json({ message: "Error while resetting password" });
+    }
+}
+
+//--------- Update user password ---------//
+
+exports.updatePassword = async (req, res) => {
+    try {
+        const { password, jwtToken } = req.body;
+        const decoded = jwt.verify(jwtToken, process.env.SECRET_KEY);
+        const userId = decoded.userId;
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const hash = await bcrypt.hashSync(password, 10);
+        user.password = hash;
+        await user.save();
+
+        res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+        console.error("Error while updating password: ", error);
+        res.status(500).json({ message: "Error while updating password" });
+    }
+}
+
+
+//--------- Change user password ---------//
+
+exports.changePassword = async (req, res) => {
+    try {
+        const { oldPassword, newPassword, userId } = req.body;
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const hash = await bcrypt.compareSync(oldPassword, user.password);
+        if (!hash) {
+            return res.status(401).json({ message: "Incorrect password" });
+        }
+
+        const newHash = await bcrypt.hashSync(newPassword, 10);
+        user.password = newHash;
+        await user.save();
+
+        res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+        console.error("Error while updating password: ", error);
+        res.status(500).json({ message: "Error while updating password" });
+    }
+}
