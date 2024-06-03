@@ -77,6 +77,34 @@ class ArchistockApiService {
         const jsonResponse = await response.json();
         return jsonResponse;
     }
+
+    async updatePassword(password: string, jwtToken: string|undefined): Promise<{ message: string }> {
+        const response = await fetch(`${this.url}/user/update-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(
+                { password, jwtToken }
+            ),
+        });
+        const jsonResponse = await response.json();
+        return jsonResponse;
+    }
+
+    async resetPassword(email: string): Promise<boolean> {
+        const response = await fetch(`${this.url}/user/reset-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
+        });
+        if (response.status !== 200) {
+            return false;
+        }
+        return true;
+    }
 }
 
 export default ArchistockApiService;

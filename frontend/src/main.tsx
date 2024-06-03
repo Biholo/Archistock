@@ -5,6 +5,6 @@ import { AuthProvider } from './contexts/AuthContext.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <AuthProvider>
-    <App />
+      <App />
   </AuthProvider>
 )
