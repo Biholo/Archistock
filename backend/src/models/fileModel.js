@@ -25,7 +25,7 @@ const File = sequelize.define(
             unique: true,
             allowNull: false,
         },
-        subscribtionId: {
+        subscriptionId: {
             type: DataTypes.INTEGER,
             allowNull: true,
             references: {
@@ -43,7 +43,7 @@ const File = sequelize.define(
 module.exports = File;
 
 //relations
-File.belongsTo(Subscription, { foreignKey: "subscribtionId" });
-Subscription.hasMany(File, { foreignKey: "subscribtionId" });
+File.belongsTo(Subscription, { foreignKey: "subscriptionId" });
+Subscription.hasMany(File, { foreignKey: "subscriptionId" });
 
 

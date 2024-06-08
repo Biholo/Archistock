@@ -23,10 +23,10 @@ class ArchistockApiService {
         const jsonResponse = await response.json();
 
         if (jsonResponse.accessToken) {
-            localStorage.setItem('accessToken', jsonResponse.accessToken);
+            this.setCookie('accessToken', jsonResponse.accessToken);
         }
         if (jsonResponse.refreshToken) {
-            localStorage.setItem('refreshToken', jsonResponse.refreshToken);
+            this.setCookie('refreshToken', jsonResponse.refreshToken);
         }
 
         return jsonResponse;
@@ -42,10 +42,10 @@ class ArchistockApiService {
         });
         const jsonResponse = await response.json();
         if (jsonResponse.accessToken) {
-            localStorage.setItem('accessToken', jsonResponse.accessToken);
+            this.setCookie('accessToken', jsonResponse.accessToken);
         }
         if(jsonResponse.refreshToken) {
-            localStorage.setItem('refreshToken', jsonResponse.refreshToken);
+            this.setCookie('refreshToken', jsonResponse.refreshToken);
         }
     
         return jsonResponse;
@@ -104,6 +104,10 @@ class ArchistockApiService {
             return false;
         }
         return true;
+    }
+
+    private setCookie(name: string, value: string) {
+        document.cookie = `${name}=${value}; Secure; SameSite=Strict; Path=/;`;
     }
 }
 

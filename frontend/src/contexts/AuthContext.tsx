@@ -1,5 +1,11 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import ArchistockApiService from '../services/ArchistockApiService';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+} from "react";
+import ArchistockApiService from "../services/ArchistockApiService";
 import User from "../models/User";
 import AuthContextType from "../models/AuthContextType";
 
@@ -19,8 +25,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken');
+    const accessToken = getCookie("accessToken");
+    const refreshToken = getCookie("refreshToken");
 
     if (accessToken) {
       archistockApiService.getUserByToken(accessToken).then((response) => {
@@ -28,22 +34,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(response);
           setLoggedIn(true);
         } else if (refreshToken) {
-          archistockApiService.getNewAccessToken(refreshToken).then((response) => {
-            localStorage.setItem('accessToken', response.accessToken);
-            localStorage.setItem('refreshToken', response.refreshToken);
+          archistockApiService
+            .getNewAccessToken(refreshToken)
+            .then((response) => {
+              setCookie("accessToken", response.accessToken, 1);
+              setCookie("refreshToken", response.refreshToken, 1);
 
-            if (response.accessToken) {
-              archistockApiService.getUserByToken(response.accessToken).then((response) => {
-                if (response) {
-                  setUser(response);
-                  setLoggedIn(true);
-                }
+              if (response.accessToken) {
+                archistockApiService
+                  .getUserByToken(response.accessToken)
+                  .then((response) => {
+                    if (response) {
+                      setUser(response);
+                      setLoggedIn(true);
+                    }
+                    setLoading(false);
+                  });
+              } else {
                 setLoading(false);
-              });
-            } else {
-              setLoading(false);
-            }
-          });
+              }
+            });
         } else {
           setLoading(false);
         }
@@ -60,23 +70,48 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [loggedIn]);
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    deleteCookie("accessToken");
+    deleteCookie("refreshToken");
     setUser(null);
     setLoggedIn(false);
   };
 
   return (
-    <AuthContext.Provider value={{ loggedIn, user, setLoggedIn, setUser, handleLogout, loading }}>
+    <AuthContext.Provider
+      value={{ loggedIn, user, setLoggedIn, setUser, handleLogout, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
+export const setCookie = (name: string, value: string, days: number) => {
+  const date = new Date();
+  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+  const expires = "expires=" + date.toUTCString();
+  document.cookie = name + "=" + value + ";" + expires + ";path=/";
+};
+
+export const getCookie = (name: string) => {
+  const cookieName = name + "=";
+  const cookies = document.cookie.split(";");
+  for (let i = 0; i < cookies.length; i++) {
+    let cookie = cookies[i].trim();
+    if (cookie.indexOf(cookieName) === 0) {
+      return cookie.substring(cookieName.length, cookie.length);
+    }
+  }
+  return "";
+};
+
+export const deleteCookie = (name: string) => {
+  document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
+};
+
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
