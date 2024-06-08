@@ -1,8 +1,7 @@
-.login {
+.register {
     .card {
         background: rgba(255, 255, 255, 0.4);
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-
        .top {
             h1 {
                 font-size: 36px;
@@ -14,7 +13,7 @@
             border-top: solid 1px rgba(31, 41, 55, 0.1);
             border-bottom: solid 1px rgba(31, 41, 55, 0.1);
             padding: 30px 100px;
-            min-width: 500px;
+            min-width: 652px !important;
 
             h2 {
                 font-size: 30px;
@@ -24,20 +23,30 @@
 
             button {
                 background: #4338CA;
-                color: #C7D2FE;
+                color: white;
                 border-radius: 8px;
+            }
+            button.before-btn {
+                outline: solid 2px #4338CA;
+                background: none;
+                font-weight: 700;
+                color: #4338CA;
             }
             p  {
                 font-size: 12px;
+            }
+            .item-payment {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 20px;
+                border: solid 1px rgba(31, 41, 55, 0.5);
+                border-radius: 8px;
+
+                img {
+                    height: 27px;
+                    
+                }
             }   
-
-            .p-password-forgot {
-                cursor: pointer;
-            }
-            .p-password-forgot:hover {
-                text-decoration: underline;
-
-            }
         }
 
         .bottom {
