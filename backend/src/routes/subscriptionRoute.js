@@ -4,21 +4,33 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const SubscriptionController = require("../controllers/subscriptionController");
+const middleware = require("../middleware/middleware");
 
 // Create an subscription (POST)
-router.post("/add", SubscriptionController.add);
+router.post("/add", middleware.authenticator, SubscriptionController.add);
 
 // Delete subscription (DELETE)
-router.post("/delete/:id", SubscriptionController.delete);
+router.delete(
+  "/delete/:id",
+  middleware.authenticator,
+  SubscriptionController.delete
+);
 
 // Get all subscription (GET)
-router.post("/all", SubscriptionController.getAll);
+router.get("/all", middleware.authenticator, SubscriptionController.getAll);
 
 // Get subscription by ID (GET)
-router.get("/get/:id", SubscriptionController.getById);
+router.get(
+  "/get/:id",
+  middleware.authenticator,
+  SubscriptionController.getById
+);
 
 // Update subscription (PUT)
-router.put("/update/:id", SubscriptionController.update);
-
+router.put(
+  "/update/:id",
+  middleware.authenticator,
+  SubscriptionController.update
+);
 
 module.exports = router;
