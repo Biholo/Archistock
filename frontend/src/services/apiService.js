@@ -8,6 +8,13 @@ const fileApi = {
         "Content-Type": "application/json",
       },
     }).then((response) => response.json()),
+  getSubscription: (idFile) =>
+    fetch(`${API_BASE_URL}/file/subscription/${idFile}`, {
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((response) => response.json()),
 };
 
 export { fileApi };

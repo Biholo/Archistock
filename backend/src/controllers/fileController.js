@@ -1,5 +1,5 @@
-const Subscription = require("../models/subscriptionModel");
 const File = require("../models/fileModel");
+const Subscription = require("../models/subscriptionModel");
 
 // Create a file (POST)
 exports.add = async (req, res) => {
@@ -8,7 +8,7 @@ exports.add = async (req, res) => {
     await File.create(file);
     res.status(201).json("File added");
   } catch (error) {
-    console.error("Error adding file : ", error);
+    console.error("Error adding file:", error);
     res.status(500).json({ error: "Error adding file" });
   }
 };
@@ -25,7 +25,7 @@ exports.delete = async (req, res) => {
       res.status(404).json({ error: "File not found" });
     }
   } catch (error) {
-    console.error("Error deleting file : ", error);
+    console.error("Error deleting file:", error);
     res.status(500).json({ error: "Error deleting file" });
   }
 };
@@ -43,7 +43,7 @@ exports.update = async (req, res) => {
       res.status(404).json({ error: "File not found" });
     }
   } catch (error) {
-    console.error("Error updating file : ", error);
+    console.error("Error updating file:", error);
     res.status(500).json({ error: "Error updating file" });
   }
 };
@@ -52,7 +52,9 @@ exports.update = async (req, res) => {
 exports.getById = async (req, res) => {
   const idP = req.params.id;
   try {
-    const result = await File.findByPk(idP);
+    const result = await File.findByPk(idP, {
+      include: [{ model: Subscription, as: "subscription" }],
+    });
     if (result) {
       res.status(200).json(result);
     } else {
@@ -64,30 +66,29 @@ exports.getById = async (req, res) => {
   }
 };
 
-//--------- Get all File ---------//
+// Get all files (GET)
 exports.getAll = async (req, res) => {
   try {
-    const results = await File.findAll();
+    const results = await File.findAll({
+      include: [{ model: Subscription, as: "subscription" }],
+    });
 
-    const fileDetails = await Promise.all(
-      results.map(async (result) => {
-        const subscription = await Subscription.findByPk(result.subscriptionId);
-        return {
-          id: result.id,
-          name: result.name,
-          format: result.format,
-          size: result.size,
-          subsriptionName: subscription.name,
-          subscriptionSize: subscription.size,
-          subscriptionPrice: subscription.price,
-          subscriptionFeatures: subscription.features,
-          subscriptionDuration: subscription.duration,
-        };
-      })
-    );
+    const fileDetails = results.map((result) => ({
+      id: result.id,
+      name: result.name,
+      format: result.format,
+      size: result.size,
+      createdAt: result.createdAt,
+      subscriptionName: result.subscription ? result.subscription.name : null,
+      subscriptionSize: result.subscription ? result.subscription.size : null,
+      subscriptionPrice: result.subscription ? result.subscription.price : null,
+      subscriptionFeatures: result.subscription ? result.subscription.features : null,
+      subscriptionDuration: result.subscription ? result.subscription.duration : null,
+    }));
+
     res.status(200).json(fileDetails);
   } catch (error) {
-    console.error("Error retrieving the file", error);
-    res.status(500).json({ error: "Error retrieving the file" });
+    console.error("Error retrieving the files:", error);
+    res.status(500).json({ error: "Error retrieving the files" });
   }
 };
