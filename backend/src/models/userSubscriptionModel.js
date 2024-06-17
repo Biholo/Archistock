@@ -39,7 +39,3 @@ UserSubscription.belongsTo(User, { foreignKey: "userId" });
 User.hasMany(UserSubscription, { foreignKey: "userId" });
 UserSubscription.belongsTo(Subscription, { foreignKey: "subscriptionId" });
 Subscription.hasMany(UserSubscription, { foreignKey: "subscriptionId" });
-
-
-
-
