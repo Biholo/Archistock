@@ -2,6 +2,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const Address = require("../models/addressModel");
+const UserSubscription = require("../models/userSubscriptionModel");
+const Subscription = require("../models/subscriptionModel");
+const File = require("../models/fileModel");
 const Mailer = require("../services/mailer");
 const multer = require("multer");
 require("dotenv").config();
@@ -362,5 +365,35 @@ exports.changePassword = async (req, res) => {
   } catch (error) {
     console.error("Error while updating password: ", error);
     res.status(500).json({ message: "Error while updating password" });
+  }
+};
+
+//--------- Get files by user ID ---------//
+exports.getFilesByUserId = async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    // Pick up all subscriptions
+    const userSubscriptions = await UserSubscription.findAll({
+      where: { userId: userId },
+      include: [
+        {
+          model: Subscription,
+          include: [
+            {
+              model: File,
+              as: 'files'
+            }
+          ]
+        }
+      ]
+    });
+
+    // Extract files from subscriptions
+    const files = userSubscriptions.flatMap(userSubscription => userSubscription.subscription.files);
+
+    res.status(200).json(files);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des fichiers :', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des fichiers' });
   }
 };

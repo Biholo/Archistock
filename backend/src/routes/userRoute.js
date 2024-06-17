@@ -42,4 +42,10 @@ router.post("/reset-password", UserController.resetPassword);
 
 router.post("/update-password", UserController.updatePassword);
 
+router.get(
+  "/files/:userId",
+  middleware.authenticator,
+  UserController.getFilesByUserId
+);
+
 module.exports = router;

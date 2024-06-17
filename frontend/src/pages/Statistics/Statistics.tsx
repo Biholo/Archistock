@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { fileApi } from "../../services/apiService";
+import { userApi } from "../../services/apiService";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   PieChart,
   Pie,
@@ -61,7 +62,10 @@ const renderCustomizedLabel = ({
   );
 };
 
-const getColorByExtension = (extension: string, extensionColorMap: { [key: string]: string }): string => {
+const getColorByExtension = (
+  extension: string,
+  extensionColorMap: { [key: string]: string }
+): string => {
   if (!extensionColorMap.hasOwnProperty(extension)) {
     const colorIndex = Object.keys(extensionColorMap).length % COLORS.length;
     extensionColorMap[extension] = COLORS[colorIndex];
@@ -70,15 +74,18 @@ const getColorByExtension = (extension: string, extensionColorMap: { [key: strin
 };
 
 const Statistics: React.FC = () => {
+  const { user } = useAuth();
   const [fileData, setFileData] = useState<FileData[]>([]);
   const [todayFilesCount, setTodayFilesCount] = useState<number>(0);
-  const [fileSizesByExtension, setFileSizesByExtension] = useState<SizeByExtension[]>([]);
+  const [fileSizesByExtension, setFileSizesByExtension] = useState<
+    SizeByExtension[]
+  >([]);
   const [filesByMonth, setFilesByMonth] = useState<FileCountByMonth[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fileApi.getAll();
+        const data = await userApi.getFilesByUserId(user.id);
         setFileData(data);
 
         // Count the number of files uploaded today
@@ -96,12 +103,12 @@ const Statistics: React.FC = () => {
           sizesByExtension[ext] = (sizesByExtension[ext] || 0) + file.size;
         });
 
-        const sizesArray: SizeByExtension[] = Object.entries(sizesByExtension).map(
-          ([key, value]) => ({
-            Extension: key,
-            Size: value,
-          })
-        );
+        const sizesArray: SizeByExtension[] = Object.entries(
+          sizesByExtension
+        ).map(([key, value]) => ({
+          Extension: key,
+          Size: value,
+        }));
 
         setFileSizesByExtension(sizesArray);
 
@@ -110,7 +117,8 @@ const Statistics: React.FC = () => {
         data.forEach((file) => {
           const date = new Date(file.createdAt);
           const month = `${date.getFullYear()}-${(
-            "0" + (date.getMonth() + 1)
+            "0" +
+            (date.getMonth() + 1)
           ).slice(-2)}`;
           countsByMonth[month] = (countsByMonth[month] || 0) + 1;
         });
@@ -120,7 +128,9 @@ const Statistics: React.FC = () => {
             month,
             count,
           }))
-          .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
+          .sort(
+            (a, b) => new Date(a.month).getTime() - new Date(b.month).getTime()
+          );
 
         setFilesByMonth(countsArray);
       } catch (error) {
@@ -136,12 +146,27 @@ const Statistics: React.FC = () => {
   return (
     <div>
       <div className="flex flex-row justify-between">
-        <StatsCard stat={fileData.length} name=" Upload from start" color="#FFA800" />
-        <StatsCard stat={todayFilesCount} name=" Upload Today" color="#E757B6" />
+        <StatsCard
+          stat={fileData.length}
+          name=" Upload from start"
+          color="#FFA800"
+        />
+        <StatsCard
+          stat={todayFilesCount}
+          name=" Upload Today"
+          color="#E757B6"
+        />
         <StatsCard stat={32} name="Shared Today" color="#24B34C" />
         <StatsCard stat={32} name="Name" color="#7C57E7" />
       </div>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
         <h2 style={{ textAlign: "center" }}>Sizes by Extension</h2>
         <div style={{ display: "flex", width: "100%", height: 250 }}>
           <div style={{ width: "50%", height: "100%" }}>
@@ -160,7 +185,10 @@ const Statistics: React.FC = () => {
                   {fileSizesByExtension.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={getColorByExtension(entry.Extension, extensionColorMap)}
+                      fill={getColorByExtension(
+                        entry.Extension,
+                        extensionColorMap
+                      )}
                     />
                   ))}
                 </Pie>
@@ -187,7 +215,10 @@ const Statistics: React.FC = () => {
                   {fileSizesByExtension.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={getColorByExtension(entry.Extension, extensionColorMap)}
+                      fill={getColorByExtension(
+                        entry.Extension,
+                        extensionColorMap
+                      )}
                     />
                   ))}
                 </Bar>
