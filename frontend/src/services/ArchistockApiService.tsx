@@ -105,6 +105,38 @@ class ArchistockApiService {
         }
         return true;
     }
+
+    async getUserStorage(accessToken: string): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user/storage`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `${accessToken}`,
+                },
+            });
+            console.log(response);
+            
+            const jsonResponse = await response.json();
+            return jsonResponse.userSubscriptions;
+        } catch (error) {
+            console.error("Failed to fetch user storage:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
+    async getSubscriptions(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/subscription`, {
+                method: 'GET',
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to fetch subscriptions:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
 }
 
 export default ArchistockApiService;

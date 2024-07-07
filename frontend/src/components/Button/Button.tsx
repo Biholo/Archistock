@@ -1,39 +1,44 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
-function Button({label, onClick, color} : {label: string, onClick: any, color: string}) {
+function Button({children, onClick, color, css, disabled} : {children: ReactNode, onClick?: any, color?: string, css: string, disabled?: boolean}) {
 
     const [state, setState] = useState('');
 
     useEffect(() => {
-        console.log(color);
+        
         switch(color) {
+            // tailwind daisyui colors
             case 'primary':
-                setState('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded');
+                setState('btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'secondary':
-                setState('bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded');
+                setState('btn btn-secondary disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'success':
-                setState('bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded');
+                setState('btn btn-success disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'danger':
-                setState('bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded');
+                setState('btn btn-danger disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
+                break;
+            case 'error':
+                setState('btn btn-error disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'warning':
-                setState('bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded');
+                setState('btn btn-warning disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'info':
-                setState('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded');
+                setState('btn btn-info disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             default:
-                setState('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded');
+                setState('btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
+            
         }
     }, []);
 
     return (
         <React.Fragment>
-            <button className={state} onClick={onClick}>
-                {label}
+            <button className={state + " " + css} onClick={onClick} disabled={disabled}>
+                {children}
             </button>
         </React.Fragment>
     )

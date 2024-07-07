@@ -10,6 +10,7 @@ import './App.css';
 import Profil from './pages/Profil/Profil';
 import NewPassword from './pages/NewPassword/NewPassword';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
+import ExtendStorage from './pages/ExtendStorage/ExtendStorage';
 
 
 const App = () => {
@@ -52,7 +53,7 @@ const UserLogged = () => {
         <Routes>
           <Route path="components" element={<ComponentsTest />} />
           <Route path="storage" element={<div>Storage</div>} />
-          <Route path="extend" element={<div>Extend</div>} />
+          <Route path="extend" element={<ExtendStorage />} />
           <Route path="upload" element={<div>Upload</div>} />
           <Route path="settings" element={<div>Settings</div>} />
           <Route path="profile" element={<Profil />} />
