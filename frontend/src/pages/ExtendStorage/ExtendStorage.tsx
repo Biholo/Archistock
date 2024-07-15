@@ -1,8 +1,8 @@
-import Card from "../../components/Card/Card";
 import { Fragment, useEffect, useState } from "react";
 import ArchistockApiService from "../../services/ArchistockApiService";
 import SubscriptionCard from "../../components/Card/Subscription/SubscriptionCard";
 import PurchaseModal from "../../components/Modals/PurchaseModal";
+import { useAuth } from "../../contexts/AuthContext";
 
 const ExtendStorage = () => {
 
@@ -11,6 +11,7 @@ const ExtendStorage = () => {
     const [subscriptions, setSubscriptions] = useState<any[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [selectedSubscription, setSelectedSubscription] = useState<any>();
+    const { user } = useAuth();
 
     useEffect(() => {
         archistockApiService.getUserStorage(localStorage.getItem('accessToken') as string).then((res) => {
@@ -30,6 +31,10 @@ const ExtendStorage = () => {
         setShowModal(true);
     }
 
+    const handlePurchase = () => {
+
+    }
+
     return (
         <Fragment>
             <div className='m-5'>
@@ -43,7 +48,7 @@ const ExtendStorage = () => {
                 </div>
             </div>
             {selectedSubscription && showModal && (
-                <PurchaseModal show={showModal} subscription={selectedSubscription} onPurchase={() => { console.log('Purchased !') }} />
+                <PurchaseModal show={showModal} subscription={selectedSubscription} onPurchase={() => { handlePurchase }} onClose={() => setShowModal(false)} />
             )}
         </Fragment>
     );

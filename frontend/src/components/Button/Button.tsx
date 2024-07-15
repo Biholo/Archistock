@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 
-function Button({children, onClick, color, css, disabled} : {children: ReactNode, onClick?: any, color?: string, css: string, disabled?: boolean}) {
+function Button({children, onClick, color, css, loading, disabled} : {children: ReactNode, onClick?: any, color?: string, css?: string, loading?: boolean, disabled?: boolean}) {
 
     const [state, setState] = useState('');
 
@@ -9,36 +9,38 @@ function Button({children, onClick, color, css, disabled} : {children: ReactNode
         switch(color) {
             // tailwind daisyui colors
             case 'primary':
-                setState('btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
+                setState('btn btn-primary text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'secondary':
-                setState('btn btn-secondary disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
+                setState('btn btn-secondary text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'success':
-                setState('btn btn-success disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
+                setState('btn btn-success text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'danger':
-                setState('btn btn-danger disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
+                setState('btn btn-danger text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'error':
-                setState('btn btn-error disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
+                setState('btn btn-error text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'warning':
                 setState('btn btn-warning disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'info':
-                setState('btn btn-info disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
+                setState('btn btn-info text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
+                break;
+            case 'neutral':
+                setState('btn bg-neutral-300 text-black border-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800 hover:bg-neutral-400 hover:text-black ');
                 break;
             default:
-                setState('btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
-            
+                setState('btn btn-primary text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');   
         }
     }, []);
 
     return (
         <React.Fragment>
-            <button className={state + " " + css} onClick={onClick} disabled={disabled}>
-                {children}
+            <button className={state + " " + css} onClick={onClick} disabled={disabled ? true : loading ? true : false}>
+                {loading ? <><span className="loading loading-spinner mb-0 loading-xs">Loading</span> Loading</> : children}
             </button>
         </React.Fragment>
     )

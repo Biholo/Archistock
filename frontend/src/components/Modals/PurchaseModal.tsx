@@ -2,9 +2,9 @@ import React, { useEffect, useState, Fragment } from 'react';
 import Button from '../Button/Button';
 import Input from '../Input/Input';
 
-const PurchaseModal = ({ show, subscription, onPurchase } : any) => {
 
-    const [display, setDisplay] = useState(show ? 'block' : 'hidden');
+const PurchaseModal = ({ show, subscription, onPurchase, onClose } : any) => {
+
     const [formData, setFormData] = useState({
         fullName: '',
         expirationDate: '',
@@ -12,30 +12,46 @@ const PurchaseModal = ({ show, subscription, onPurchase } : any) => {
         cvv: ''
     });
 
-    useEffect(() => {
-        setDisplay(show ? 'block' : 'hidden');
-    }, [show]);
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+       // if card number change, format it
+         if (e.target.name === 'cardNumber') {
+              const value = e.target.value.replace(/\D/g, '').substring(0, 16);
+              const cardNumber = value.match(/.{1,4}/g)?.join(' ') || '';
+              setFormData({
+                ...formData,
+                [e.target.name]: cardNumber
+              });
+         } else if (e.target.name === 'expirationDate') {
+              const value = e.target.value.replace(/\D/g, '').substring(0, 4);
+              const expirationDate = value.match(/.{1,2}/g)?.join('/') || '';
+              setFormData({
+                ...formData,
+                [e.target.name]: expirationDate
+              });
+         } else {
+              setFormData({
+                ...formData,
+                [e.target.name]: e.target.value
+              });
+         }
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        // set loading true, fake wait time, set loading false
         e.preventDefault();
-        if(formData.fullName && formData.cardNumber && formData.expirationDate && formData.cvv) {
+        setLoading(true);
+        setTimeout(() => {
+            setLoading(false);
             onPurchase();
-        } else {
-            alert('Please fill in all the fields');
-        }
+            onClose();
+        }, 2000);
     };
 
     return (
         <Fragment>
-            <div className={`fixed z-10 inset-0 overflow-y-auto ${display}`}>
+            <div className={`fixed z-10 inset-0 overflow-y-auto ${show ? "block" : "hidden"}`}>
                 <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                     <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                         <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
@@ -94,15 +110,20 @@ const PurchaseModal = ({ show, subscription, onPurchase } : any) => {
                                             />
                                         </div>
                                     </div>
-                                    <hr className='m-3'/>
+                                    <div className="divider">OR</div>
+                                    <div className='flex justify-between mt-3 gap-2'>
+                                    <Button color="warning" css="w-1/2">Pay with <img className='-ml-1.5 w-14 mb-0 mt-1' src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/PayPal2007.svg/300px-PayPal2007.svg.png' /></Button>
+                                        <Button color="danger" css="w-1/2">Pay with <img className='-ml-2.5 w-14 mb-0' src='https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg' /></Button>
+                                    </div>
+
                                     <div className="mt-2">
                                         <p className="text-sm text-gray-500">
                                             You are about to purchase the {subscription.name} subscription for {subscription.price} €
                                         </p>
                                     </div>
-                                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                        <Button color="success" css="ml-3" onClick={() => { handleSubmit}} disabled={!(formData.fullName && formData.cardNumber && formData.expirationDate && formData.cvv)}>Purchase</Button>
-                                        <Button color="secondary" css="ml-3" onClick={() => setDisplay('hidden')}>Cancel</Button>
+                                    <div className="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                        <Button color="success" css="ml-3" onClick={() => { handleSubmit}} disabled={!(formData.fullName && formData.cardNumber && formData.expirationDate && formData.cvv)} loading={loading}>Purchase</Button>
+                                        <Button color="neutral" css="ml-3" onClick={() => onClose()}>Cancel</Button>
                                     </div>
                                 </form>
                             </div>

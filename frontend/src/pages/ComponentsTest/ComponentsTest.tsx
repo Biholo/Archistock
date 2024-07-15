@@ -27,12 +27,13 @@ export default function ComponentsTest() {
           <Input label='Test' labelWeight="" placeholder='Test' pattern="" onChange={() => { } } type='text' name='test' required={false} disabled={true} color='danger' value={''} css={''}></Input>
 
           <h2 className='pt-5'>Button:</h2>
-          <Button label='Primary' onClick={()=>{}} color='primary'></Button>
-          <Button label='Secondary' onClick={()=>{}} color='secondary'></Button>
-          <Button label='Success' onClick={()=>{}} color='success'></Button>
-          <Button label='Danger' onClick={()=>{}} color='danger'></Button>
-          <Button label='Warning' onClick={()=>{}} color='warning'></Button>
-          <Button label='Info' onClick={()=>{}} color='info'></Button>
+          <Button onClick={()=>{}} color='primary'>Primary</Button>
+          <Button onClick={()=>{}} color='secondary'>Secondary</Button>
+          <Button onClick={()=>{}} color='success'>Success</Button>
+          <Button onClick={()=>{}} color='danger'>Danger</Button>
+          <Button onClick={()=>{}} color='warning'>Warning</Button>
+          <Button onClick={()=>{}} color='info'>Info</Button>
+          <Button onClick={()=>{}} loading={true} color='primary'>Error</Button>
         
         </div>
 

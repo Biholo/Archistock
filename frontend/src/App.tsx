@@ -11,6 +11,7 @@ import Profil from './pages/Profil/Profil';
 import NewPassword from './pages/NewPassword/NewPassword';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ExtendStorage from './pages/ExtendStorage/ExtendStorage';
+import { ToastContainer } from 'react-toastify';
 
 
 const App = () => {
@@ -45,6 +46,17 @@ const AuthRoutes = () => {
 const UserLogged = () => {
   return (
     <div className="flex min-h-dvh text-black">
+      <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <div className="w-2/12 bg-white">
         <Aside />
       </div>

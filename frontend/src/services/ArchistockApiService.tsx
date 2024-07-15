@@ -137,6 +137,24 @@ class ArchistockApiService {
         }
     }
 
+    async purchaseSubscription(accessToken: string, subscriptionId: number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user/purchase`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ subscriptionId }),
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to purchase subscription:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
 }
 
 export default ArchistockApiService;
