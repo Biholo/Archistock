@@ -12,6 +12,7 @@ import NewPassword from './pages/NewPassword/NewPassword';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ExtendStorage from './pages/ExtendStorage/ExtendStorage';
 import { ToastContainer } from 'react-toastify';
+import Statistics from './pages/Statistics/Statistics';
 
 
 const App = () => {
@@ -63,6 +64,7 @@ const UserLogged = () => {
       <div className="w-10/12 mx-4 my-4 bg-white-100 shadow-md">
         <div className='m-4'></div>
         <Routes>
+          <Route path="statistics" element={<Statistics />} />
           <Route path="components" element={<ComponentsTest />} />
           <Route path="storage" element={<div>Storage</div>} />
           <Route path="extend" element={<ExtendStorage />} />

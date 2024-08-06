@@ -4,7 +4,7 @@ import "./Login.scss";
 import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import ArchistockApiService from "../../services/ArchistockApiService";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth, setCookie } from "../../contexts/AuthContext";
 
 const Login = () => {
     const {loggedIn, setUser, setLoggedIn} = useAuth();
@@ -32,8 +32,8 @@ const Login = () => {
         archistockApiService.loginUser(loginUser).then((res) => {
             console.log(res);
             if(res && res.accessToken) {
-                localStorage.setItem('accessToken', res.accessToken);
-                localStorage.setItem('refreshToken', res.refreshToken);
+                setCookie("accessToken", res.accessToken, 1);
+                setCookie("refreshToken", res.refreshToken, 1)
                 setUser(res.user);
                 setLoggedIn(true);
                 navigate("/user/storage");
