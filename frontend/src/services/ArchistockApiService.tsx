@@ -3,6 +3,7 @@ import AccessTokenResponse from "../models/AccessTokenResponse";
 import UserAndTokens from "../models/UserAndTokens";
 import LoginUser from "../models/LoginUser";
 import Address from "../models/Address";
+import { getCookie } from "../contexts/AuthContext";
 
 class ArchistockApiService {
   private readonly url: string;
@@ -111,28 +112,52 @@ class ArchistockApiService {
     document.cookie = `${name}=${value}; Secure; SameSite=Strict; Path=/;`;
   }
 
-    async getUserStorage(accessToken: string): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/user/storage`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `${accessToken}`,
-                },
-            });
-            console.log(response);
-            
-            const jsonResponse = await response.json();
-            return jsonResponse.userSubscriptions;
-        } catch (error) {
-            console.error("Failed to fetch user storage:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
-        }
+  private getCookie(name: string): string | null {
+    return getCookie(name);
+  }
+
+  async getUserStorage(): Promise<any> {
+      try {
+          const response = await fetch(`${this.url}/usersubscription/me`, {
+              method: 'GET',
+              headers: {
+                  Authorization: `${getCookie('accessToken')}`,
+              },
+          });
+          
+          const jsonResponse = await response.json();
+          return jsonResponse;
+      } catch (error) {
+          console.error("Failed to fetch user storage:", error);
+          throw error;  // rethrow the error if you want to handle it further up in your components
+      }
+  }
+
+  async getUserStorageWithFiles(): Promise<any> {
+    try {
+        const response = await fetch(`${this.url}/usersubscription/files/me`, {
+            method: 'GET',
+            headers: {
+                Authorization: `${getCookie('accessToken')}`,
+            },
+        });
+        
+        const jsonResponse = await response.json();
+        return jsonResponse;
+    } catch (error) {
+        console.error("Failed to fetch user storage:", error);
+        throw error;  // rethrow the error if you want to handle it further up in your components
     }
+}
 
     async getSubscriptions(): Promise<any> {
         try {
-            const response = await fetch(`${this.url}/subscription`, {
+            const response = await fetch(`${this.url}/subscription/all`, {
                 method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `${getCookie('accessToken')}`,
+                },
             });
             const jsonResponse = await response.json();
             return jsonResponse;
@@ -142,12 +167,12 @@ class ArchistockApiService {
         }
     }
 
-    async purchaseSubscription(accessToken: string, subscriptionId: number): Promise<any> {
+    async purchaseSubscription(subscriptionId: number): Promise<any> {
         try {
-            const response = await fetch(`${this.url}/user/purchase`, {
+            const response = await fetch(`${this.url}/usersubscription/add`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `${accessToken}`,
+                    Authorization: `${getCookie('accessToken')}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ subscriptionId }),

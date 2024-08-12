@@ -12,9 +12,12 @@ const getEmailFromToken = (token) => {
 };
 
 exports.authenticator = (req, res, next) => {
-  // Récupérer le token depuis les cookies
-  const token = req.cookies.accessToken;
-
+  // get token from authorization header
+  const token = req.headers.authorization;
+  // if "bearer", split 
+  if (token && token.startsWith("Bearer ")) {
+    token = token.split(" ")[1];
+  }
   // Décoder le token
   if (token && process.env.SECRET_KEY) {
     jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
@@ -30,13 +33,17 @@ exports.authenticator = (req, res, next) => {
 };
 
 exports.isAdmin = async (req, res, next) => {
-  const token = req.cookies.accessToken;
+  // get token from authorization header
+  const token = req.headers.authorization;
+  // if "bearer", split 
+  if (token && token.startsWith("Bearer ")) {
+    token = token.split(" ")[1];
+  }
+
   if (!token) return res.status(401).json({ error: "Access denied" });
 
   const email = getEmailFromToken(token);
-  if (!email) {
-    return res.status(401).json({ error: "Token invalid" });
-  }
+  if (!email) return res.status(401).json({ error: "Access denied" });
 
   try {
     const result = await User.findOne({ where: { email: email } });

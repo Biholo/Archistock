@@ -1,7 +1,7 @@
 import React, { PropsWithChildren } from 'react';
 import './Card.scss';
 
-export default function Card({title, css, children} : {title: string, css:string, children: any}) {
+export default function Card({title, css, children} : {title?: string, css?:string, children?: any}) {
   return (
     <React.Fragment>
         <div className={"card card-background shadow-sm " + css }>

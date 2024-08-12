@@ -15,7 +15,6 @@ const mailer = new Mailer();
 
 exports.register = async (req, res) => {
   try {
-    console.log(req.body);
     const { email, password, firstName, lastName, phoneNumner } = req.body.user;
     const { street, city, postalCode, countryId } = req.body.address;
 
@@ -62,7 +61,6 @@ exports.register = async (req, res) => {
 
     res.status(201).json({ user, accessToken: token, refreshToken });
   } catch (error) {
-    console.log(error);
     console.error("Error while registering the user: ", error);
     res.status(500).json({ message: "Error while registering the user" });
   }
@@ -73,7 +71,6 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email, password);
     const existingUser = await User.findOne({
       where: {
         email: email,
@@ -256,7 +253,6 @@ exports.getProfile = async (req, res) => {
         },
       ],
     });
-    console.log(user);
     res.status(200).json(user);
   } catch (error) {
     console.error("Error recovering user by token:", error);

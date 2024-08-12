@@ -13,6 +13,8 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ExtendStorage from './pages/ExtendStorage/ExtendStorage';
 import { ToastContainer } from 'react-toastify';
 import Statistics from './pages/Statistics/Statistics';
+import Usersubscriptions from './pages/UserSubscriptions/Usersubscriptions';
+import UploadFiles from './pages/UploadFiles/UploadFiles';
 
 
 const App = () => {
@@ -66,9 +68,9 @@ const UserLogged = () => {
         <Routes>
           <Route path="statistics" element={<Statistics />} />
           <Route path="components" element={<ComponentsTest />} />
-          <Route path="storage" element={<div>Storage</div>} />
+          <Route path="storage" element={<Usersubscriptions />} />
           <Route path="extend" element={<ExtendStorage />} />
-          <Route path="upload" element={<div>Upload</div>} />
+          <Route path="upload" element={<UploadFiles />} />
           <Route path="settings" element={<div>Settings</div>} />
           <Route path="profile" element={<Profil />} />
           <Route path="profile/change-password" element={<NewPassword />} />

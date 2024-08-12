@@ -3,7 +3,7 @@ import Card from "../Card";
 import Badge from "../../Badge/Badge";
 import Button from "../../Button/Button";
 
-const SubscriptionCard = ({ subscription, onSelectSubscription } : any) => {
+const SubscriptionCard = ({ subscription, onSelect } : any) => {
 
     const formatPrice = (price:string) => {
         const formattedPrice = parseFloat(price).toFixed(2);
@@ -36,7 +36,7 @@ const SubscriptionCard = ({ subscription, onSelectSubscription } : any) => {
                             <li className="text-sm">And more...</li>
                         </ul>
                     </div>
-                    <Button color="success" css="mt-10" onClick={() => { onSelectSubscription(subscription) }}>Subscribe here</Button>
+                    <Button color="success" css="mt-10" onClick={() => { onSelect(subscription) }}>Subscribe here</Button>
                 </div>
             </Card>
         </Fragment>

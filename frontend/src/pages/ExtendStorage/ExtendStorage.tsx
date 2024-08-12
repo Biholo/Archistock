@@ -2,19 +2,18 @@ import { Fragment, useEffect, useState } from "react";
 import ArchistockApiService from "../../services/ArchistockApiService";
 import SubscriptionCard from "../../components/Card/Subscription/SubscriptionCard";
 import PurchaseModal from "../../components/Modals/PurchaseModal";
-import { useAuth } from "../../contexts/AuthContext";
+import { getCookie, useAuth } from "../../contexts/AuthContext";
 
 const ExtendStorage = () => {
 
     const archistockApiService = new ArchistockApiService();
     const [storage, setStorage] = useState<number>(0);
-    const [subscriptions, setSubscriptions] = useState<any[]>([]);
+    const [subscriptions, setSubscriptions] = useState([]);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [selectedSubscription, setSelectedSubscription] = useState<any>();
-    const { user } = useAuth();
 
     useEffect(() => {
-        archistockApiService.getUserStorage(localStorage.getItem('accessToken') as string).then((res) => {
+        archistockApiService.getUserStorage().then((res) => {
             setStorage(res.length);
         });
     }, []);
@@ -22,7 +21,6 @@ const ExtendStorage = () => {
     useEffect(() => {
         archistockApiService.getSubscriptions().then((res) => {
             setSubscriptions(res);
-            console.log(res);
         });
     }, [])
 
@@ -32,23 +30,25 @@ const ExtendStorage = () => {
     }
 
     const handlePurchase = () => {
-
+        archistockApiService.purchaseSubscription(selectedSubscription.id).then((res) => {
+            console.log(res);
+            setStorage(storage + 1);
+        });
     }
 
     return (
         <Fragment>
             <div className='m-5'>
-                <h1 className='text-xl font-bold mb-3'>Extend Storage:</h1>
-                <p>Need more storage ? Extend it with our plans !</p>
-                <p>Currently, you are subscribed to : <span className="fw-bold">{storage} storage(s)</span></p>
-                <div className="flex flex-wrap flex-row justify-center">
-                    {subscriptions.map((subscription) => {
-                        return <SubscriptionCard key={subscription.id} subscription={subscription} onSelectSubscription={(e: any) => { onSelectSubscription(e) }} />
-                    })}
+                <h1 className='text-xl font-bold mb-3'>Extending Storage</h1>
+                <p className="font-semibold">Currently, you are subscribed to : <span className="font-bold">{storage} storage(s)</span></p>
+                <div className="flex flex-wrap flex-row justify-center mt-5">
+                    {subscriptions.length > 0 && subscriptions.map((subscription: any) => (
+                        <SubscriptionCard key={subscription.id} subscription={subscription} onSelect={onSelectSubscription} />
+                    ))}
                 </div>
             </div>
             {selectedSubscription && showModal && (
-                <PurchaseModal show={showModal} subscription={selectedSubscription} onPurchase={() => { handlePurchase }} onClose={() => setShowModal(false)} />
+                <PurchaseModal show={showModal} subscription={selectedSubscription} onPurchase={handlePurchase} onClose={() => setShowModal(false)} />
             )}
         </Fragment>
     );
