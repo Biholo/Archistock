@@ -12,7 +12,12 @@ const UserSubscription = sequelize.define(
             primaryKey: true,
             autoIncrement: true,
             allowNull: false
-          },
+        },
+        name: {
+            type: DataTypes.STRING(50),
+            allowNull: false,
+            defaultValue: "New storage",
+        },
         startDate: {
             type: DataTypes.DATE,
             allowNull: false,

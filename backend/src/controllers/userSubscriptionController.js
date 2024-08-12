@@ -3,6 +3,7 @@ const User = require("../models/userModel");
 const File = require("../models/fileModel");
 const Subscription = require("../models/subscriptionModel");
 const jwt = require("jsonwebtoken");
+const Folder = require("../models/folderModel");
 require("dotenv").config();
 
 // Create a user subscription (POST)
@@ -27,7 +28,13 @@ exports.add = async (req, res) => {
     userSubscription.userId = user.id;
     userSubscription.startDate = new Date();
 
-    await UserSubscription.create(userSubscription);
+    let subscription = await UserSubscription.create(userSubscription);
+    
+    await Folder.create({
+      name: "root",
+      userSubscriptionId: subscription.id,
+    });
+
     res.status(201).json("User subscription added");
   } catch (error) {
     console.error("Error adding user subscription: ", error);
@@ -167,6 +174,7 @@ exports.getByUserIdWithFiles = async (req, res) => {
         { model: User, as: 'user' },
         { model: Subscription, as: 'subscription' },
         { model: File, as: 'files' },
+        { model: Folder, as: 'folders', include: [{ model: File, as: 'files' }] },
       ],
     });
 

@@ -15,6 +15,8 @@ import { ToastContainer } from 'react-toastify';
 import Statistics from './pages/Statistics/Statistics';
 import Usersubscriptions from './pages/UserSubscriptions/Usersubscriptions';
 import UploadFiles from './pages/UploadFiles/UploadFiles';
+import EGModal from './components/Modals/EG';
+import { StorageProvider } from './contexts/StorageContext';
 
 
 const App = () => {
@@ -47,6 +49,34 @@ const AuthRoutes = () => {
 };
 
 const UserLogged = () => {
+
+  const [show, setShow] = React.useState(false);
+
+  // add even listener to listen to konami code
+  useEffect(() => {
+    const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let index = 0;
+
+    const keyHandler = (e: KeyboardEvent) => {
+      if (e.key === konamiCode[index]) {
+        index++;
+        if (index === konamiCode.length) {
+          alert('Konami code activated');
+          setShow(true);
+          index = 0;
+        }
+      } else {
+        index = 0;
+      }
+    };
+
+    window.addEventListener('keydown', keyHandler);
+
+    return () => {
+      window.removeEventListener('keydown', keyHandler);
+    };
+  }, []);
+
   return (
     <div className="flex min-h-dvh text-black">
       <ToastContainer 
@@ -60,6 +90,7 @@ const UserLogged = () => {
         draggable
         pauseOnHover
       />
+      <EGModal  show={show} handleClose={() => setShow(false)} />
       <div className="w-2/12 bg-white">
         <Aside />
       </div>
@@ -68,7 +99,11 @@ const UserLogged = () => {
         <Routes>
           <Route path="statistics" element={<Statistics />} />
           <Route path="components" element={<ComponentsTest />} />
-          <Route path="storage" element={<Usersubscriptions />} />
+          <Route path="storage" element={
+            <StorageProvider>
+              <Usersubscriptions />
+            </StorageProvider>
+          } />
           <Route path="extend" element={<ExtendStorage />} />
           <Route path="upload" element={<UploadFiles />} />
           <Route path="settings" element={<div>Settings</div>} />
