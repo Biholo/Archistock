@@ -16,6 +16,10 @@ const fileRoute = require("./src/routes/fileRoute");
 const folderRoute = require("./src/routes/folderRoute");
 const subscriptionRoute = require("./src/routes/subscriptionRoute");
 const userSubscriptionRoute = require("./src/routes/userSubscriptionRoute");
+const invitationRequestRoute = require("./src/routes/invitationRequestRoute");
+const sharedStorageSpaceRoute = require("./src/routes/sharedStorageSpaceRoute");
+const rightRoute = require("./src/routes/rightRoute");
+const countryRoute = require("./src/routes/countryRoute");
 
 app.use("/database", databaseRoute);
 app.use("/user", userRoute);
@@ -24,6 +28,11 @@ app.use("/file", fileRoute);
 app.use("/folder", folderRoute);
 app.use("/subscription", subscriptionRoute);
 app.use("/usersubscription", userSubscriptionRoute);
+app.use("/invitation-request", invitationRequestRoute);
+app.use("/sharedstorage-space", sharedStorageSpaceRoute);
+app.use("/right", rightRoute);
+app.use("/country", countryRoute);
+
 
 app.use("/files", express.static("src/files"));
 

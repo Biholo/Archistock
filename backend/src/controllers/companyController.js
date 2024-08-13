@@ -68,26 +68,42 @@ exports.getById = async (req, res) => {
 //--------- Get all Company ---------//
 exports.getAll = async (req, res) => {
   try {
-    const results = await Company.findAll();
+    const companies = await Company.findAll(
 
-    const companyDetails = await Promise.all(
-      results.map(async (result) => {
-        const address = await Address.findByPk(result.addressId);
-        const country = await Country.findByPk(result.countryId);
-        return {
-          id: result.id,
-          name: result.name,
-          addressCity: address.city,
-          addressStreet: address.street,
-          addresssPostalCode: address.postalCode,
-          countryName: country.name,
-          countryCode: country.code,
-        };
-      })
     );
-    res.status(200).json(companyDetails);
+    res.status(200).json({
+      message: "Companies found successfully.",
+      data: companies
+    });
   } catch (error) {
-    console.error("Error retrieving the company:", error);
-    res.status(500).json({ error: "Error retrieving the company" });
+    console.error("Error finding companies : ", error);
+    res.status(500).json({ error: "Error finding companies" });
   }
-};
+}
+
+//--------- Get all Companies for a user ---------//
+exports.getAllCompaniesForUser = async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const companies = await Company.findAll({
+      where: {
+        userId,
+      },
+      include: {
+        model: Address,
+        as: "address",
+        include: {
+          model: Country,
+          as: "country",
+        }
+      },
+    });
+    res.status(200).json({
+      message: "Companies found successfully.",
+      data: companies,
+    });
+  } catch (error) {
+    console.error("Error finding companies : ", error);
+    res.status(500).json({ error: "Error finding companies" });
+  }
+}

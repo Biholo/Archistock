@@ -20,6 +20,11 @@
     "mysql2": "^3.9.2",
     "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
-    "sequelize": "^6.37.1"
+    "sequelize": "^6.37.1",
+    "world-countries": "^5.0.0"
+  },
+  "devDependencies": {
+    "faker": "^6.6.6",
+    "sequelize-fixtures": "^1.2.0"
   }
 }

@@ -25,4 +25,6 @@ router.get("/get/:id", middleware.authenticator, CompanyController.getById);
 // Update company (PUT)
 router.put("/update/:id", middleware.authenticator, CompanyController.update);
 
+router.get("/all/user/:userId", CompanyController.getAllCompaniesForUser);
+
 module.exports = router;

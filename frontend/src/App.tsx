@@ -17,6 +17,7 @@ import Usersubscriptions from './pages/UserSubscriptions/Usersubscriptions';
 import UploadFiles from './pages/UploadFiles/UploadFiles';
 import EGModal from './components/Modals/EG';
 import { StorageProvider } from './contexts/StorageContext';
+import Company from './pages/Company/Company';
 
 
 const App = () => {
@@ -98,6 +99,7 @@ const UserLogged = () => {
         <div className='m-4'></div>
         <Routes>
           <Route path="statistics" element={<Statistics />} />
+          
           <Route path="components" element={<ComponentsTest />} />
           <Route path="storage" element={
             <StorageProvider>
@@ -105,6 +107,7 @@ const UserLogged = () => {
             </StorageProvider>
           } />
           <Route path="extend" element={<ExtendStorage />} />
+          <Route path="company" element={<Company />} />
           <Route path="upload" element={<UploadFiles />} />
           <Route path="settings" element={<div>Settings</div>} />
           <Route path="profile" element={<Profil />} />
