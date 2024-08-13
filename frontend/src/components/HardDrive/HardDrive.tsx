@@ -1,8 +1,9 @@
 import { HardDrive } from "@phosphor-icons/react";
 import { Fragment, useState, useEffect, useRef } from "react";
 import ArchistockApiService from "../../services/ArchistockApiService";
+import { toast } from "react-toastify";
 
-const HardDriveStorage = ({ storage, onStorageClick}: { storage: any, onStorageClick: any}): any => {
+const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, onStorageClick: any, onUpdate: any}): any => {
     const [showMenu, setShowMenu] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
     const [editStorage, setEditStorage] = useState(false);
@@ -26,7 +27,12 @@ const HardDriveStorage = ({ storage, onStorageClick}: { storage: any, onStorageC
     const handleUpdateStorage = () => {
         setEditStorage(false);
         archistockApiService.updateStorage(storage.id, { name: storageName }).then((res) => {
-            console.log(res);
+            if(res.status === 201) {
+                toast.success("Storage updated successfully");
+                onUpdate();
+            } else {
+                toast.error("An error occured while updating storage. Please retry.");
+            }
         });
     }
 

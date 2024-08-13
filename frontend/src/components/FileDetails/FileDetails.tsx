@@ -1,8 +1,9 @@
 import { Fragment, useState, useEffect, useRef } from "react";
 import FileIcon from "../FileIcon/FileIcon";
 import ArchistockApiService from "../../services/ArchistockApiService";
+import { toast } from "react-toastify";
 
-const FileDetails = ({ file, onClick, onDelete, onViewProperties }: any) => {
+const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: any) => {
     const [showMenu, setShowMenu] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
     const [editFile, setEditFile] = useState(false);
@@ -26,7 +27,13 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties }: any) => {
     const handleUpdateFile = () => {
         setEditFile(false);
         archistockApiService.updateFile(file.id, { name: fileName }).then((res) => {
-            console.log(res);
+            console.log(res.status);
+            if(res.status === 201) {
+                toast.success("File updated successfully");
+                onUpdate();
+            } else {
+                toast.error("An error occured while updating file. Please retry.");
+            }
         });
     }
 
@@ -52,7 +59,7 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties }: any) => {
             {editFile ? (
                 <input
                     type="text"
-                    className="text-xs w-20 bg-slate-200 rounded"
+                    className="text-xs w-16 bg-slate-200 rounded"
                     value={fileName}
                     onChange={(e) => {console.log(e.target.value); setFileName(e.target.value)}}
                     onBlur={() => handleUpdateFile()}

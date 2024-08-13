@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { Folder } from "@phosphor-icons/react";
 import ArchistockApiService from "../../services/ArchistockApiService";
+import { toast } from "react-toastify";
 
-const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties }: any) => {
+const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties, onUpdate }: any) => {
     const [showMenu, setShowMenu] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
     const [editFolder, setEditFolder] = useState(false);
@@ -26,7 +27,12 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties }: an
     const handleUpdateFolder = () => {
         setEditFolder(false);
         archistockApiService.updateFolder(folder.id, { name: folderName }).then((res) => {
-            console.log(res);
+            if(res.status === 201) {
+                toast.success("Folder updated successfully");
+                onUpdate();
+            } else {
+                toast.error("An error occured while updating folder. Please retry.");
+            }
         });
     }
 
@@ -48,7 +54,7 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties }: an
             onClick={() => editFolder ? null : onFolderClick(folder)}
             onContextMenu={handleRightClick}
         >
-            <Folder size={32} />
+            <Folder size={32} className="text-amber-400" weight="fill" />
             {editFolder ? (
                 <input
                     type="text"

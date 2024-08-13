@@ -67,13 +67,13 @@ exports.update = async (req, res) => {
     const result = await UserSubscription.findByPk(idP);
     if (result) {
       await result.update(userSubscription);
-      res.status(200).json(result);
+      res.status(201).json({ status: 201, message: "User subscription updated successfully" });
     } else {
-      res.status(404).json({ error: "User subscription not found" });
+      res.status(404).json({ status: 404, error: "User subscription not found" });
     }
   } catch (error) {
     console.error("Error updating user subscription: ", error);
-    res.status(500).json({ error: "Error updating user subscription" });
+    res.status(500).json({ status: 500, error: "Error updating user subscription" });
   }
 };
 
