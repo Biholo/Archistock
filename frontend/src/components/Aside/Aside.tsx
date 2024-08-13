@@ -30,7 +30,7 @@ export default function Aside() {
         <div className="title flex flex-row justify-center md:justify-between items-center">
           <h1>
             <span className="font-bold hidden md:block text-lg xl:text-xl">
-              🔗Archistock
+              🔗ArchiStock
             </span>
             <span className="font-black block md:hidden text-xl text-center">
               AS

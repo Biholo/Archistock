@@ -16,7 +16,7 @@ import Statistics from './pages/Statistics/Statistics';
 import Usersubscriptions from './pages/UserSubscriptions/Usersubscriptions';
 import UploadFiles from './pages/UploadFiles/UploadFiles';
 import EGModal from './components/Modals/EG';
-import { StorageProvider } from './contexts/StorageContext';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const App = () => {
@@ -79,17 +79,7 @@ const UserLogged = () => {
 
   return (
     <div className="flex min-h-dvh text-black">
-      <ToastContainer 
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      <ToastContainer />
       <EGModal  show={show} handleClose={() => setShow(false)} />
       <div className="w-2/12 bg-white">
         <Aside />
@@ -99,11 +89,7 @@ const UserLogged = () => {
         <Routes>
           <Route path="statistics" element={<Statistics />} />
           <Route path="components" element={<ComponentsTest />} />
-          <Route path="storage" element={
-            <StorageProvider>
-              <Usersubscriptions />
-            </StorageProvider>
-          } />
+          <Route path="storage" element={<Usersubscriptions />} />
           <Route path="extend" element={<ExtendStorage />} />
           <Route path="upload" element={<UploadFiles />} />
           <Route path="settings" element={<div>Settings</div>} />
