@@ -355,6 +355,27 @@ class ArchistockApiService {
         }
     }
 
+    async createCompany (company:any, userId: number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/company/create`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...company,
+                    userId
+                }),
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to create company:", error);
+            throw error; 
+        }
+    }
+
 }
 
 export default ArchistockApiService;

@@ -24,6 +24,10 @@ const Company = sequelize.define(
                 key: "id",
             },
         },
+        icon: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
     },
     {
         sequelize,

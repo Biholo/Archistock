@@ -17,7 +17,7 @@ interface Country {
 interface NewCompany {
     name: string;
     city: string;
-    country: string;
+    countryId: number |null;
     street: string;
     postalCode: string;
 }
@@ -37,9 +37,9 @@ export default function JoinCompanyForm() {
     const [newCompany, setNewCompany] = useState<NewCompany>({
         name: '',
         city: '',
-        country: '',
+        countryId: null,
         street: '',
-        postalCode: ''
+        postalCode: '',
     });
 
     const [countries, setCountries] = useState<Country[]>([]);
@@ -60,14 +60,13 @@ export default function JoinCompanyForm() {
     const [myCompanies, setMyCompanies] = useState<Company[]>([]);
 
     useEffect(() => {
-        if(user && user.id) {
+        if (user && user.id) {
             archistockApiService.findCompaniesByUserId(user.id).then((response) => {
                 setMyCompanies(response);
                 console.log('my companies', response);
             });
         }
-    }
-    );
+    }, [user]);
 
     useEffect(() => {
         if (user && user.id) {
@@ -120,7 +119,7 @@ export default function JoinCompanyForm() {
     }
 
     const handleSelectCountry = (suggestion: Country) => {
-        setNewCompany({ ...newCompany, country: suggestion.id });
+        setNewCompany({ ...newCompany, countryId: suggestion.id });
         setSearchedCountry(suggestion.name);
         setCountrySuggestions([]);
     }
@@ -166,6 +165,21 @@ export default function JoinCompanyForm() {
         return requestSent.find((request: any) => request.companyId === companyId);
     }
 
+    const validateForm = () => {
+        if (!newCompany.name || !newCompany.city || !newCompany.countryId || !newCompany.street || !newCompany.postalCode) {
+            setErrorMessage('Veuillez remplir tous les champs');
+            return;
+        }
+        if (!user || !user.id) {
+            return;
+        }
+        console.log('new company', newCompany);
+        archistockApiService.createCompany(newCompany, user.id).then(
+            (response) => {
+                console.log(response);
+            }
+        );
+    }
 
 
 
@@ -256,9 +270,20 @@ export default function JoinCompanyForm() {
                             placeholder="Street"
                             required={true}
                         />
+                        <Input
+                            value={newCompany.postalCode}
+                            onChange={(e) => setNewCompany({ ...newCompany, postalCode: e.target.value })}
+                            css={'w-full mb-3'}
+                            name="postalCode"
+                            label="Postal Code"
+                            type="text"
+                            labelWeight="bold"
+                            placeholder="Postal Code"
+                            required={true}
+                        />
                         <div className='flex w-full justify-between'>
                             <Button css='w-2/6' color='secondary' onClick={() => setJoiningStep('select_choice')}>Retour</Button>
-                            <Button css='w-3/6' color='primary' onClick={() => setJoiningStep('end_form')}>Créer</Button>
+                            <Button css='w-3/6' color='primary' onClick={() => validateForm()}>Créer</Button>
                         </div>
 
                     </div>
