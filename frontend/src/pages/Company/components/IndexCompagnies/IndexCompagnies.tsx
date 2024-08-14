@@ -12,7 +12,7 @@ export default function IndexCompagnies( {companies}) {
     , [companies]);
 
     const openCompany = (id) => {
-        navigate(`/detail/${id}`);
+        navigate(`/company/detail/${id}`);
     }
 
   return (

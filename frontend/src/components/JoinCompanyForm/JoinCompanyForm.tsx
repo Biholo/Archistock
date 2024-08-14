@@ -22,13 +22,7 @@ interface NewCompany {
     postalCode: string;
 }
 
-interface Company {
-    id: number;
-    name: string;
-    addressId: number;
-    createdAt: string;
-    updatedAt: string;
-}
+
 
 
 export default function JoinCompanyForm() {

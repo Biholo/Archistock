@@ -106,12 +106,12 @@ const UserLogged = () => {
               <Usersubscriptions />
             </StorageProvider>
           } />
-          <Route path="extend" element={<ExtendStorage />} />
-          <Route path="company" element={<Company />} />
-          <Route path="upload" element={<UploadFiles />} />
-          <Route path="settings" element={<div>Settings</div>} />
-          <Route path="profile" element={<Profil />} />
-          <Route path="profile/change-password" element={<NewPassword />} />
+          <Route path="/extend" element={<ExtendStorage />} />
+          <Route path="/company" element={<Company />} />
+          <Route path="/upload" element={<UploadFiles />} />
+          <Route path="/settings" element={<div>Settings</div>} />
+          <Route path="/profile" element={<Profil />} />
+          <Route path="/profile/change-password" element={<NewPassword />} />
         </Routes>
       </div>
     </div>

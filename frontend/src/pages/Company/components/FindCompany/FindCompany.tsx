@@ -7,6 +7,13 @@ import Button from '../../../../components/Button/Button';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+interface Company {
+    id: number;
+    name: string;
+    addressId: number;
+    createdAt: string;
+    updatedAt: string;
+}
 
 export default function FindCompany() {
     const { user } = useAuth();
