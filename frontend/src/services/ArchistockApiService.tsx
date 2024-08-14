@@ -3,6 +3,7 @@ import AccessTokenResponse from "../models/AccessTokenResponse";
 import UserAndTokens from "../models/UserAndTokens";
 import LoginUser from "../models/LoginUser";
 import Address from "../models/Address";
+import { getCookie } from "../contexts/AuthContext";
 
 class ArchistockApiService {
   private readonly url: string;
@@ -110,6 +111,168 @@ class ArchistockApiService {
   private setCookie(name: string, value: string) {
     document.cookie = `${name}=${value}; Secure; SameSite=Strict; Path=/;`;
   }
+
+  private getCookie(name: string): string | null {
+    return getCookie(name);
+  }
+
+  async getUserStorage(): Promise<any> {
+      try {
+          const response = await fetch(`${this.url}/usersubscription/me`, {
+              method: 'GET',
+              headers: {
+                  Authorization: `${getCookie('accessToken')}`,
+              },
+          });
+          
+          const jsonResponse = await response.json();
+          return jsonResponse;
+      } catch (error) {
+          console.error("Failed to fetch user storage:", error);
+          throw error;  // rethrow the error if you want to handle it further up in your components
+      }
+  }
+
+  async getUserStorageWithFiles(): Promise<any> {
+    try {
+        const response = await fetch(`${this.url}/usersubscription/files/me`, {
+            method: 'GET',
+            headers: {
+                Authorization: `${getCookie('accessToken')}`,
+            },
+        });
+        
+        const jsonResponse = await response.json();
+        return jsonResponse;
+    } catch (error) {
+        console.error("Failed to fetch user storage:", error);
+        throw error;  // rethrow the error if you want to handle it further up in your components
+    }
+  }
+
+  async getSubscriptions(): Promise<any> {
+      try {
+          const response = await fetch(`${this.url}/subscription/all`, {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `${getCookie('accessToken')}`,
+              },
+          });
+          const jsonResponse = await response.json();
+          return jsonResponse;
+      } catch (error) {
+          console.error("Failed to fetch subscriptions:", error);
+          throw error;  // rethrow the error if you want to handle it further up in your components
+      }
+  }
+
+    async purchaseSubscription(subscriptionId: number): Promise<any> {
+            try {
+                const response = await fetch(`${this.url}/usersubscription/add`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `${getCookie('accessToken')}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ subscriptionId }),
+                });
+                const jsonResponse = await response.json();
+                return jsonResponse;
+            } catch (error) {
+                console.error("Failed to purchase subscription:", error);
+                throw error;  // rethrow the error if you want to handle it further up in your components
+            }
+    }
+
+    async updateStorage(storageId:number, storage:any): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/usersubscription/update/${storageId}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(storage),
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to update storage:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
+    async createFolder(folder:any): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/folder/add`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(folder),
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to create folder:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
+    async updateFolder(id:number, folder:any): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/folder/update/${id}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(folder),
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to update folder:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
+    async deleteFolder(folderId:number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/folder/delete/${folderId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to delete folder:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
+    async updateFile(fileId:number, file:any): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/file/update/${fileId}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(file),
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to update file:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
 }
 
 export default ArchistockApiService;

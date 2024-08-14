@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Input.scss';
 
-function Input({label, labelWeight, placeholder, pattern, value, onChange, type, name, required, disabled, color, css} : {label: string, labelWeight: string, placeholder: string, pattern: string, value: string, onChange: any, type: string, name: string, required: boolean, disabled: boolean, color: string, css: string}) {
+function Input({label, labelWeight, placeholder, pattern, value, onChange, type, name, required, disabled, color, css} : {label?: string, labelWeight?: string, placeholder?: string, pattern?: string, value?: string, onChange?: any, type?: string, name?: string, required?: boolean, disabled?: boolean, color?: string, css?: string}) {
 
     const [state , setState] = useState('');
 

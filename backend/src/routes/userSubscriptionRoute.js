@@ -33,4 +33,16 @@ router.put(
   UserSubscriptionController.update
 );
 
+router.get(
+  "/me",
+  middleware.authenticator,
+  UserSubscriptionController.getByUserId
+);
+
+router.get(
+  "/files/me",
+  middleware.authenticator,
+  UserSubscriptionController.getByUserIdWithFiles
+);
+
 module.exports = router;
