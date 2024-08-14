@@ -31,7 +31,7 @@ const Register = () => {
 
   useEffect(() => {
     if (loggedIn) {
-      navigate("/user/storage");
+      navigate("/storage");
     }
   }, [loggedIn]);
 
@@ -97,7 +97,7 @@ const Register = () => {
           setCookie("accessToken", res.accessToken, 1);
           setCookie("refreshToken", res.refreshToken, 1);
           setUser(res.user);
-          navigate("/user/storage");
+          navigate("/storage");
         }
       });
     }

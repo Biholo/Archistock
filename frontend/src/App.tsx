@@ -40,9 +40,9 @@ const AuthRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={loggedIn ? <Navigate to="/user/storage" /> : <Login />} />
+      <Route path="/" element={loggedIn ? <Navigate to="/storage" /> : <Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/user/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
+      <Route path="/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
       <Route path="/temp/reset-password/:jwt" element={<ResetPassword/>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
     </Routes>
