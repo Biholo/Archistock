@@ -10,6 +10,7 @@ import {
   User,
   X,
   ChartLine,
+  Factory
 } from "@phosphor-icons/react";
 
 export default function Aside() {
@@ -61,13 +62,6 @@ export default function Aside() {
           onClick={() => handleChangeItem("upload")}
         ></AsideItem>
         <AsideItem
-          title="Settings"
-          icon={<Sliders size={20} />}
-          link="settings"
-          active={active === "settings"}
-          onClick={() => handleChangeItem("settings")}
-        ></AsideItem>
-        <AsideItem
           title="Components"
           icon={<Cube size={20} />}
           link="components"
@@ -88,6 +82,14 @@ export default function Aside() {
           active={active === "profile"}
           onClick={() => handleChangeItem("profile")}
         ></AsideItem>
+        <AsideItem
+          title="Company"
+          icon={<Factory size={20} />}
+          link="company"
+          active={active === "company"}
+          onClick={() => handleChangeItem("company")}
+        ></AsideItem>
+        
         <AsideItem
           title="Logout"
           icon={<X size={20} />}

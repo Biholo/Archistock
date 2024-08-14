@@ -18,7 +18,7 @@ const Login = () => {
     useEffect(() => {
         console.log(loggedIn);
         if(loggedIn) {
-            navigate("/user/storage");
+            navigate("/storage");
         }
     }, [loggedIn]);
 
@@ -36,7 +36,7 @@ const Login = () => {
                 setCookie("refreshToken", res.refreshToken, 1)
                 setUser(res.user);
                 setLoggedIn(true);
-                navigate("/user/storage");
+                navigate("/storage");
             }
         })
     }

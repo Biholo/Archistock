@@ -45,7 +45,7 @@ export default function NewPassword() {
         }
         archistockApiService.updatePassword(newPassword.password, jwt).then((response) => {
             if (response) {
-                navigate('/user/profile');
+                navigate('/profile');
             }
         });
     }

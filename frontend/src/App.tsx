@@ -17,6 +17,7 @@ import Usersubscriptions from './pages/UserSubscriptions/Usersubscriptions';
 import UploadFiles from './pages/UploadFiles/UploadFiles';
 import EGModal from './components/Modals/EG';
 import { StorageProvider } from './contexts/StorageContext';
+import Company from './pages/Company/Company';
 
 
 const App = () => {
@@ -39,9 +40,9 @@ const AuthRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={loggedIn ? <Navigate to="/user/storage" /> : <Login />} />
+      <Route path="/" element={loggedIn ? <Navigate to="/storage" /> : <Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/user/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
+      <Route path="/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
       <Route path="/temp/reset-password/:jwt" element={<ResetPassword/>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
     </Routes>
@@ -98,6 +99,7 @@ const UserLogged = () => {
         <div className='m-4'></div>
         <Routes>
           <Route path="statistics" element={<Statistics />} />
+          
           <Route path="components" element={<ComponentsTest />} />
           <Route path="storage" element={
             <StorageProvider>
@@ -105,6 +107,7 @@ const UserLogged = () => {
             </StorageProvider>
           } />
           <Route path="extend" element={<ExtendStorage />} />
+          <Route path="company" element={<Company />} />
           <Route path="upload" element={<UploadFiles />} />
           <Route path="settings" element={<div>Settings</div>} />
           <Route path="profile" element={<Profil />} />

@@ -21,7 +21,7 @@ export default function Profil() {
     };
 
     const handleCLickOnNewPassword = () => {
-        navigate('/user/profile/change-password')
+        navigate('/profile/change-password')
     }
 
    

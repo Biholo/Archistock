@@ -40,3 +40,6 @@ const Address = sequelize.define(
 );
 
 module.exports = Address;
+
+//relations
+Address.belongsTo(Country, { foreignKey: "countryId", as: "country" });

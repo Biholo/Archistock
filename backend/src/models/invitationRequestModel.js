@@ -29,18 +29,6 @@ const InvitationRequest = sequelize.define(
         companyId: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            validate: {
-                cannotBeBothNull(value) {
-                    if (value === null && this.sharedStorageSpaceId === null) {
-                        throw new Error('CompanyId and SharedStorageSpaceId cannot both be null.');
-                    }
-                },
-                cannotBeBothNonNull(value) {
-                    if (value !== null && this.sharedStorageSpaceId !== null) {
-                        throw new Error('CompanyId and SharedStorageSpaceId cannot both be non-null.');
-                    }
-                }
-            },
             references: {
                 model: Company,
                 key: "id",
@@ -49,18 +37,6 @@ const InvitationRequest = sequelize.define(
         sharedStorageSpaceId: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            validate: {
-                cannotBeBothNull(value) {
-                    if (value === null && this.companyId === null) {
-                        throw new Error('CompanyId and SharedStorageSpaceId cannot both be null.');
-                    }
-                },
-                cannotBeBothNonNull(value) {
-                    if (value !== null && this.companyId !== null) {
-                        throw new Error('CompanyId and SharedStorageSpaceId cannot both be non-null.');
-                    }
-                }
-            },
             references: {
                 model: SharedStorageSpace,
                 key: "id",
@@ -78,6 +54,17 @@ const InvitationRequest = sequelize.define(
     {
         sequelize,
         freezeTableName: true,
+        validate: {
+            cannotBeBothNullOrBothNonNull() {
+                const companyId = this.companyId === undefined ? null : this.companyId;
+                const sharedStorageSpaceId = this.sharedStorageSpaceId === undefined ? null : this.sharedStorageSpaceId;
+
+                if ((companyId === null && sharedStorageSpaceId === null) ||
+                    (companyId !== null && sharedStorageSpaceId !== null)) {
+                    throw new Error('Either companyId or sharedStorageSpaceId must be set, but not both.');
+                }
+            }
+        }
     }
 );
 
