@@ -14,7 +14,6 @@ const getEmailFromToken = (token) => {
 exports.authenticator = (req, res, next) => {
   // Récupérer le token depuis les cookies
   const token = req.cookies.accessToken;
-
   // Décoder le token
   if (token && process.env.SECRET_KEY) {
     jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
@@ -25,9 +24,10 @@ exports.authenticator = (req, res, next) => {
       }
     });
   } else {
-    res.status(401).json({ erreur: "Access denied" });
+    res.status(401).json({ erreur: "NON GROS CHIEN" });
   }
 };
+
 
 exports.isAdmin = async (req, res, next) => {
   const token = req.cookies.accessToken;
