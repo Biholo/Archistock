@@ -24,6 +24,10 @@ const Company = sequelize.define(
                 key: "id",
             },
         },
+        icon: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
     },
     {
         sequelize,
@@ -34,5 +38,4 @@ const Company = sequelize.define(
 module.exports = Company;
 
 //relations
-Company.hasOne(Address, { foreignKey: "addressId" });
-Address.belongsTo(Company, { foreignKey: "addressId" });
+Company.belongsTo(Address, { foreignKey: 'addressId', as: 'address' });

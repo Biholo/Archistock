@@ -33,3 +33,7 @@ const SharedStorageSpace = sequelize.define(
 );
 
 module.exports = SharedStorageSpace;
+
+//relations
+SharedStorageSpace.belongsTo(companyModel, { foreignKey: "companyId" });
+companyModel.hasMany(SharedStorageSpace, { foreignKey: "companyId" });

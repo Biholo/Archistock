@@ -12,7 +12,7 @@ export const AuthWrapper:  React.FC<AuthProviderProps> = ({ children }) => {
   
     useEffect(() => {
       if (loggedIn) {
-        navigate('/user/storage');
+        navigate('/storage');
       }
     }, [loggedIn, navigate]);
   

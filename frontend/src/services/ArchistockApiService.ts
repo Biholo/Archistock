@@ -273,6 +273,109 @@ class ArchistockApiService {
         }
     }
 
+    async findAllCountries(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/country/all`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse.data;
+        } catch (error) {
+            console.error("Failed to fetch countries:", error);
+            throw error; 
+        }
+    }
+
+    async findAllCompanies(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/company/all`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse.data;
+        } catch (error) {
+            console.error("Failed to fetch companies:", error);
+            throw error; 
+        }
+    }
+
+    async askToJoinCompany(companyId:number, userId: number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/invitation-request/ask-to-join`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ companyId, userId}),
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to join company:", error);
+            throw error; 
+        }
+    }
+
+    async findInvitationsByUserId(userId:number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/invitation-request/all/user/${userId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse.data;
+        } catch (error) {
+            console.error("Failed to fetch invitations:", error);
+            throw error; 
+        }
+    }
+
+    async findCompaniesByUserId(userId:number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/company/all/user/${userId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse.data;
+        } catch (error) {
+            console.error("Failed to fetch companies:", error);
+            throw error; 
+        }
+    }
+
+    async createCompany (company:any, userId: number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/company/create`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...company,
+                    userId
+                }),
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to create company:", error);
+            throw error; 
+        }
+    }
+
 }
 
 export default ArchistockApiService;

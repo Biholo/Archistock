@@ -3,7 +3,6 @@ const User = require("../models/userModel");
 const Address = require("../models/addressModel");
 const Company = require("../models/companyModel");
 const Subscription = require("../models/subscriptionModel");
-const UserCompany = require("../models/userCompanyModel");
 const UserSubscription = require("../models/userSubscriptionModel");
 const File = require("../models/fileModel");
 const Country = require("../models/countryModel");
