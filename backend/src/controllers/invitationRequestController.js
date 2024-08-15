@@ -1,16 +1,18 @@
 const User = require("../models/userModel");
-const Company = require("../models/companyModel");
-const SharedStorageSpace = require("../models/sharedStorageSpaceModel");
+
 const InvitationRequest = require("../models/invitationRequestModel");
 const Right = require("../models/rightModel");
-const Country = require("../models/countryModel");
-const Address = require("../models/addressModel");
+const UserInvitation = require("../models/userInvitationModel");
+const Company = require("../models/companyModel");
+const UserInvitation = require("../models/userInvitationModel");
+
+const Mailer = require("../services/mailer");
 const RolesManager = require("../services/rolesManager");
 const { getInvitationRequests } = require('../helpers/invitationRequestHelper');
 
 
 const { Op } = require("sequelize");
-
+const mailer = new Mailer();
 const roleHierarchy = ["employee", "manager", "admin", "owner"];
 
 //ask to join
@@ -24,19 +26,19 @@ exports.askToJoin = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        if(!companyId && !sharedStorageSpaceId){
+        if (!companyId && !sharedStorageSpaceId) {
             return res.status(400).json({ message: "CompanyId or SharedStorageSpaceId is required" });
         }
 
-        if(companyId && sharedStorageSpaceId){
+        if (companyId && sharedStorageSpaceId) {
             return res.status(400).json({ message: "CompanyId and SharedStorageSpaceId cannot both be provided" });
         }
 
-        if(companyId && user.companyId === companyId){
+        if (companyId && user.companyId === companyId) {
             return res.status(400).json({ message: "User is already in the company" });
         }
 
-        if(sharedStorageSpaceId && user.sharedStorageSpaceId === sharedStorageSpaceId){
+        if (sharedStorageSpaceId && user.sharedStorageSpaceId === sharedStorageSpaceId) {
             return res.status(400).json({ message: "User is already in the shared storage space" });
         }
 
@@ -49,10 +51,10 @@ exports.askToJoin = async (req, res) => {
             status: "pending",
         });
 
-        res.status(201).json({ 
+        res.status(201).json({
             message: "Invitation request created successfully",
             data: invitationRequest
-         });
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
@@ -127,10 +129,10 @@ exports.inviteToJoin = async (req, res) => {
             acceptedRole
         });
 
-        res.status(201).json({ 
+        res.status(201).json({
             message: "Invitation request created successfully",
             data: invitationRequest
-         });
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
@@ -163,10 +165,10 @@ exports.acceptInvitationRequest = async (req, res) => {
         invitationRequest.status = "accepted";
         await invitationRequest.save();
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: "Invitation request accepted successfully",
             data: invitationRequest
-         });
+        });
     }
     catch (error) {
         console.error(error);
@@ -220,10 +222,10 @@ exports.declineInvitationRequest = async (req, res) => {
             invitationRequest.acceptedBy = userId;
             await invitationRequest.save();
 
-            return res.status(200).json({ 
+            return res.status(200).json({
                 message: "Invitation request declined successfully.",
                 data: invitationRequest
-             });
+            });
         }
     } catch (error) {
         console.error(error);
@@ -345,10 +347,10 @@ exports.findAllInvitationRequestsNotDoneBySharedStorageSpaceId = async (req, res
             conditions: { sharedStorageSpaceId }
         });
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: "Invitation requests retrieved successfully",
             data: invitationRequests
-         });
+        });
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }
@@ -358,7 +360,7 @@ exports.findOneInvitationRequest = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const invitationRequest = await getInvitationRequests({ 
+        const invitationRequest = await getInvitationRequests({
             conditions: { id },
             findOne: true,
         });
@@ -367,10 +369,98 @@ exports.findOneInvitationRequest = async (req, res) => {
             return res.status(404).json({ message: "Invitation request not found" });
         }
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: "Invitation request retrieved successfully",
             data: invitationRequest
-         });
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+//TODO FINISH THIS
+exports.inviteManyPersonByEmailToCompany = async (req, res) => {
+    const { companyId, inviterId, users } = req.body;
+    console.log(companyId, inviterId, users);
+    try {
+
+        const inviter = await User.findByPk(inviterId);
+        if (!inviter) {
+            return res.status(404).json({ message: "Inviter not found" });
+        }
+
+        const right = await Right.findOne({
+            where: {
+                userId: inviterId,
+                companyId
+            }
+        });
+
+        if (!right || !["owner", "admin"].includes(right.roles)) {
+            return res.status(403).send({
+                message: "You do not have the right to invite to this company.",
+            });
+        }
+
+        const company = await Company.findByPk(companyId);
+
+        if (!company) {
+            return res.status(404).json({ message: "Company not found" });
+        }
+
+        const invitationRequests = [];
+        const userInvitations = [];
+        for (const user of users) {
+            const invitedUser = await User.findOne({
+                where: {
+                    email: user.email
+                }
+            });
+
+            if (!invitedUser) {
+
+                const existingInvitation = await UserInvitation.findOne({
+                    where: {
+                        invitedEmail: user.email,
+                        invitedByCompanyId: companyId
+                    }
+                });
+
+                if (existingInvitation) {
+                    continue;
+                }
+
+                const userInvitation = await UserInvitation.create({
+                    invitedEmail: user.email,
+                    invitedByUserId: inviterId,
+                    invitedByCompanyId: companyId,
+                    isAccepted: false,
+                    acceptedRole: user.permission
+                });
+
+                userInvitations.push(userInvitation);
+
+                mailer.sendCompanyInvitationEmailNoAccount(user.email, user.email, company.name, user.permission, userInvitation.id);
+                continue;
+            } else {
+                const invitationRequest = await InvitationRequest.create({
+                    type: "invitation",
+                    userId: invitedUser.id,
+                    companyId,
+                    status: "pending",
+                    acceptedRole: user.role
+                });
+
+                invitationRequests.push(invitationRequest);
+                mailer.sendCompanyInvitationEmail(invitedUser.email, invitedUser, company.name, user.permission);
+            }
+
+            res.status(201).json({
+                message: "Invitations created successfully",
+                data: invitationRequests
+            });
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });

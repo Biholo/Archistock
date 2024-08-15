@@ -18,7 +18,7 @@ import UploadFiles from './pages/UploadFiles/UploadFiles';
 import EGModal from './components/Modals/EG';
 import { StorageProvider } from './contexts/StorageContext';
 import Company from './pages/Company/Company';
-
+import RegisterInvitation from './pages/RegisterInvitation/RegisterInvitation';
 
 const App = () => {
   return (
@@ -42,6 +42,7 @@ const AuthRoutes = () => {
     <Routes>
       <Route path="/" element={loggedIn ? <Navigate to="/storage" /> : <Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/register-invitation/:uuid" element={<RegisterInvitation />} />
       <Route path="/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
       <Route path="/temp/reset-password/:jwt" element={<ResetPassword/>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -107,7 +108,7 @@ const UserLogged = () => {
             </StorageProvider>
           } />
           <Route path="/extend" element={<ExtendStorage />} />
-          <Route path="/company" element={<Company />} />
+          <Route path="/*" element={<Company />} />
           <Route path="/upload" element={<UploadFiles />} />
           <Route path="/settings" element={<div>Settings</div>} />
           <Route path="/profile" element={<Profil />} />

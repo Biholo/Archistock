@@ -6,11 +6,13 @@ const CompanyController = require("../controllers/companyController");
 const middleware = require("../middleware/middleware");
 const upload = require('../middleware/imageUpload');
 
-router.post("/create", CompanyController.createCompany);
+router.post("/create", upload, CompanyController.createCompany);
 
-router.put("/update/:id", upload, CompanyController.updateCompany);
+router.put("/update/:id", CompanyController.updateCompany);
 
 router.get("/all", middleware.authenticator, CompanyController.getAll);
 router.get("/all/user/:userId", CompanyController.getAllCompaniesForUser);
+router.get("/one/:id", CompanyController.getCompanyById);
+router.get("/informations/one/:id", CompanyController.getAllInformationsForACompany);
 
 module.exports = router;

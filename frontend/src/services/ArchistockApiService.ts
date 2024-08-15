@@ -355,19 +355,29 @@ class ArchistockApiService {
         }
     }
 
-    async createCompany (company:any, userId: number): Promise<any> {
+    async createCompany (company: any, userId: number): Promise<any> {
         try {
+            const formData = new FormData();
+    
+            formData.append('name', company.name);
+            formData.append('city', company.city);
+            formData.append('countryId', company.countryId);
+            formData.append('street', company.street);
+            formData.append('postalCode', company.postalCode);
+            formData.append('userId', userId.toString());
+    
+            if (company.image) {
+                formData.append('image', company.image);
+            }
+    
             const response = await fetch(`${this.url}/company/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `${getCookie('accessToken')}`,
-                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    ...company,
-                    userId
-                }),
+                body: formData,
             });
+    
             const jsonResponse = await response.json();
             return jsonResponse;
         } catch (error) {
@@ -375,6 +385,85 @@ class ArchistockApiService {
             throw error; 
         }
     }
+    
+
+    async findOneCompanyById (companyId:string, userId: number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/company/one/${companyId}?userId=${userId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse.data;
+        } catch (error) {
+            console.error("Failed to fetch company:", error);
+            throw error; 
+        }
+    }
+
+    async findAllInfosByCompanyId (companyId:string, userId: number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/company/informations/one/${companyId}?userId=${userId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse.data;
+        } catch (error) {
+            console.error("Failed to fetch company infos:", error);
+            throw error; 
+        }
+    }
+
+    async submitInvitationsToCompany(inviterId: number, users: any[], companyId: string): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/invitation-request/many-person`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${getCookie('accessToken')}`, // Assuming Bearer token
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    users,
+                    companyId,
+                    inviterId
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to submit invitations:", error);
+            throw error; 
+        }
+    }
+    
+
+    async registerInvitation (uuid:string, user: any): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user/register-invitation/${uuid}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user),
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to register invitation:", error);
+            throw error; 
+        }
+    }
+        
 
 }
 

@@ -18,10 +18,6 @@ const Right = sequelize.define(
             type: DataTypes.ENUM("owner", "admin", "employee", "manager"),
             allowNull: false,
         },
-        acceptedRole: {
-            type: DataTypes.ENUM("owner", "admin", "employee", "manager"),
-            allowNull: true,
-        },
         userId: {
             type: DataTypes.INTEGER,
             allowNull: false,
