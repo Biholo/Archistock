@@ -19,7 +19,7 @@ const FolderCreate = ({ onCreate }: any) => {
             <form onSubmit={handleCreateFolder}>
                 <input
                     type="text"
-                    className="text-sm font-semibold text-gray-600 bg-slate-200 rounded w-20"
+                    className="text-md font-semibold text-gray-600 bg-slate-200 rounded w-20"
                     value={folderName}
                     onChange={(e) => setFolderName(e.target.value)}
                     onBlur={handleCreateFolder}

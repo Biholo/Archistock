@@ -59,13 +59,13 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
             {editFile ? (
                 <input
                     type="text"
-                    className="text-xs w-16 bg-slate-200 rounded"
+                    className="text-md w-16 bg-slate-200 rounded"
                     value={fileName}
                     onChange={(e) => {console.log(e.target.value); setFileName(e.target.value)}}
                     onBlur={() => handleUpdateFile()}
                 />
             ) : (
-                <p className="text-xs">{fileName}</p>
+                <p className="text-md">{fileName}</p>
             )}
 
             {showMenu && (
@@ -83,7 +83,7 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
                                     onViewProperties(file);  // Par exemple pour afficher les propriétés
                                 }}
                             >
-                                <p className="text-xs">Propriétés</p>
+                                <p className="text-sm">Propriétés</p>
                             </button>
                         </li>
                         <li>
@@ -94,7 +94,7 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
                                     setShowMenu(false);
                                 }}
                             >
-                                <p className="text-xs">Renommer</p>
+                                <p className="text-sm">Renommer</p>
                             </button>
                         </li>
                         <li>
@@ -105,7 +105,7 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
                                     setShowMenu(false);
                                 }}
                             >
-                                <p className="text-xs">Supprimer</p>
+                                <p className="text-sm">Supprimer</p>
                             </button>
                         </li>
                     </ul>

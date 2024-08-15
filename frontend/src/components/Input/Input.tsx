@@ -49,7 +49,7 @@ function Input({label, labelWeight, placeholder, pattern, value, onChange, type,
                 {label} {required ? <span className='text-red-400'>*</span> : ''}
             </label>
             <input
-                className={`input input-bordered bg-white w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl ${state} ${disabled ? 'cursor-not-allowed disabled:bg-white' : ''}`}
+                className={`input input-bordered bg-white w-full shadow-sm ${state} ${disabled ? 'cursor-not-allowed disabled:bg-white' : ''}`}
                 id={name}
                 name={name}
                 type={type}

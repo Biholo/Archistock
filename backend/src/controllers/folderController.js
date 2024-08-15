@@ -2,6 +2,7 @@ const sequelize = require("../database/database");
 const Folder = require("../models/folderModel");
 const UserSubscription = require("../models/userSubscriptionModel");
 const File = require("../models/fileModel");
+const { where } = require("sequelize");
 
 // Create a folder (POST)
 exports.add = async (req, res) => {
@@ -56,18 +57,44 @@ exports.update = async (req, res) => {
   }
 };
 
-exports.getFolderFiles = async (req, res) => {
+exports.getFolder = async (req, res) => {
     const idP = req.params.id;
     try {
-        const result = await Folder.findByPk(idP);
-        if (result) {
-        const files = await File.findAll({ where: { folderId: idP } });
-        res.status(201).json({ status: 201, data: files });
+        const folder = await Folder.findByPk(idP, {
+            include: [
+                { model: File, as: "files" },
+                { model: Folder, as: "children" }
+            ]
+        });
+        if (folder) {
+            res.status(200).json(folder);
         } else {
-        res.status(404).json({ status: 404, error: "Folder not found" });
+            res.status(404).json({ status: 404, error: "Folder not found" });
         }
     } catch (error) {
-        console.error("Error getting folder files: ", error);
-        res.status(500).json({ status: 500, error: "Error getting folder files" });
+        console.error("Error getting folder: ", error);
+        res.status(500).json({ status: 500, error: "Error getting folder" });
     }
+}
+
+exports.getRootFolder = async (req, res) => {
+    // take userSubscriptionId (id) from req
+    const idP = req.params.id;
+
+    try {
+        const userSubscription = await UserSubscription.findByPk(idP);
+        if (userSubscription) {
+            // get folder where parentId is null and userSubscriptionId is id
+            const children = await Folder.findAll({ where: { parentId: null, userSubscriptionId: idP } });
+            // get files where parentId is null and userSubscriptionId is id
+            const files = await File.findAll({ where: { parentId: null, userSubscriptionId: idP } });
+
+            return res.status(200).json({ children, files });
+        } else {
+            res.status(404).json({ status: 404, error: "User subscription not found" });
+        }
+    } catch (error) {
+        console.error("Error getting root folder: ", error);
+        res.status(500).json({ status: 500, error: "Error getting root folder" });
+    } 
 }

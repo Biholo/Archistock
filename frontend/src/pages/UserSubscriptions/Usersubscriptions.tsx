@@ -10,174 +10,197 @@ import Button from "../../components/Button/Button";
 import { FolderSimplePlus } from "@phosphor-icons/react";
 import FolderCreate from "../../components/FolderIcon/FolderCreate";
 import { toast } from "react-toastify";
+import PreviewFolderModal from "../../components/Modals/PreviewFolderModal";
+import FolderSkeleton from "../../components/FolderSkeleton/FolderSkeleton";
+import IconSkeleton from "../../components/IconSkeleton/IconSkeleton";
+import Input from "../../components/Input/Input";
 
+// Services
 const archistockApiService = new ArchistockApiService();
 
-const Usersubscriptions = () => {
-    // Services
+const UserSubscriptions = () => {
 
     // Variables d'état
-    const [storages, setStorages] = useState<any>([]);
-    const [files, setFiles] = useState<any>([]);
+    const [storages, setStorages] = useState<any[]>([]);
+    const [files, setFiles] = useState<any[]>([]);
     const [updated, setUpdated] = useState<boolean>(false);
     const [createFolder, setCreateFolder] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
-    // Gestion navigation 
-    const [breadcrumb, setBreadcrumb] = useState<string[]>(['Subscriptions']);
+    // Gestion de la navigation
+    const [breadcrumb, setBreadcrumb] = useState<{name: string, id: string | null}[]>([{ name: 'Subscriptions', id: null }]);
 
     // Gestion des dossiers et fichiers
     const [selectedStorage, setSelectedStorage] = useState<any>(null);
+    const [selectedFolderContent, setSelectedFolderContent] = useState<any>(null);
     const [displayStorage, setDisplayStorage] = useState<boolean>(true);
-    const [parentId, setParentId] = useState<any>(null);
+    const [parentId, setParentId] = useState<string | null>(null);
     const [selectedFile, setSelectedFile] = useState<any>(null);
 
-    // Récupération des données 
+    // Récupération des données
     useEffect(() => {
-        archistockApiService.getUserStorageWithFiles().then((res) => {
-            setStorages(res);
-            setFiles(res.flatMap((storage: any) => storage.files));
-            if (selectedStorage) {
-                setSelectedStorage(res.find((storage: any) => storage.id === selectedStorage.id));
-            }
-        });
-    }, [updated]);
+        setLoading(true);
+
+       if(selectedStorage && parentId) {
+            archistockApiService.getFolder(parseInt(parentId!)).then((res) => {
+                setSelectedFolderContent(res);
+                setLoading(false);
+            });
+        } else if(selectedStorage && !parentId) {
+            archistockApiService.getStorageRoot(selectedStorage.id).then((res) => {
+                setSelectedFolderContent(res);
+                setLoading(false);
+            });
+        } else {
+            archistockApiService.getUserStorageWithFiles().then((res) => {
+                setStorages(res);
+                setFiles(res.flatMap((storage: any) => storage.files));
+                setLoading(false);
+            });
+        }
+    }, [updated, selectedStorage, parentId]);
 
     // Récupération de la taille totale des fichiers
-    const getAllFilesSize = (files: any) => {
-        let totalSize = 0;
-        files.forEach((file: any) => {
-            totalSize += parseFloat(file.size) / 1000;
-        });
-        return totalSize.toFixed(2);
-    }
+    const getAllFilesSize = (files: any[]) => {
+        return files.reduce((totalSize, file) => totalSize + parseFloat(file.size) / 1000, 0).toFixed(2);
+    };
 
     // Récupération de la taille totale du stockage
-    const getTotalStorageSize = (storages: any) => {
-        let totalSize = 0;
-        storages.forEach((storage: any) => {
-            totalSize += parseFloat(storage.subscription.size);
-        });
-        return totalSize;
-    }
+    const getTotalStorageSize = (storages: any[]) => {
+        return storages.reduce((totalSize, storage) => totalSize + parseFloat(storage.subscription.size), 0);
+    };
 
     // Gestion des événements
 
-    // Clic sur un stockage, affiche les dossiers et fichiers
     const onStorageClick = (storage: any) => {
-        setBreadcrumb([...breadcrumb, storage.name]);
         setSelectedStorage(storage);
         setDisplayStorage(false);
-        setParentId(null); // Reset parentId to start from the root of the selected storage
-    }
+        setParentId(null);
+        setBreadcrumb([{ name: 'Subscriptions', id: null }, { name: storage.name, id: storage.id }]);
+        setUpdated(!updated);
+    };
 
-    // Clic sur un dossier, affiche les sous-dossiers et fichiers
     const onFolderClick = (folder: any) => {
-        setBreadcrumb([...breadcrumb, folder.name]);
+        // Mise à jour du breadcrumb
         setParentId(folder.id);
-    }
+        setBreadcrumb(prevBreadcrumb => [...prevBreadcrumb, { name: folder.name, id: folder.id }]);
+        setUpdated(!updated);
+    };
 
-    // Clic sur un élément du breadcrumb, affiche les éléments correspondants
     const onBreadcrumbClick = (index: number) => {
-        const newBreadcrumb = breadcrumb.slice(0, index + 1);
-        setBreadcrumb(newBreadcrumb);
-    
         if (index === 0) {
-            setParentId(null);
             setDisplayStorage(true);
-        } else {
-            let currentParentId:any = null;
-            for (let i = 1; i <= index; i++) {
-                const folder = storages.flatMap((storage: any) => storage.folders)
-                    .find((folder: any) => folder.name === newBreadcrumb[i] && folder.parentId === currentParentId);
-                currentParentId = folder ? folder.id : null;
-            }
-            setParentId(currentParentId);
+            setParentId(null);
+            setBreadcrumb([{ name: 'Subscriptions', id: null }]);
+        } else if(index === 1) {
             setDisplayStorage(false);
+            setParentId(null);
+            setBreadcrumb([{ name: 'Subscriptions', id: null }, { name: selectedStorage.name, id: selectedStorage.id }]);
+        } else {
+            setParentId(breadcrumb[index].id);
+            setBreadcrumb(breadcrumb.slice(0, index + 1));
         }
-    }
+        setUpdated(!updated);
+    };
 
-    // Création d'un dossier puis mise à jour de la liste des dossiers
     const handleCreateFolder = (folderName: string) => {
-        archistockApiService.createFolder({name: folderName, parentId: parentId, userSubscriptionId: selectedStorage.id}).then((res) => {
+        archistockApiService.createFolder({ name: folderName, parentId, userSubscriptionId: selectedStorage.id }).then((res) => {
             if (res.status === 201) {
                 toast.success("Folder created successfully");
                 setCreateFolder(false);
                 setUpdated(!updated);
             } else {
-                toast.error("An error occured while creating folder. Please retry.");
+                toast.error("An error occurred while creating the folder. Please retry.");
             }
         });
-    }
+    };
 
-    // Suppression d'un dossier puis mise à jour de la liste des dossiers
     const onDeleteFolder = (folder: any) => {
         archistockApiService.deleteFolder(folder.id).then((res) => {
             if (res.status === 201) {
                 toast.success("Folder deleted successfully");
                 setUpdated(!updated);
             } else {
-                toast.error("An error occured while deleting folder. Please retry.");
+                toast.error("An error occurred while deleting the folder. Please retry.");
             }
         });
-    }
-    
+    };
+
     return (
         <Fragment>
             {storages.length > 0 && (
-                <div className='m-5'>
-                    <h1 className='text-xl font-bold mb-3'>Your storage</h1>
-                    <div className="flex flex-wrap flex-row justify-between mt-5">
+                <div className="m-5">
+                    <h1 className="text-xl font-bold mb-3">Your storage</h1>
+                    <div className="flex flex-wrap justify-between mt-5">
                         <StatsCard name="Storage" stat={storages.length} color="#FFA800" />
                         <StatsCard name="Files" stat={files.length} color="#E757B6" />
                         <StatsCard name="Go" stat={getAllFilesSize(files)} color="#24B34C" />
-                        <StatsCard name="Total Go" stat={getTotalStorageSize(storages)} color='#7C57E7' />
+                        <StatsCard name="Total Go" stat={getTotalStorageSize(storages)} color="#7C57E7" />
                     </div>
 
                     <Card css="mt-10">
-                        <div className="flex flex-row justify-between">
+                        <div className="flex justify-between">
                             <div className="breadcrumbs text-sm">
                                 <ul>
                                     {breadcrumb.map((item, index) => (
-                                        <li key={index} className={"cursor-pointer " + (index === breadcrumb.length - 1 ? 'font-bold' : '')} onClick={() => onBreadcrumbClick(index)}>{item}</li>
+                                        <li key={index} className="inline-block">
+                                            {index === breadcrumb.length - 1 ? (
+                                                <span className="font-bold">{item.name}</span>
+                                            ) : (
+                                                <span className="cursor-pointer" onClick={() => onBreadcrumbClick(index)}>{item.name}</span>
+                                            )}
+                                        </li>
                                     ))}
                                 </ul>
                             </div>
-                            {!displayStorage &&  (
-                                <Button color="primary" onClick={() => { setCreateFolder(true) }} css="btn-sm">
-                                    <FolderSimplePlus size={16} />
+                            {!displayStorage && (
+                                <Button color="primary" onClick={() => setCreateFolder(true)} css="btn-md">
+                                    <FolderSimplePlus size={24} />
                                 </Button>
                             )}
                         </div>
+                        <Input placeholder="Rechercher les fichiers" css="w-full" color="input-primary" />
                         {displayStorage ? (
                             <div className="flex flex-row mt-5">
-                                {storages.map((storage: any, index: number) => (
+                                {storages.map((storage, index) => (
                                     <div key={index} className="mr-5">
-                                        <HardDriveStorage storage={storage} onStorageClick={onStorageClick} onUpdate={() => { setUpdated(!updated) }}  />
+                                        <HardDriveStorage storage={storage} onStorageClick={onStorageClick} onUpdate={() => setUpdated(!updated)} />
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="flex flex-row flex-wrap gap-5 mt-5">
-                                <FolderIcon folder={{name: '...', id: null, parentId: null, files: []}} onFolderClick={() => onBreadcrumbClick(breadcrumb.length - 2)} />
-                                    {selectedStorage.folders.map((folder: any, index: number) => (
-                                        folder.parentId === parentId && (
-                                            <Fragment key={index}>
-                                                <FolderIcon folder={folder} onFolderClick={onFolderClick} onUpdate={() => { setUpdated(!updated) }}  onDelete={(e:any) => { onDeleteFolder(e) }}/>
-                                            </Fragment>
-                                        )
-                                    ))}
-                                    {createFolder && (
-                                            <FolderCreate onCreate={(e:any) => { handleCreateFolder(e) }} />
-                                        )}
-                                    {selectedStorage.files.map((file: any, index: number) => (
-                                        file.parentId === parentId && (
-                                            <Fragment key={index}>
-                                                <FileDetails key={index} file={file} onClick={(e:any) => setSelectedFile(e)} onUpdate={() => { setUpdated(!updated) }} />
-                                            </Fragment>
-                                        )
-                                    ))}
-                            </div>
-                        )}
+                            selectedFolderContent && (
+                                <div className="flex flex-wrap gap-5 mt-5 w-full">
+                                    <FolderIcon folder={{ name: '...', id: null, parentId: null, files: [] }}
+                                        onFolderClick={() => onBreadcrumbClick(breadcrumb.length - 2)}
+                                        onDelete={() => {}}
+                                    />
+                                    {loading ? (
+                                        <Fragment>
+                                            <FolderSkeleton />
+                                        </Fragment> 
+                                    ) : (
+                                        <Fragment>
+                                           {selectedFolderContent && (
+                                                <Fragment>
+                                                   {selectedFolderContent.children.map((folder: any, index: number) => (
+                                                        console.log("FOLDER", folder),
+                                                        <FolderIcon key={index} folder={folder} onFolderClick={() => onFolderClick(folder)} onDelete={() => onDeleteFolder(folder)} />
+                                                    ))}
+                                                    {createFolder && (
+                                                        <FolderCreate onCreate={(e: any) => handleCreateFolder(e)} />
+                                                    )}
+                                                    {selectedFolderContent.files.map((file: any, index: number) => (
+                                                        console.log("FILE", file),
+                                                        <FileDetails key={index} file={file} onClick={() => setSelectedFile(file)} />
+                                                    ))}
+                                                </Fragment>
+                                            )}
+                                        </Fragment>
+                                    )}
+                                </div>
+                            )
+                            )}
                     </Card>
                 </div>
             )}
@@ -186,6 +209,6 @@ const Usersubscriptions = () => {
             )}
         </Fragment>
     );
-}
+};
 
-export default Usersubscriptions;
+export default UserSubscriptions;

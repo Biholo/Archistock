@@ -6,6 +6,7 @@ const FolderController = require("../controllers/folderController");
 router.post("/add", FolderController.add);
 router.delete("/delete/:id", FolderController.delete);
 router.put("/update/:id", FolderController.update);
-router.get("/get/files/:id", FolderController.getFolderFiles);
+router.get("/root/:id", FolderController.getRootFolder);
+router.get("/:id", FolderController.getFolder);
 
 module.exports = router;

@@ -185,6 +185,22 @@ class ArchistockApiService {
             }
     }
 
+    async getStorageRoot(storageId:number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/folder/root/${storageId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to fetch root folder:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
     async updateStorage(storageId:number, storage:any): Promise<any> {
         try {
             const response = await fetch(`${this.url}/usersubscription/update/${storageId}`, {
@@ -217,6 +233,22 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to create folder:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
+    async getFolder(folderId:number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/folder/${folderId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to fetch folder:", error);
             throw error;  // rethrow the error if you want to handle it further up in your components
         }
     }
