@@ -4,7 +4,6 @@ const InvitationRequest = require("../models/invitationRequestModel");
 const Right = require("../models/rightModel");
 const UserInvitation = require("../models/userInvitationModel");
 const Company = require("../models/companyModel");
-const UserInvitation = require("../models/userInvitationModel");
 
 const Mailer = require("../services/mailer");
 const RolesManager = require("../services/rolesManager");

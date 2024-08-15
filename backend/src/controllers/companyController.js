@@ -6,6 +6,8 @@ const User = require("../models/userModel");
 const RolesManager = require("../services/rolesManager");
 const InvitationRequest = require("../models/invitationRequestModel");
 const SharedStorageSpace = require("../models/sharedStorageSpaceModel");
+const UserInvitation = require("../models/userInvitationModel");
+
 const { Op } = require("sequelize");
 
 const rolesManager = new RolesManager();
@@ -41,7 +43,7 @@ exports.createCompany = async (req, res) => {
       companyId: company.id,
       roles: "owner",
     });
-    
+
     res.status(200).json({
       message: "Company created successfully.",
       data: company,
@@ -140,7 +142,7 @@ exports.getAllCompaniesForUser = async (req, res) => {
           ],
         },
       ],
-      
+
     });
     res.status(200).json({
       message: "Companies found successfully.",
@@ -269,6 +271,13 @@ exports.getAllInformationsForACompany = async (req, res) => {
       ],
     });
 
+    const userInvitations = await UserInvitation.findAll({
+      where: {
+        invitedByCompanyId: companyId,
+        isAccepted: null
+      },
+    });
+
     // Envoi de la réponse avec toutes les données récupérées
     return res.status(200).json({
       message: "Company found successfully.",
@@ -277,6 +286,7 @@ exports.getAllInformationsForACompany = async (req, res) => {
         users,
         sharedStorageSpaces,
         invitationRequests,
+        userInvitations
       },
     });
   } catch (error) {

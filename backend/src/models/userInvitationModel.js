@@ -44,8 +44,8 @@ const UserInvitation = sequelize.define(
         },
         isAccepted: {
             type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
+            allowNull: true,
+            defaultValue: null,
         },
         acceptedRole: {
             type: DataTypes.ENUM("owner", "admin", "employee", "manager"),

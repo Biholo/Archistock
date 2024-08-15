@@ -22,6 +22,7 @@ export default function Parameter() {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
     const [invitations, setInvitations] = useState([]);
+    const [userInvitations, setUserInvitations] = useState([]);
     const [sharedStorageSpaces, setSharedStorageSpaces] = useState([]);
     const [company, setCompany] = useState(null);
     const [page, setPage] = useState('users');
@@ -42,8 +43,9 @@ export default function Parameter() {
                     console.log(response);
                     setCompany(response.company);
                     setUsers(response.users);
-                    setInvitations(response.invitations);
+                    setInvitations(response.invitationRequests);
                     setSharedStorageSpaces(response.sharedStorageSpaces);
+                    setUserInvitations(response.userInvitations);
                     setLoading(false);
                 }
             ).catch((error) => {
@@ -135,7 +137,7 @@ export default function Parameter() {
             case 'stockages':
                 return <StockageList sharedStorageSpaces={sharedStorageSpaces} />;
             case 'invitations':
-                return <InvitationList invitations={invitations} />;
+                return <InvitationList invitations={invitations} userInvitations={userInvitations}/>;
             default:
                 return <UserList users={users} />;
         }
@@ -214,7 +216,7 @@ export default function Parameter() {
                                     <p className='font-medium'>{inviteUsers.length} Users</p>
                                     <p className='text-sm text-sky-500 cursor-pointer' onClick={() => setInviteUsers([])}>Clear all</p>
                                 </div>
-                                <div className='flex wrap mt-3'>
+                                <div className='flex flex-wrap mt-3'>
                                     {
                                         inviteUsers.map((user, index) => (
                                             <div key={index} className='flex items-center mb-2 bg-slate-200 py-1 px-3 rounded-full mr-2'>
