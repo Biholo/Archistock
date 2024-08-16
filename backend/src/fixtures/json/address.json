@@ -1,0 +1,47 @@
+[
+    {
+      "model": "Address",
+      "data": {
+        "city": "Paris",
+        "street": "Champs-Élysées",
+        "countryId": 77,
+        "postalCode": "75008"
+      }
+    },
+    {
+      "model": "Address",
+      "data": {
+        "city": "New York",
+        "street": "5th Avenue",
+        "countryId": 236,
+        "postalCode": "10001"
+      }
+    },
+    {
+      "model": "Address",
+      "data": {
+        "city": "Tokyo",
+        "street": "Ginza",
+        "countryId": 117,
+        "postalCode": "104-0061"
+      }
+    },
+    {
+      "model": "Address",
+      "data": {
+        "city": "Berlin",
+        "street": "Unter den Linden",
+        "countryId": 61,
+        "postalCode": "10117"
+      }
+    },
+    {
+      "model": "Address",
+      "data": {
+        "city": "Sydney",
+        "street": "George Street",
+        "countryId": 15,
+        "postalCode": "2000"
+      }
+    }
+  ]

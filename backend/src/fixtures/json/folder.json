@@ -1,0 +1,57 @@
+[
+    {
+        "model": "Folder",
+        "data": {
+            "name": "root",
+            "parentId": null,
+            "userSubscriptionId": 1
+        }
+    },{
+        "model": "Folder",
+        "data": {
+            "name": "Photo",
+            "parentId": 1,
+            "userSubscriptionId": 1
+        }
+    },
+    {
+        "model": "Folder",
+        "data": {
+            "name": "Documents",
+            "parentId": 1,
+            "userSubscriptionId": 1
+        }
+    },
+    {
+        "model": "Folder",
+        "data": {
+            "name": "Vidéos",
+            "parentId": 1,
+            "userSubscriptionId": 1
+        }
+    },
+    {
+        "model": "Folder",
+        "data": {
+            "name": "2024",
+            "parentId": 2,
+            "userSubscriptionId": 1
+        }
+    },
+    {
+        "model": "Folder",
+        "data": {
+            "name": "2023",
+            "parentId": 2,
+            "userSubscriptionId": 1
+        }
+    },
+    {
+        "model": "Folder",
+        "data": {
+            "name": "2022",
+            "parentId": 2,
+            "userSubscriptionId": 1
+        }
+    }
+]

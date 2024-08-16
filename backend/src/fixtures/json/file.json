@@ -1,0 +1,42 @@
+[
+    {
+        "model": "File",
+        "data": {
+            "format": "csv",
+            "size": 80,
+            "name": "Tableau",
+            "parentId": 1,
+            "userSubscriptionId": 1
+        }
+    },
+    {
+        "model": "File",
+        "data": {
+            "format": "png",
+            "size": 400,
+            "name": "logo",
+            "parentId": 2,
+            "userSubscriptionId": 1
+        }
+    },
+    {
+        "model": "File",
+        "data": {
+            "format": "jpg",
+            "size": 400,
+            "name": "photo1",
+            "parentId": 5,
+            "userSubscriptionId": 1
+        }
+    },
+    {
+        "model": "File",
+        "data": {
+            "format": "jpg",
+            "size": 400,
+            "name": "photo2",
+            "parentId": 5,
+            "userSubscriptionId": 1
+        }
+    }
+]
