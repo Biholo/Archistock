@@ -287,31 +287,37 @@ class ArchistockApiService {
         }
     }
 
-    async uploadFile(formData: FormData): Promise<any> {
+    async uploadFileWithProgress(formData: FormData, onProgress: (progress: number) => void): Promise<any> {
       const token = getCookie('accessToken');
       if (!token) {
           throw new Error("No access token found.");
       }
-  
-      try {
-          const response = await fetch(`${this.url}/usersubscription/add-files`, {
-              method: 'POST',
-              headers: {
-                  Authorization: `Bearer ${token}`,
-              },
-              body: formData,
-          });
-  
-          if (!response.ok) {
-              const errorText = await response.text();
-              throw new Error(`Failed to upload file: ${response.status} ${response.statusText} - ${errorText}`);
-          }
-  
-          return await response.json();
-      } catch (error) {
-          console.error("Failed to upload file:", error);
-          throw error;
-      }
+
+      return new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', `${this.url}/usersubscription/add-files`, true);
+
+          xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+          xhr.upload.onprogress = (event) => {
+              if (event.lengthComputable) {
+                  const percentage = (event.loaded / event.total) * 100;
+                  onProgress(Math.round(percentage));
+              }
+          };
+
+          xhr.onload = () => {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                  resolve(JSON.parse(xhr.response));
+              } else {
+                  reject(new Error(`Failed to upload file: ${xhr.status} ${xhr.statusText}`));
+              }
+          };
+
+          xhr.onerror = () => reject(new Error("Network error"));
+
+          xhr.send(formData);
+      });
   }
   
 

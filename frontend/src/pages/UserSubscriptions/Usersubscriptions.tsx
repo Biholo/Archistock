@@ -137,97 +137,97 @@ const UserSubscriptions = () => {
 
   return (
     <Fragment>
-            <DndProvider backend={HTML5Backend}>
-      <Fragment>
-        {storages.length > 0 && (
-          <div className="m-5">
-            <h1 className="text-xl font-bold mb-3">Your storage</h1>
-            <div className="flex flex-wrap justify-between mt-5">
-              <StatsCard name="Storage" stat={storages.length} color="#FFA800" />
-              <StatsCard name="Files" stat={files.length} color="#E757B6" />
-              <StatsCard name="Go" stat={getAllFilesSize(files)} color="#24B34C" />
-              <StatsCard name="Total Go" stat={getTotalStorageSize(storages)} color="#7C57E7" />
-            </div>
-
-            <Card css="mt-10">
-              <div className="flex justify-between">
-                <div className="breadcrumbs text-sm">
-                  <ul>
-                    {breadcrumb.map((item, index) => (
-                      <li key={index} className="inline-block">
-                        {index === breadcrumb.length - 1 ? (
-                          <span className="font-bold">{item.name}</span>
-                        ) : (
-                          <span className="cursor-pointer" onClick={() => onBreadcrumbClick(index)}>{item.name}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                {!displayStorage && (
-                  <Button color="primary" onClick={() => setCreateFolder(true)} css="btn-md">
-                    <FolderSimplePlus size={24} />
-                  </Button>
-                )}
+        <DndProvider backend={HTML5Backend}>
+        <Fragment>
+          {storages.length > 0 && (
+            <div className="m-5">
+              <h1 className="text-xl font-bold mb-3">Your storage</h1>
+              <div className="flex flex-wrap justify-between mt-5">
+                <StatsCard name="Storage" stat={storages.length} color="#FFA800" />
+                <StatsCard name="Files" stat={files.length} color="#E757B6" />
+                <StatsCard name="Go" stat={getAllFilesSize(files)} color="#24B34C" />
+                <StatsCard name="Total Go" stat={getTotalStorageSize(storages)} color="#7C57E7" />
               </div>
-              <Input placeholder="Rechercher les fichiers" css="w-full" color="input-primary" />
-              {displayStorage ? (
-                <div className="flex flex-row mt-5">
-                  {storages.map((storage, index) => (
-                    <div key={index} className="mr-5">
-                      <HardDriveStorage storage={storage} onStorageClick={onStorageClick} onUpdate={() => setUpdated(!updated)} />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                selectedFolderContent && (
-                  <div className="flex flex-wrap gap-5 mt-5 w-full">
-                    <FolderIcon folder={{name:"..."}} onFolderClick={() => onBreadcrumbClick(breadcrumb.length - 2)} />
-                    {loading ? (
-                      <Fragment>
-                        <FolderSkeleton />
-                      </Fragment>
-                    ) : (
-                      <Fragment>
-                        {selectedFolderContent && (
-                          <Fragment>
-                            {selectedFolderContent.children.map((folder: any, index: number) => (
-                              <DroppableFolder 
-                                key={index} 
-                                folder={folder} 
-                                onDrop={(file: any) => handleDrop(file, folder)} 
-                                onClick={() => { onFolderClick(folder) }} 
-                                onDelete={() => { onDeleteFolder(folder) }}
-                                onUpdate={() => setUpdated(!updated)}
-                             />
-                            ))}
-                            {createFolder && (
-                              <FolderCreate onCreate={(e: any) => handleCreateFolder(e)} />
-                            )}
-                            {selectedFolderContent.files.map((file: any, index: number) => (
-                              <DraggableFile 
-                                key={index} 
-                                file={file} 
-                                onClick={() => {console.log("File clicked"); setSelectedFile(file)}}
-                                onDelete={() => {setUpdated(!updated)}}
-                                onUpdate={() => setUpdated(!updated)}
-                            />
-                            ))}
-                          </Fragment>
-                        )}
-                      </Fragment>
-                    )}
+
+              <Card css="mt-10">
+                <div className="flex justify-between">
+                  <div className="breadcrumbs text-sm">
+                    <ul>
+                      {breadcrumb.map((item, index) => (
+                        <li key={index} className="inline-block">
+                          {index === breadcrumb.length - 1 ? (
+                            <span className="font-bold">{item.name}</span>
+                          ) : (
+                            <span className="cursor-pointer" onClick={() => onBreadcrumbClick(index)}>{item.name}</span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                )
-                )}
-            </Card>
-            </div>
-        )}
-        </Fragment>
-    </DndProvider>
-    {selectedFile && (
-        <PreviewFileModal show={true} file={selectedFile} onClose={() => setSelectedFile(null)} />
-    )}
+                  {!displayStorage && (
+                    <Button color="primary" onClick={() => setCreateFolder(true)} css="btn-md">
+                      <FolderSimplePlus size={24} />
+                    </Button>
+                  )}
+                </div>
+                <Input placeholder="Rechercher les fichiers" css="w-full" color="input-primary" />
+                {displayStorage ? (
+                  <div className="flex flex-row mt-5">
+                    {storages.map((storage, index) => (
+                      <div key={index} className="mr-5">
+                        <HardDriveStorage storage={storage} onStorageClick={onStorageClick} onUpdate={() => setUpdated(!updated)} />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  selectedFolderContent && (
+                    <div className="flex flex-wrap gap-5 mt-5 w-full">
+                      <FolderIcon folder={{name:"..."}} onFolderClick={() => onBreadcrumbClick(breadcrumb.length - 2)} />
+                      {loading ? (
+                        <Fragment>
+                          <FolderSkeleton />
+                        </Fragment>
+                      ) : (
+                        <Fragment>
+                          {selectedFolderContent && (
+                            <Fragment>
+                              {selectedFolderContent.children.map((folder: any, index: number) => (
+                                <DroppableFolder 
+                                  key={index} 
+                                  folder={folder} 
+                                  onDrop={(file: any) => handleDrop(file, folder)} 
+                                  onClick={() => { onFolderClick(folder) }} 
+                                  onDelete={() => { onDeleteFolder(folder) }}
+                                  onUpdate={() => setUpdated(!updated)}
+                              />
+                              ))}
+                              {createFolder && (
+                                <FolderCreate onCreate={(e: any) => handleCreateFolder(e)} />
+                              )}
+                              {selectedFolderContent.files.map((file: any, index: number) => (
+                                <DraggableFile 
+                                  key={index} 
+                                  file={file} 
+                                  onClick={() => {console.log("File clicked"); setSelectedFile(file)}}
+                                  onDelete={() => {setUpdated(!updated)}}
+                                  onUpdate={() => setUpdated(!updated)}
+                              />
+                              ))}
+                            </Fragment>
+                          )}
+                        </Fragment>
+                      )}
+                    </div>
+                  )
+                  )}
+              </Card>
+              </div>
+          )}
+          </Fragment>
+      </DndProvider>
+      {selectedFile && (
+          <PreviewFileModal show={true} file={selectedFile} onClose={() => setSelectedFile(null)} />
+      )}
     </Fragment>
     );
 }
