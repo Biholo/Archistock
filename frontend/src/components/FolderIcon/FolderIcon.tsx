@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { Folder } from "@phosphor-icons/react";
 import ArchistockApiService from "../../services/ArchistockApiService";
+import { toast } from "react-toastify";
 
-const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties }: any) => {
+const archistockApiService = new ArchistockApiService();
+
+const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties, onUpdate }: any) => {
     const [showMenu, setShowMenu] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
     const [editFolder, setEditFolder] = useState(false);
     const [folderName, setFolderName] = useState(folder.name);
     const menuRef = useRef(null);
     
-    const archistockApiService = new ArchistockApiService();
-
     const handleRightClick = (e: any) => {
         e.preventDefault();
         setShowMenu(true);
@@ -26,7 +27,12 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties }: an
     const handleUpdateFolder = () => {
         setEditFolder(false);
         archistockApiService.updateFolder(folder.id, { name: folderName }).then((res) => {
-            console.log(res);
+            if(res.status === 201) {
+                toast.success("Folder updated successfully");
+                onUpdate();
+            } else {
+                toast.error("An error occured while updating folder. Please retry.");
+            }
         });
     }
 
@@ -48,17 +54,17 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties }: an
             onClick={() => editFolder ? null : onFolderClick(folder)}
             onContextMenu={handleRightClick}
         >
-            <Folder size={32} />
+            <Folder size={40} className="text-amber-400" weight="fill" />
             {editFolder ? (
                 <input
                     type="text"
-                    className="text-sm w-20 bg-slate-200 rounded"
+                    className="text-md w-20 bg-slate-200 rounded"
                     value={folderName}
                     onChange={(e) => setFolderName(e.target.value)}
                     onBlur={handleUpdateFolder}
                 />
             ) : (
-                <p className="text-sm truncate">{folderName}</p>
+                <p className="text-md truncate">{folderName}</p>
             )}
 
             {showMenu && (
@@ -76,7 +82,7 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties }: an
                                     onViewProperties(folder);
                                 }}
                             >
-                                <p className="text-xs">Propriétés</p>
+                                <p className="text-sm">Propriétés</p>
                             </button>
                         </li>
                         <li>
@@ -87,7 +93,7 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties }: an
                                     setShowMenu(false);
                                 }}
                             >
-                                <p className="text-xs">Renommer</p>
+                                <p className="text-sm">Renommer</p>
                             </button>
                         </li>
                         <li>
@@ -98,7 +104,7 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties }: an
                                     setShowMenu(false);
                                 }}
                             >
-                                <p className="text-xs">Supprimer</p>
+                                <p className="text-sm">Supprimer</p>
                             </button>
                         </li>
                     </ul>

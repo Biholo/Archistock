@@ -67,13 +67,13 @@ exports.update = async (req, res) => {
     const result = await UserSubscription.findByPk(idP);
     if (result) {
       await result.update(userSubscription);
-      res.status(200).json(result);
+      res.status(201).json({ status: 201, message: "User subscription updated successfully" });
     } else {
-      res.status(404).json({ error: "User subscription not found" });
+      res.status(404).json({ status: 404, error: "User subscription not found" });
     }
   } catch (error) {
     console.error("Error updating user subscription: ", error);
-    res.status(500).json({ error: "Error updating user subscription" });
+    res.status(500).json({ status: 500, error: "Error updating user subscription" });
   }
 };
 
@@ -141,6 +141,17 @@ exports.getByUserId = async (req, res) => {
       ],
     });
 
+    // for erach userSubscription, get the files size. (Files are store in Mo)
+    for (let i = 0; i < result.length; i++) {
+      let userSubscription = result[i];
+      let files = await File.findAll({ where: { userSubscriptionId: userSubscription.id } });
+      let totalSize = 0;
+      for (let j = 0; j < files.length; j++) {
+        totalSize += files[j].size;
+      }
+      userSubscription.dataValues.totalSize = totalSize;
+    }
+
     console.log(result);  // Log the result directly
     res.status(200).json(result);  // Send the result as a JSON response
   } catch (error) {
@@ -186,3 +197,32 @@ exports.getByUserIdWithFiles = async (req, res) => {
   }
 };
 
+/*
+// add file to subscription
+router.post(
+  "/add-file",
+  middleware.authenticator,
+  upload.array('files', 10),
+  UserSubscriptionController.addFile
+);
+
+*/
+exports.addFile = async (req, res) => {
+  let files = req.files;
+  let userSubscriptionId = req.body.userSubscriptionId;
+  try {
+    for (let i = 0; i < files.length; i++) {
+      await File.create({
+        name: files[i].originalname,
+        size: (files[i].size / 1048576).toFixed(2),
+        format: files[i].mimetype.split("/")[1],
+        parentId: null,
+        userSubscriptionId: userSubscriptionId,
+      });
+    }
+    res.status(201).json("Files added to subscription");
+  } catch (error) {
+    console.error("Error adding files to subscription: ", error);
+    res.status(500).json({ error: "Error adding files to subscription" });
+  }
+}
