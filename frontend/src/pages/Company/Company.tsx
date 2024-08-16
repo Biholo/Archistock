@@ -7,14 +7,14 @@ import './Company.scss'
 import JoinCompanyForm from '../../components/JoinCompanyForm/JoinCompanyForm';
 
 import CreateCompany from './components/CreateCompany/CreateCompany';
+import Parameter from './components/Parameter/Parameter';
 import FindCompany from './components/FindCompany/FindCompany';
 import IndexCompagnies from './components/IndexCompagnies/IndexCompagnies';
 import NoCompany from './components/NoCompany/NoCompany';
 import CompanyDetail from './components/CompanyDetail/CompanyDetail';
 import ArchistockApiService from '../../services/ArchistockApiService';
 import { useAuth } from '../../contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 import { Route, Routes } from 'react-router-dom';
 
 export default function Company() {
@@ -22,6 +22,7 @@ export default function Company() {
     const archistockApiService = new ArchistockApiService();
     const [companies, setCompanies] = useState([]);
     const [rights, setRights] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (user && user.id) {
@@ -29,8 +30,8 @@ export default function Company() {
                 setRights(response);
                 const companies = response.map((right) => right.company);
                 setCompanies(companies);
-                if(companies.length === 0) {
-                    return <Navigate to="/no-company" />
+                if (companies.length === 0) {
+                    navigate("/company/no-company")
                 }
 
             });
@@ -39,31 +40,16 @@ export default function Company() {
 
 
     return (
-        <>
+        <div className="company p-10 h-full">
             <Routes>
-                <Route path="/" element={<IndexCompagnies companies={companies} />} />
-                <Route path="/no-company" element={<NoCompany />} />
-                <Route path="/find" element={<FindCompany />} />
-                <Route path="/create" element={<CreateCompany />} />
-                <Route path="/detail/:id" element={<CompanyDetail />} />
+                <Route path="/company/no-company" element={<NoCompany />} />
+                <Route path="/company/find" element={<FindCompany />} />
+                <Route path="/company/create" element={<CreateCompany />} />
+                <Route path="/company/detail/:id" element={<CompanyDetail />} />
+                <Route path="/company" element={<IndexCompagnies companies={companies} />} />
+                <Route path="/company/:id/parameter" element={<Parameter />} />
             </Routes>
-        </>
-    )
+        </div>
+    );
+
 }
-
-
- // return (
-    //     <div className='company flex flex-col items-center justify-center h-full'>
-    //         {
-
-    //             companies.length === 0 && isJoiningCompany === false ? (
-    //                 <div className='flex flex-col items-center justify-center no-company'>
-    //                     <Factory size={300} />
-    //                     <h3 className='text-2xl my-5'>Vous êtes actuellement dans aucune entreprise !</h3>
-    //                     <p className='mt-3 underline cursor-pointer' onClick={e => setIsJoiningCompany(true)}>Rejoindre une entreprise</p>
-    //                 </div>
-    //             ) : (
-    //                 <JoinCompanyForm />
-    //             )
-
-    // }

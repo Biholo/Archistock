@@ -1,11 +1,14 @@
 // rolesManager.js
 
+const { inviteToJoin } = require("../controllers/invitationRequestController");
+
 class RolesManager {
     constructor() {
         this.roleHierarchy = ["employee", "manager", "admin", "owner"];
         this.permissions = {
             acceptRequest: ["admin", "owner"],
-            assignRole: ["admin", "owner"]
+            assignRole: ["admin", "owner"],
+            inviteToJoin: ["admin", "owner", "manager"],
         };
     }
 

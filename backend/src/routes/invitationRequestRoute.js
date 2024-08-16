@@ -5,6 +5,7 @@ const invitationRequestController = require('../controllers/invitationRequestCon
 
 router.post('/ask-to-join', invitationRequestController.askToJoin);
 router.post('/invite', invitationRequestController.inviteToJoin);
+router.post ('/many-person', invitationRequestController.inviteManyPersonByEmailToCompany);
 
 router.put('/accept', invitationRequestController.acceptInvitationRequest);
 router.put('/decline', invitationRequestController.declineInvitationRequest);

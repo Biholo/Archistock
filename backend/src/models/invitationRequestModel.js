@@ -42,6 +42,10 @@ const InvitationRequest = sequelize.define(
                 key: "id",
             },
         },
+        acceptedRole: {
+            type: DataTypes.ENUM("owner", "admin", "employee", "manager"),
+            allowNull: true,
+        },
         status: {
             type: DataTypes.ENUM("pending", "accepted", "declined", "cancelled"),
             allowNull: false,

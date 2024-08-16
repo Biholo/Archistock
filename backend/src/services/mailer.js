@@ -47,17 +47,6 @@ class Mailer {
         return `${this.baseUrl}/temp/${type}/${token}`;
     }
 
-    // Méthode pour envoyer un e-mail de réinitialisation de mot de passe
-    sendPasswordResetEmail(to, user) {
-        const resetLink = this.generateTemporaryLink(user.id, '1h', 'reset-password');
-        const subject = 'Réinitialisation de mot de passe';
-        const html = this.templateService.renderTemplate('resetPasswordTemplate', { firstName: user.firstName, lastName: user.lastName, resetLink });
-
-        return this.sendMail(this.senderEmail, to, subject, '', html);
-    }
-
-
-
     // Méthode pour envoyer un e-mail de confirmation de compte
     sendAccountConfirmationEmail(to, userId) {
         const confirmationLink = this.generateTemporaryLink(userId, '1h', 'confirm-account');
@@ -94,6 +83,47 @@ class Mailer {
         return this.sendMail( this.senderEmail, to, subject, text, html);
     }
 
+    // Email invitant un utilisateur avec un compte à rejoindre une entreprise
+    sendCompanyInvitationEmail(to, user, companyName, role) {
+        const subject = `Invitation à rejoindre ${companyName}`;
+        const html = this.templateService.renderTemplate('invitationRequestWithAccount', { 
+            firstName: user.firstName, 
+            lastName: user.lastName, 
+            companyName,
+            role,
+            confirmationLink: `${this.baseUrl}/login`,
+        });
+
+        return this.sendMail(this.senderEmail, to, subject, '', html);
+    }
+        
+
+    //Email invitant un utilisateur sans compte à rejoindre une entreprise
+    sendCompanyInvitationEmailNoAccount(to, email, companyName, role, invitationUUID) {
+        const subject = `Invitation à rejoindre ${companyName}`;
+        const html = this.templateService.renderTemplate('invitationRequestWithAccount', { 
+            email,
+            companyName,
+            role,
+            confirmationLink: `${this.baseUrl}/register/invitation/${invitationUUID}`,
+        });
+
+        return this.sendMail(this.senderEmail, to, subject, '', html);
+    }
+
+     // Méthode pour envoyer un e-mail de réinitialisation de mot de passe
+     sendPasswordResetEmail(to, user) {
+        const resetLink = this.generateTemporaryLink(user.id, '1h', 'reset-password');
+        const subject = 'Réinitialisation de mot de passe';
+        const html = this.templateService.renderTemplate('resetPasswordTemplate', { 
+            firstName: user.firstName, 
+            lastName: user.lastName, 
+            resetLink 
+        });
+
+        return this.sendMail(this.senderEmail, to, subject, '', html);
+    }
+    
 }
 
 module.exports = Mailer;
