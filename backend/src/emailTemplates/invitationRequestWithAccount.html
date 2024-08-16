@@ -1,0 +1,69 @@
+<!-- src/emailTemplates/resetPasswordTemplate.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #CBE3FF !important;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            height: 100%;
+        }
+
+        .main-content {
+            border-top: solid 1px rgba(31, 41, 55, 0.1);
+            border-bottom: solid 1px rgba(31, 41, 55, 0.1);
+            padding: 30px 100px;
+        }
+
+        h2 {
+            font-size: 30px;
+            font-weight: 700;
+            color: black;
+        }
+
+        p {
+            font-size: 16px;
+        }
+
+        .button {
+            background: #4338CA;
+            color: white;
+            border-radius: 8px;
+            padding: 10px 20px;
+            text-decoration: none;
+            margin: 30px 0 !important;
+        }
+
+        .under-button {
+            padding-top: 30px;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="../styles/main.css">
+
+</head>
+
+<body>
+    <div class="card">
+        {{> HeaderEmail}}
+
+        <div class="main-content">
+            <h2>Bonjour, {{firstName}} {{lastName}}</h2>
+            <p class="top-button">{{ companyName }} vous invite à rejoindre l'entreprise en tant que {{role}}. Veuillez cliquer sur le bouton suivant :</p>
+            <a href="{{confirmationLink}}" class="button">Je me connecter et j'accepte</a>
+            <p class="under-button">Cordialement,<br>L'équipe d'Archistock</p>
+        </div>
+        {{> FooterEmail}}
+
+    </div>
+</body>
+
+</html>
