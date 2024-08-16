@@ -28,9 +28,10 @@ exports.authenticator = (req, res, next) => {
       }
     });
   } else {
-    res.status(401).json({ erreur: "Access denied" });
+    res.status(401).json({ erreur: "NON GROS CHIEN" });
   }
 };
+
 
 exports.isAdmin = async (req, res, next) => {
   // get token from authorization header
