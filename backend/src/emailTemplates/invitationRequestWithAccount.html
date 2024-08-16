@@ -57,11 +57,8 @@
 
         <div class="main-content">
             <h2>Bonjour, {{firstName}} {{lastName}}</h2>
-            <p class="top-button">Vous avez demandé la réinitialisation de votre mot de passe. Veuillez cliquer sur le
-                bouton ci-dessous
-                pour
-                réinitialiser votre mot de passe :</p>
-            <a href="{{resetLink}}" class="button">Réinitialiser le mot de passe</a>
+            <p class="top-button">{{ companyName }} vous invite à rejoindre l'entreprise en tant que {{role}}. Veuillez cliquer sur le bouton suivant :</p>
+            <a href="{{confirmationLink}}" class="button">Je me connecter et j'accepte</a>
             <p class="under-button">Cordialement,<br>L'équipe d'Archistock</p>
         </div>
         {{> FooterEmail}}

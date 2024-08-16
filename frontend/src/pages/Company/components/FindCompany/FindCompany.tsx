@@ -27,7 +27,14 @@ export default function FindCompany() {
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [requestSent, setRequestSent] = useState([]);
 
-
+    useEffect(() => {
+        archistockApiService.findAllCompanies().then(
+            (response: any) => {
+                console.log(response);
+                setCompanies(response);
+            }
+        );
+    }, []);
 
     const handleCompanyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const searchValue = e.target.value;
@@ -76,27 +83,27 @@ export default function FindCompany() {
     }
 
     return (
-        <div>
+        <div className='h-full'>
             <h2>Recherche d'une entreprise</h2>
-            <div className='flex flex-col items-center'>
+            <div className='flex items-center justify-center h-4/5 w-full'>
+                <div className='flex flex-col items-center w-1/2'>
+                    <div className='flex items-end justify-center w-full'>
+                        <InputSuggestion
+                            value={searchedCompany}
+                            onChange={handleCompanyChange}
+                            css={'w-3/4'}
+                            name="company"
+                            label="Company"
+                            type="text"
+                            labelWeight="bold"
+                            placeholder="Company name"
+                            suggestions={renderCompaniesSuggestions()}
+                        />
 
-                <div className='flex items-end justify-center'>
-                    <InputSuggestion
-                        value={searchedCompany}
-                        onChange={handleCompanyChange}
-                        css={'w-72'}
-                        name="company"
-                        label="Company"
-                        type="text"
-                        labelWeight="bold"
-                        placeholder="Company name"
-                        required={true}
-                        suggestions={renderCompaniesSuggestions()}
-                    />
-
-                    <Button onClick={() => askToJoinCompany()} disabled={checkIfUserCanRequest(companySelectedId) ? false : true} css='w-2/6 ml-4' color='primary'>Rejoindre</Button>
+                        <Button onClick={() => askToJoinCompany()} disabled={checkIfUserCanRequest(companySelectedId) ? false : true} css='w-1/4 ml-4' color='primary'>Rejoindre</Button>
+                    </div>
+                    <p onClick={() => navigate('/company/create')} className='text-xs underline mt-3 cursor-pointer'>Vous ne trouvez pas votre entreprise ? Référencer là !</p>
                 </div>
-                <p onClick={() => navigate('/company/create')} className='text-xs underline mt-3 cursor-pointer'>Vous ne trouvez pas votre entreprise ? Référencer là !</p>
             </div>
         </div>
     );

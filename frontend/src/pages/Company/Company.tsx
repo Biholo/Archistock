@@ -7,6 +7,7 @@ import './Company.scss'
 import JoinCompanyForm from '../../components/JoinCompanyForm/JoinCompanyForm';
 
 import CreateCompany from './components/CreateCompany/CreateCompany';
+import Parameter from './components/Parameter/Parameter';
 import FindCompany from './components/FindCompany/FindCompany';
 import IndexCompagnies from './components/IndexCompagnies/IndexCompagnies';
 import NoCompany from './components/NoCompany/NoCompany';
@@ -29,9 +30,9 @@ export default function Company() {
                 setRights(response);
                 const companies = response.map((right) => right.company);
                 setCompanies(companies);
-            if (companies.length === 0) {
-                navigate("/company/no-company")
-            }
+                if (companies.length === 0) {
+                    navigate("/company/no-company")
+                }
 
             });
         }
@@ -39,13 +40,16 @@ export default function Company() {
 
 
     return (
-        <Routes>
-            <Route path="/no-company" element={<NoCompany />} />
-            <Route path="/find" element={<FindCompany />} />
-            <Route path="/create" element={<CreateCompany />} />
-            <Route path="/detail/:id" element={<CompanyDetail />} />
-            <Route path="/" element={<IndexCompagnies companies={companies} />} />
-        </Routes>
+        <div className="company p-10 h-full">
+            <Routes>
+                <Route path="/company/no-company" element={<NoCompany />} />
+                <Route path="/company/find" element={<FindCompany />} />
+                <Route path="/company/create" element={<CreateCompany />} />
+                <Route path="/company/detail/:id" element={<CompanyDetail />} />
+                <Route path="/company" element={<IndexCompagnies companies={companies} />} />
+                <Route path="/company/:id/parameter" element={<Parameter />} />
+            </Routes>
+        </div>
     );
-    
+
 }

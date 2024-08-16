@@ -20,6 +20,7 @@ const invitationRequestRoute = require("./src/routes/invitationRequestRoute");
 const sharedStorageSpaceRoute = require("./src/routes/sharedStorageSpaceRoute");
 const rightRoute = require("./src/routes/rightRoute");
 const countryRoute = require("./src/routes/countryRoute");
+const userInvitationRoute = require("./src/routes/userInvitationRoute");
 
 app.use("/database", databaseRoute);
 app.use("/user", userRoute);
@@ -32,9 +33,11 @@ app.use("/invitation-request", invitationRequestRoute);
 app.use("/sharedstorage-space", sharedStorageSpaceRoute);
 app.use("/right", rightRoute);
 app.use("/country", countryRoute);
+app.use('/user-invitation', userInvitationRoute);
 
 
 app.use("/files", express.static("src/files"));
+app.use('/Images', express.static('./Images'));
 
 app.listen(8000, function () {
   console.log("Serveur ouvert: ");
