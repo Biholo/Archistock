@@ -13,7 +13,7 @@ const getEmailFromToken = (token) => {
 
 exports.authenticator = (req, res, next) => {
   // get token from authorization header
-  const token = req.headers.authorization;
+  let token = req.headers.authorization;
   // if "bearer", split 
   if (token && token.startsWith("Bearer ")) {
     token = token.split(" ")[1];

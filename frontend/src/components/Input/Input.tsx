@@ -1,12 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import './Input.scss';
 
-function Input({label, labelWeight, placeholder, pattern, value, onChange, type, name, required, disabled, color, css} : {label?: string, labelWeight?: string, placeholder?: string, pattern?: string, value?: string, onChange?: any, type?: string, name?: string, required?: boolean, disabled?: boolean, color?: string, css?: string}) {
+interface InputProps {
+    label?: string;
+    children?: React.ReactNode;
+    labelWeight?: string;
+    placeholder?: string;
+    pattern?: string;
+    value?: string;
+    onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement>;
+    type?: string;
+    name?: string;
+    required?: boolean;
+    disabled?: boolean;
+    color?: string;
+    css?: string;
+}
 
-    const [state , setState] = useState('');
+function Input({
+    label,
+    children,
+    labelWeight,
+    placeholder,
+    pattern,
+    value,
+    onChange,
+    type,
+    name,
+    required,
+    disabled,
+    color,
+    css
+}: InputProps) {
+    const [state, setState] = useState('');
 
     useEffect(() => {
-        switch(color) {
+        switch (color) {
             case 'primary':
                 setState('input-primary');
                 break;
@@ -31,20 +60,40 @@ function Input({label, labelWeight, placeholder, pattern, value, onChange, type,
             default:
                 setState('');
         }
-    }, [])
+    }, [color]);
 
-    const handleChange = (e: any) => {
-        if (pattern) {
-            if (!e.target.value.match(pattern)) {
-                setState('input-error');
-            } else {
-                setState('input-success');
-            }
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        if (pattern && e.target.value && !new RegExp(pattern).test(e.target.value)) {
+            setState('input-error');
+        } else {
+            setState('input-success');
         }
+        if (onChange) onChange(e);
+    };
+
+    if (type === 'select') {
+        return (
+            <div className={css}>
+                <label className={`block text-sm mb-2 font-${labelWeight}`} htmlFor={name}>
+                    {label} {required ? <span className='text-red-400'>*</span> : ''}
+                </label>
+                <select
+                    className={`input input-bordered bg-white w-full shadow-sm ${state} ${disabled ? 'cursor-not-allowed disabled:bg-white' : ''}`}
+                    id={name}
+                    name={name}
+                    value={value}
+                    onChange={handleChange}
+                    required={required}
+                    disabled={disabled}
+                >
+                    {children}
+                </select>
+            </div>
+        );
     }
 
     return (
-       <div className={css}>
+        <div className={css}>
             <label className={`block text-sm mb-2 font-${labelWeight}`} htmlFor={name}>
                 {label} {required ? <span className='text-red-400'>*</span> : ''}
             </label>
@@ -55,13 +104,12 @@ function Input({label, labelWeight, placeholder, pattern, value, onChange, type,
                 type={type}
                 placeholder={placeholder}
                 value={value}
-                onChange={onChange}
-                onInput={handleChange}
+                onChange={handleChange}
                 required={required}
                 disabled={disabled}
             />
         </div>
-    )
+    );
 }
 
-export default Input
+export default Input;

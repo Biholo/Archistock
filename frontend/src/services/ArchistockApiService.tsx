@@ -287,6 +287,34 @@ class ArchistockApiService {
         }
     }
 
+    async uploadFile(formData: FormData): Promise<any> {
+      const token = getCookie('accessToken');
+      if (!token) {
+          throw new Error("No access token found.");
+      }
+  
+      try {
+          const response = await fetch(`${this.url}/usersubscription/add-files`, {
+              method: 'POST',
+              headers: {
+                  Authorization: `Bearer ${token}`,
+              },
+              body: formData,
+          });
+  
+          if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(`Failed to upload file: ${response.status} ${response.statusText} - ${errorText}`);
+          }
+  
+          return await response.json();
+      } catch (error) {
+          console.error("Failed to upload file:", error);
+          throw error;
+      }
+  }
+  
+
     async updateFile(fileId:number, file:any): Promise<any> {
         try {
             const response = await fetch(`${this.url}/file/update/${fileId}`, {
