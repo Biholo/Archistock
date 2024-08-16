@@ -36,6 +36,7 @@ exports.update = async (req, res) => {
   const file = req.body;
   try {
     const result = await File.findByPk(idP);
+
     if (result) {
       await result.update(file);
       res.status(201).json({ status: 201, message: "File updated successfully" });

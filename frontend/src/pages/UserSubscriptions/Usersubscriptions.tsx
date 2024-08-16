@@ -9,7 +9,7 @@ import HardDriveStorage from '../../components/HardDrive/HardDrive';
 import FolderIcon from '../../components/FolderIcon/FolderIcon';
 import PreviewFileModal from '../../components/Modals/PreviewFileModal';
 import Button from '../../components/Button/Button';
-import { FolderSimplePlus } from '@phosphor-icons/react';
+import { Drop, FolderSimplePlus } from '@phosphor-icons/react';
 import FolderCreate from '../../components/FolderIcon/FolderCreate';
 import { toast } from 'react-toastify';
 import PreviewFolderModal from '../../components/Modals/PreviewFolderModal';
@@ -47,6 +47,7 @@ const UserSubscriptions = () => {
 
     if (selectedStorage && parentId) {
       archistockApiService.getFolder(parseInt(parentId!)).then((res) => {
+        console.log(res);
         setSelectedFolderContent(res);
         setLoading(false);
       });
@@ -130,10 +131,22 @@ const UserSubscriptions = () => {
   };
 
   const handleDrop = (file: any, folder: any) => {
-    // Logique pour ajouter un fichier à un dossier
-    console.log(`Dropping file ${file.name} into folder ${folder.name}`);
-    // Vous devrez faire appel à une fonction pour mettre à jour le backend ici
-  };
+    const data = {
+      parentId: folder.id,
+    };
+
+    console.log(folder.id);
+
+    archistockApiService.updateFile(file.id, data).then((res) => {
+      if (res.status === 201) {
+        toast.success("File moved successfully");
+        setUpdated(!updated);
+      } else {
+        console.log(res);
+        toast.error("An error occurred while moving the file. Please retry.");
+      }
+    })
+    };
 
   return (
     <Fragment>
@@ -182,7 +195,14 @@ const UserSubscriptions = () => {
                 ) : (
                   selectedFolderContent && (
                     <div className="flex flex-wrap gap-5 mt-5 w-full">
-                      <FolderIcon folder={{name:"..."}} onFolderClick={() => onBreadcrumbClick(breadcrumb.length - 2)} />
+                      <DroppableFolder 
+                        folder={{ name: "...", id: breadcrumb.length > 2 ? breadcrumb[breadcrumb.length - 3].id : null }}
+                        onDrop={(file: any, folder: any) => handleDrop(file, folder)}
+                        onClick={() => onBreadcrumbClick(breadcrumb.length - 2)}
+                        onDelete={() => {}}
+                        onUpdate={() => setUpdated(!updated)}
+
+                      />
                       {loading ? (
                         <Fragment>
                           <FolderSkeleton />
@@ -208,6 +228,7 @@ const UserSubscriptions = () => {
                                 <DraggableFile 
                                   key={index} 
                                   file={file} 
+                                  onDrop={(folder: any) => console.log(`Dropping file ${file.name} into folder ${folder.name}`)}
                                   onClick={() => {console.log("File clicked"); setSelectedFile(file)}}
                                   onDelete={() => {setUpdated(!updated)}}
                                   onUpdate={() => setUpdated(!updated)}

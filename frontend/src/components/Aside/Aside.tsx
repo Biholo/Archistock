@@ -82,7 +82,6 @@ export default function Aside() {
           active={active === "profile"}
           onClick={() => handleChangeItem("profile")}
         ></AsideItem>
-        // ContactSupport
         <AsideItem
           title="Contact Support"
           icon={<User size={20} />}
@@ -90,7 +89,6 @@ export default function Aside() {
           active={active === "contact-support"}
           onClick={() => handleChangeItem("contact-support")}
         ></AsideItem>
-        // AnswerClient
         <AsideItem
           title="Answer Client"
           icon={<User size={20} />}

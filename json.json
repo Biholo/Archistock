@@ -1,0 +1,142 @@
+
+{
+    "global": "Toutes les actions sont réalisables sur le site web, avec un compte utilisateur",
+    "pages": [
+        {
+            "id": 1,
+            "title": "Your storage",
+            "content": "Permet à l'utilisateur de consulter son espace de stockage",
+            "url": "http://localhost:5173/storage",
+            "actions": [
+                {
+                    "id": 1,
+                    "name": "Cliquer sur un disque dur, dossier ou fichier",
+                    "description": "Permet de consulter les fichiers présents sur le disque dur",
+                    "actions": [
+                        {
+                            "id":1,
+                            "name": "Créer un dossier",
+                            "conditions": "Le disque dur doit être sélectionné"
+                        },
+                        {
+                            "id":2,
+                            "name": "Supprimer un dossier ou un fichier",
+                            "conditions": "Le disque dur doit être sélectionné",
+                            "requis":"Clique droit sur le fichier ou le dossier"
+                        },
+                        {
+                            "id":3,
+                            "name": "Télécharger un fichier ou un dossier",
+                            "conditions": "Le disque dur doit être sélectionné",
+                            "requis":"Clique droit sur le fichier ou le dossier"
+                        },
+                        {
+                            "id":4,
+                            "name": "Partager un fichier ou un dossier",
+                            "conditions": "Le disque dur doit être sélectionné",
+                            "requis":"Clique droit sur le fichier ou le dossier"
+                        },
+                        {
+                            "id":5,
+                            "name": "Renommer un fichier ou un dossier",
+                            "conditions": "Le disque dur doit être sélectionné",
+                            "requis":"Clique droit sur le fichier ou le dossier"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "name": "Rechercher un fichier",
+                    "description": "Permet de rechercher un fichier dans le disque dur",
+                    "actions": [
+                        {
+                            "id":1,
+                            "name": "Télécharger un fichier",
+                            "conditions": "Le fichier doit être trouvé"
+                        },
+                        {
+                            "id":2,
+                            "name": "Partager un fichier",
+                            "conditions": "Le fichier doit être trouvé"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "title": "Extend your storage",
+            "content": "Permet à l'utilisateur d'acheter de l'espace de stockage",
+            "url": "http://localhost:5173/extend",
+            "actions": [
+                {
+                    "id": 1,
+                    "name": "Acheter un abonnement",
+                    "description": "Permet d'acheter un disque dur",
+                    "actions": [
+                        {
+                            "id":1,
+                            "name": "Acheter un disque dur",
+                            "conditions": "L'utilisateur doit être connecté",
+                            "description": "Paiement par carte bancaire, paypal ou stripe"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "title": "Your account",
+            "content": "Permet à l'utilisateur de consulter son compte",
+            "url": "http://localhost:5173/account",
+            "actions": [
+                {
+                    "id": 1,
+                    "name": "Modifier son compte",
+                    "description": "Permet de modifier les informations de l'utilisateur",
+                    "actions": [
+                        {
+                            "id":1,
+                            "name": "Modifier son mot de passe",
+                            "conditions": "L'utilisateur doit être connecté"
+                        },
+                        {
+                            "id":2,
+                            "name": "Modifier son adresse mail",
+                            "conditions": "L'utilisateur doit être connecté"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "name": "Supprimer son compte",
+                    "description": "Permet de supprimer le compte de l'utilisateur",
+                    "actions": [
+                        {
+                            "id":1,
+                            "name": "Supprimer son compte",
+                            "conditions": "L'utilisateur doit être connecté"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "name":"upload files",
+            "content": "Permet à l'utilisateur de télécharger des fichiers",
+            "url": "http://localhost:5173/upload",
+            "actions": [
+                {
+                    "id":1,
+                    "name": "Upload un fichier",
+                    "description": "Permet de télécharger un fichier sur le disque dur",
+                    "conditions": "L'utilisateur doit être connecté, le disque dur doit être sélectionné",
+                    "requis":"Drag and drop le fichier dans la zone de téléchargement"
+                    
+                }
+            ]
+        }
+        
+    ]
+}

@@ -9,14 +9,27 @@ const archistockApiService = new ArchistockApiService();
 const UploadFiles = () => {
     const [storage, setStorage] = useState<any>(null);
     const [selectedStorage, setSelectedStorage] = useState<any>(null);
-    const [progress, setProgress] = useState<number>(0);  // Nouvel état pour la progression
+    const [progress, setProgress] = useState<number>(0);
+    const [progressColor, setProgressColor] = useState<string>("");
+    const [files, setFiles] = useState<any>([]);
 
     useEffect(() => {
         archistockApiService.getUserStorage().then((res) => {
             setStorage(res);
+            setSelectedStorage(res[0].id);
             console.log(res);
         });
     }, []);
+
+    useEffect(() => {
+        if (progress < 50) {
+            setProgressColor("bg-red-500");
+        } else if (progress < 75) {
+            setProgressColor("bg-yellow-500");
+        } else {
+            setProgressColor("bg-green-500");
+        }
+    }, [progress]);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (!selectedStorage) {
@@ -27,6 +40,7 @@ const UploadFiles = () => {
         const formData = new FormData();
         acceptedFiles.forEach(file => {
             formData.append('files', file);
+            setFiles([...files, file]);
         });
         formData.append('userSubscriptionId', selectedStorage.toString());
 
@@ -49,7 +63,7 @@ const UploadFiles = () => {
                             <Input type="select" label="Select Storage" onChange={(e: any) => setSelectedStorage(e.target.value)}>
                                 <option>Select Storage</option>
                                 {storage && storage.map((item: any, index: number) => (
-                                    <option key={index} value={item.id}>{item.name} - {(parseInt(item.totalSize) / 1000).toFixed(2)} / {item.subscription.size.toFixed(2)} Go</option>
+                                    <option key={index} value={item.id} selected={selectedStorage} >{item.name} - {(parseInt(item.totalSize) / 1000).toFixed(2)} / {item.subscription.size.toFixed(2)} Go</option>
                                 ))}
                             </Input>
 
@@ -66,9 +80,21 @@ const UploadFiles = () => {
 
                             {/* Affichage de la barre de progression */}
                             {progress > 0 && (
-                                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
-                                </div>
+                                <Fragment>
+                                    <div className="flex flex-row gap-3">
+                                        <div className="w-full">
+                                            <div className="w-full h-3 bg-gray-200 rounded-lg">
+                                                <div className={`h-full ${progressColor} rounded-lg`} style={{ width: `${progress}%` }}></div>
+                                            </div>
+                                            <div className="flex flex-col gap-3">
+                                                <p className="font-semibold">{progress == 100 ? "Files uploaded !" : "Uploading files..."}</p>
+                                                {files.map((file: any, index: number) => (
+                                                    <p key={index}>{file.name}</p>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Fragment>
                             )}
                         </div>
                     </Card>

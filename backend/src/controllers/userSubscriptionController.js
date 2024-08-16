@@ -4,6 +4,8 @@ const File = require("../models/fileModel");
 const Subscription = require("../models/subscriptionModel");
 const jwt = require("jsonwebtoken");
 const Folder = require("../models/folderModel");
+const fs = require("fs");
+const crypto = require("crypto");
 require("dotenv").config();
 
 // Create a user subscription (POST)
@@ -212,8 +214,26 @@ exports.addFile = async (req, res) => {
   let userSubscriptionId = req.body.userSubscriptionId;
   try {
     for (let i = 0; i < files.length; i++) {
+
+      // if file size is > 2 GB, do not add it to the subscription
+      if(files[i].size > 2147483648) {
+        continue;
+      }
+
+      let hash = crypto.randomBytes(20).toString("hex");
+
+      // rename file
+      fs.renameSync(`src/files/${files[i].filename}`, `src/files/${hash}.${files[i].mimetype.split("/")[1]}`);
+
+      // if file name is > 128 characters, generate hash for the file name
+      if(files[i].originalname.split("").length > 128) {
+        // generate hash for the file name
+        files[i].originalname = hash;
+      }
+
       await File.create({
-        name: files[i].originalname,
+        name: files[i].originalname.split('.')[0],
+        pathName: hash,
         size: (files[i].size / 1048576).toFixed(2),
         format: files[i].mimetype.split("/")[1],
         parentId: null,

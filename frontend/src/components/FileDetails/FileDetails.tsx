@@ -3,6 +3,8 @@ import FileIcon from "../FileIcon/FileIcon";
 import ArchistockApiService from "../../services/ArchistockApiService";
 import { toast } from "react-toastify";
 
+const archistockApiService = new ArchistockApiService();
+
 const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: any) => {
     const [showMenu, setShowMenu] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
@@ -10,7 +12,6 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
     const [fileName, setFileName] = useState(file.name);
     const menuRef = useRef(null);
     
-    const archistockApiService = new ArchistockApiService();
 
     const handleRightClick = (e: any) => {
         e.preventDefault();

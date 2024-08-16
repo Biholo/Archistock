@@ -27,13 +27,13 @@ const PreviewFileModal = ({ show, file, onClose } : any) => {
                                     File Preview
                                 </h3>
                                 {file.format === 'jpg' || file.format === 'png' || file.format === 'jpeg' || file.format === 'gif' || file.format === 'svg' ? (
-                                    <img src={`http://localhost:8000/files/${file.name}.${file.format}`} alt={file.name} className="w-full h-auto" />
+                                    <img src={`http://localhost:8000/files/${file.pathName}.${file.format}`} alt={file.pathName} className="w-full h-auto" />
                                 ) : file.format === 'mp4' || file.format === 'avi' || file.format === 'mov' || file.format === 'wmv' ? (
-                                    <video src={`http://localhost:8000/files/${file.name}.${file.format}`} className="w-full h-auto" controls></video>
+                                    <video src={`http://localhost:8000/files/${file.pathName}.${file.format}`} className="w-full h-auto" controls></video>
                                 ) : file.format === 'mp3' || file.format === 'wav' || file.format === 'flac' || file.format === 'aac' ? (
-                                    <audio src={`http://localhost:8000/files/${file.name}.${file.format}`} controls></audio>
+                                    <audio src={`http://localhost:8000/files/${file.pathName}.${file.format}`} controls></audio>
                                 ) : file.format === 'pdf' ? (
-                                    <embed src={`http://localhost:8000/files/${file.name}.${file.format}`} type="application/pdf" width="100%" height="600px" />
+                                    <embed src={`http://localhost:8000/files/${file.pathName}.${file.format}`} type="application/pdf" width="100%" height="600px" />
                                 ) : (
                                     <p>File format not supported.</p>
                                 )}
