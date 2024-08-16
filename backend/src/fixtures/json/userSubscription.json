@@ -1,0 +1,33 @@
+[
+    {
+      "model": "UserSubscription",
+      "data": {
+        "name": "User 1 Subscription",
+        "startDate": "2024-01-01",
+        "userId": 1,
+        "sharedStorageSpaceId": null,
+        "subscriptionId": 1
+      }
+    },
+    {
+      "model": "UserSubscription",
+      "data": {
+        "name": "Shared Space Subscription A",
+        "startDate": "2024-02-01",
+        "userId": null,
+        "sharedStorageSpaceId": 1,  
+        "subscriptionId": 2
+      }
+    },
+    {
+      "model": "UserSubscription",
+      "data": {
+        "name": "User 2 Subscription",
+        "startDate": "2024-03-01",
+        "userId": 2,
+        "sharedStorageSpaceId": null,
+        "subscriptionId": 3
+      }
+    }
+  ]
+  

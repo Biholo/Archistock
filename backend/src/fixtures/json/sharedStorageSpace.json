@@ -1,0 +1,38 @@
+[
+    {
+      "model": "SharedStorageSpace",
+      "data": {
+        "name": "Main Warehouse",
+        "companyId": 1
+      }
+    },
+    {
+      "model": "SharedStorageSpace",
+      "data": {
+        "name": "Backup Storage",
+        "companyId": 2
+      }
+    },
+    {
+      "model": "SharedStorageSpace",
+      "data": {
+        "name": "Central Depot",
+        "companyId": 3
+      }
+    },
+    {
+      "model": "SharedStorageSpace",
+      "data": {
+        "name": "East Wing Storage",
+        "companyId": 4
+      }
+    },
+    {
+      "model": "SharedStorageSpace",
+      "data": {
+        "name": "North Zone Storage",
+        "companyId": 5
+      }
+    }
+  ]
+  
