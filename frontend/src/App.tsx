@@ -25,6 +25,7 @@ import Homepage from './pages/Homepage/Homepage';
 import ApiPage from './pages/ApiPage/ApiPage';
 import Solutions from './pages/Solutions/Solutions';
 import Navbar from './components/Navbar/Navbar';
+import Footer from './components/Footer/Footer';
 
 const App = () => {
   return (
@@ -49,10 +50,10 @@ const AuthRoutes = () => {
       <Route path="/" element={loggedIn ? <UserLogged /> : <PublicRoutes />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
-      
+
       <Route path="/register-invitation/:uuid" element={<RegisterInvitation />} />
       <Route path="/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
-      <Route path="/temp/reset-password/:jwt" element={<ResetPassword/>} />
+      <Route path="/temp/reset-password/:jwt" element={<ResetPassword />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
     </Routes>
   );
@@ -60,14 +61,15 @@ const AuthRoutes = () => {
 
 const PublicRoutes = () => {
   return (
-    <div>
+    <div className='flex flex-col'>
       <Navbar />
       <Routes>
-      <Route path="/api" element={<ApiPage />} />
-      <Route path="/pricing" element={<Pricing />} />
-      <Route path="/solutions" element={<Solutions />} />
-      <Route path="/" element={<Homepage />} />
-    </Routes>
+        <Route path="/api" element={<ApiPage />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/solutions" element={<Solutions />} />
+        <Route path="/" element={<Pricing />} />
+      </Routes>
+      <Footer />
     </div>
   );
 }
@@ -103,7 +105,7 @@ const UserLogged = () => {
 
   return (
     <div className="flex min-h-dvh text-black">
-      <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
@@ -114,7 +116,7 @@ const UserLogged = () => {
         draggable
         pauseOnHover
       />
-      <EGModal  show={show} handleClose={() => setShow(false)} />
+      <EGModal show={show} handleClose={() => setShow(false)} />
       <div className="w-2/12 bg-white">
         <Aside />
       </div>
@@ -122,7 +124,7 @@ const UserLogged = () => {
         <div className='m-4'></div>
         <Routes>
           <Route path="/statistics" element={<Statistics />} />
-          
+
           <Route path="/components" element={<ComponentsTest />} />
           <Route path="/storage" element={
             <StorageProvider>
