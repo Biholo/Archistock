@@ -47,14 +47,15 @@ const AuthRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={loggedIn ? <UserLogged /> : <PublicRoutes />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
 
       <Route path="/register-invitation/:uuid" element={<RegisterInvitation />} />
-      <Route path="/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
       <Route path="/temp/reset-password/:jwt" element={<ResetPassword />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+
+      <Route path="/*" element={loggedIn ? <UserLogged /> : <PublicRoutes />} />
+      <Route path="/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
     </Routes>
   );
 };
@@ -66,8 +67,7 @@ const PublicRoutes = () => {
       <Routes>
         <Route path="/api" element={<ApiPage />} />
         <Route path="/pricing" element={<Pricing />} />
-        <Route path="/solutions" element={<Solutions />} />
-        <Route path="/" element={<Pricing />} />
+        <Route path="/" element={<Homepage />} />
       </Routes>
       <Footer />
     </div>
