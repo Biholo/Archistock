@@ -529,7 +529,54 @@ class ArchistockApiService {
             throw error; 
         }
     }
-        
+       
+    async findAllSubscriptionByUserId(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/usersubscription/me`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            })
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to find subscription:", error);
+            throw error; 
+        }
+    }
+
+    async findAllUsers(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user/all`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            })
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to find subscription:", error);
+            throw error; 
+        }
+    }
+
+    async findAllSubscriptions(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/usersubscription/all`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            })
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to find subscription:", error);
+            throw error; 
+        }
+    }
 
 }
 

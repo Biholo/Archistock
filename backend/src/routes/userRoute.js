@@ -44,9 +44,8 @@ router.post("/update-password", UserController.updatePassword);
 
 router.get(
   "/files/:userId",
-  middleware.authenticator,
+  // middleware.authenticator,
   UserController.getFilesByUserId
 );
-
 
 module.exports = router;

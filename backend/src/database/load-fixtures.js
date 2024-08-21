@@ -11,6 +11,8 @@ const User = require("../models/userModel");
 const UserSubscription = require("../models/userSubscriptionModel");
 const Folder = require("../models/folderModel");
 const File = require("../models/fileModel");
+const Right = require("../models/rightModel");
+const InvitationRequest = require("../models/invitationRequestModel");
 require("dotenv").config();
 
 // Fonction pour charger les fixtures
@@ -65,6 +67,18 @@ const loadFixtures = async () => {
     await fixtures.loadFiles(
       [path.join(__dirname, "../fixtures/json/userSubscription.json")],
       { UserSubscription },
+      { sequelize }
+    );
+
+    await fixtures.loadFiles(
+      [path.join(__dirname, "../fixtures/json/right.json")],
+      { Right },
+      { sequelize }
+    );
+
+    await fixtures.loadFiles(
+      [path.join(__dirname, "../fixtures/json/invitationRequest.json")],
+      { InvitationRequest },
       { sequelize }
     );
 

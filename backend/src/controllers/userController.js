@@ -367,29 +367,36 @@ exports.changePassword = async (req, res) => {
 //--------- Get files by user ID ---------//
 exports.getFilesByUserId = async (req, res) => {
   const userId = req.params.userId;
+
   try {
-    // Pick up all subscriptions
+    // Retrieve all subscriptions for the user along with the associated files via UserSubscription
     const userSubscriptions = await UserSubscription.findAll({
       where: { userId: userId },
       include: [
         {
           model: Subscription,
-          include: [
-            {
-              model: File,
-              as: 'files'
-            }
-          ]
-        }
-      ]
+        },
+        {
+          model: File,
+          as: "files",
+        },
+      ],
     });
 
-    // Extract files from subscriptions
-    const files = userSubscriptions.flatMap(userSubscription => userSubscription.subscription.files);
+    if (!userSubscriptions || userSubscriptions.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No subscriptions or files found for this user" });
+    }
+
+    // Extract files from the user subscriptions
+    const files = userSubscriptions.flatMap(
+      (userSubscription) => userSubscription.files
+    );
 
     res.status(200).json(files);
   } catch (error) {
-    console.error('Erreur lors de la récupération des fichiers :', error);
-    res.status(500).json({ error: 'Erreur lors de la récupération des fichiers' });
+    console.error("Error retrieving files:", error);
+    res.status(500).json({ error: "An error occurred while retrieving files" });
   }
 };

@@ -151,8 +151,7 @@ exports.getByUserId = async (req, res) => {
       }
       userSubscription.dataValues.totalSize = totalSize;
     }
-
-    console.log(result);  // Log the result directly
+    
     res.status(200).json(result);  // Send the result as a JSON response
   } catch (error) {
     console.error("Error retrieving the user subscriptions:", error);
@@ -189,24 +188,15 @@ exports.getByUserIdWithFiles = async (req, res) => {
       ],
     });
 
-    console.log(result);  // Log the result directly
-    res.status(200).json(result);  // Send the result as a JSON response
+    console.log(result);
+    res.status(200).json(result);
   } catch (error) {
     console.error("Error retrieving the user subscriptions:", error);
     res.status(500).json({ error: "Error retrieving the user subscriptions" });
   }
 };
 
-/*
-// add file to subscription
-router.post(
-  "/add-file",
-  middleware.authenticator,
-  upload.array('files', 10),
-  UserSubscriptionController.addFile
-);
 
-*/
 exports.addFile = async (req, res) => {
   let files = req.files;
   let userSubscriptionId = req.body.userSubscriptionId;
