@@ -1,5 +1,3 @@
-// pages/Administrator/Administrator.js
-
 import React, { useEffect, useState, useMemo } from "react";
 import ArchistockApiService from "../../services/ArchistockApiService";
 import CardUser from "../../components/CardUser/CardUser";
