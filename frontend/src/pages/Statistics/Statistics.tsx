@@ -435,25 +435,21 @@ const Statistics: React.FC = () => {
               stat={accountStats.accountsCount}
               name="Comptes Inscrits"
               color="#FFA800"
-              style={{ flex: "1", minWidth: "150px" }}
             />
             <StatsCard
               stat={accountStats.companiesCount}
               name="Entreprises inscrites"
               color="#E757B6"
-              style={{ flex: "1", minWidth: "150px" }}
             />
             <StatsCard
               stat={licenseStats.currentLicenses}
               name="Licences en cours"
               color="#24B34C"
-              style={{ flex: "1", minWidth: "150px" }}
             />
             <StatsCard
               stat={licenseStats.canceledLicenses}
               name="Licences résiliées"
               color="#7C57E7"
-              style={{ flex: "1", minWidth: "150px" }}
             />
           </div>
           <h2 style={{ textAlign: "center" }}>

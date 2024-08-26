@@ -29,7 +29,7 @@ exports.add = async (req, res) => {
     userSubscription.startDate = new Date();
 
     let subscription = await UserSubscription.create(userSubscription);
-    
+
     await Folder.create({
       name: "root",
       userSubscriptionId: subscription.id,
@@ -67,13 +67,22 @@ exports.update = async (req, res) => {
     const result = await UserSubscription.findByPk(idP);
     if (result) {
       await result.update(userSubscription);
-      res.status(201).json({ status: 201, message: "User subscription updated successfully" });
+      res
+        .status(201)
+        .json({
+          status: 201,
+          message: "User subscription updated successfully",
+        });
     } else {
-      res.status(404).json({ status: 404, error: "User subscription not found" });
+      res
+        .status(404)
+        .json({ status: 404, error: "User subscription not found" });
     }
   } catch (error) {
     console.error("Error updating user subscription: ", error);
-    res.status(500).json({ status: 500, error: "Error updating user subscription" });
+    res
+      .status(500)
+      .json({ status: 500, error: "Error updating user subscription" });
   }
 };
 
@@ -83,8 +92,8 @@ exports.getById = async (req, res) => {
   try {
     const result = await UserSubscription.findByPk(idP, {
       include: [
-        { model: User, as: 'user' },
-        { model: Subscription, as: 'subscription' },
+        { model: User, as: "user" },
+        { model: Subscription, as: "subscription" },
       ],
     });
     if (result) {
@@ -103,8 +112,8 @@ exports.getAll = async (req, res) => {
   try {
     const result = await UserSubscription.findAll({
       include: [
-        { model: User, as: 'user' },
-        { model: Subscription, as: 'subscription' },
+        { model: User, as: "user" },
+        { model: Subscription, as: "subscription" },
       ],
     });
     res.status(200).json(result);
@@ -119,14 +128,14 @@ exports.getByUserId = async (req, res) => {
   setTimeout(() => {
     console.log("Timeout completed");
   }, 5000);
-  
+
   let token = req.headers.authorization;
   let email = null;
-  
+
   if (token && token.startsWith("Bearer ")) {
     token = token.split(" ")[1];
   }
-  
+
   if (token) {
     email = jwt.verify(token, process.env.SECRET_KEY).email;
   }
@@ -136,23 +145,25 @@ exports.getByUserId = async (req, res) => {
     const result = await UserSubscription.findAll({
       where: { userId: user.id },
       include: [
-        { model: User, as: 'user' },
-        { model: Subscription, as: 'subscription' },
+        { model: User, as: "user" },
+        { model: Subscription, as: "subscription" },
       ],
     });
 
     // for erach userSubscription, get the files size. (Files are store in Mo)
     for (let i = 0; i < result.length; i++) {
       let userSubscription = result[i];
-      let files = await File.findAll({ where: { userSubscriptionId: userSubscription.id } });
+      let files = await File.findAll({
+        where: { userSubscriptionId: userSubscription.id },
+      });
       let totalSize = 0;
       for (let j = 0; j < files.length; j++) {
         totalSize += files[j].size;
       }
       userSubscription.dataValues.totalSize = totalSize;
     }
-    
-    res.status(200).json(result);  // Send the result as a JSON response
+
+    res.status(200).json(result); // Send the result as a JSON response
   } catch (error) {
     console.error("Error retrieving the user subscriptions:", error);
     res.status(500).json({ error: "Error retrieving the user subscriptions" });
@@ -164,14 +175,14 @@ exports.getByUserIdWithFiles = async (req, res) => {
   setTimeout(() => {
     console.log("Timeout completed");
   }, 5000);
-  
+
   let token = req.headers.authorization;
   let email = null;
-  
+
   if (token && token.startsWith("Bearer ")) {
     token = token.split(" ")[1];
   }
-  
+
   if (token) {
     email = jwt.verify(token, process.env.SECRET_KEY).email;
   }
@@ -181,10 +192,14 @@ exports.getByUserIdWithFiles = async (req, res) => {
     const result = await UserSubscription.findAll({
       where: { userId: user.id },
       include: [
-        { model: User, as: 'user' },
-        { model: Subscription, as: 'subscription' },
-        { model: File, as: 'files' },
-        { model: Folder, as: 'folders', include: [{ model: File, as: 'files' }] },
+        { model: User, as: "user" },
+        { model: Subscription, as: "subscription" },
+        { model: File, as: "files" },
+        {
+          model: Folder,
+          as: "folders",
+          include: [{ model: File, as: "files" }],
+        },
       ],
     });
 
@@ -195,7 +210,6 @@ exports.getByUserIdWithFiles = async (req, res) => {
     res.status(500).json({ error: "Error retrieving the user subscriptions" });
   }
 };
-
 
 exports.addFile = async (req, res) => {
   let files = req.files;
@@ -215,4 +229,63 @@ exports.addFile = async (req, res) => {
     console.error("Error adding files to subscription: ", error);
     res.status(500).json({ error: "Error adding files to subscription" });
   }
-}
+};
+
+// Get all users with their storage usage (GET)
+exports.getAllUsersWithStorage = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      include: [
+        {
+          model: UserSubscription,
+          as: "userSubscriptions",
+          include: [
+            { model: Subscription, as: "subscription" },
+            { model: File, as: "files" },
+            {
+              model: Folder,
+              as: "folders",
+              include: [{ model: File, as: "files" }],
+            },
+          ],
+        },
+      ],
+    });
+
+    const usersWithStorage = await Promise.all(
+      users.map(async (user) => {
+        let usedStorage = 0;
+        let availableStorage = 0;
+
+        for (let subscription of user.userSubscriptions) {
+          let subscriptionSize = subscription.subscription
+            ? subscription.subscription.size
+            : 0;
+          availableStorage += subscriptionSize;
+
+          let files = await File.findAll({
+            where: { userSubscriptionId: subscription.id },
+          });
+          for (let file of files) {
+            usedStorage += parseFloat(file.size);
+          }
+        }
+
+        return {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          usedStorage,
+          availableStorage,
+        };
+      })
+    );
+
+    res.status(200).json(usersWithStorage);
+  } catch (error) {
+    console.error("Error retrieving users with storage info:", error);
+    res
+      .status(500)
+      .json({ error: "Error retrieving users with storage info." });
+  }
+};

@@ -22,6 +22,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import Company from './pages/Company/Company';
 import RegisterInvitation from './pages/RegisterInvitation/RegisterInvitation';
+import Administrator from './pages/Administrator/Administrator';
 
 const App = () => {
   return (
@@ -92,8 +93,6 @@ const UserLogged = () => {
       <div className="w-10/12 mx-4 my-4 bg-white-100 shadow-md">
         <div className='m-4'></div>
         <Routes>
-          <Route path="statistics" element={<Statistics />} />
-          
           <Route path="components" element={<ComponentsTest />} />
           <Route path="storage" element={
               <Usersubscriptions />
@@ -106,6 +105,8 @@ const UserLogged = () => {
           <Route path="/profile/change-password" element={<NewPassword />} />
           <Route path="/contact-support" element={<ContactSupport />} />
           <Route path="/answer-client" element={<AnswerClient />} />
+          <Route path="/statistics" element={<Statistics />} />
+          <Route path="/administrator" element={<Administrator />} />
         </Routes>
       </div>
     </div>
