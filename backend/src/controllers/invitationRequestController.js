@@ -8,6 +8,7 @@ const Company = require("../models/companyModel");
 const Mailer = require("../services/mailer");
 const RolesManager = require("../services/rolesManager");
 const { getInvitationRequests } = require('../helpers/invitationRequestHelper');
+const { checkRight } = require('../helpers/rightHelper');
 
 
 const { Op } = require("sequelize");
@@ -141,6 +142,7 @@ exports.inviteToJoin = async (req, res) => {
 exports.acceptInvitationRequest = async (req, res) => {
     try {
         const { id } = req.params;
+        const userId = req.user.id;
 
         const invitationRequest = await InvitationRequest.findByPk(id);
 
@@ -157,7 +159,7 @@ exports.acceptInvitationRequest = async (req, res) => {
                 userId,
                 companyId: invitationRequest.companyId,
                 sharedStorageSpaceId: invitationRequest.sharedStorageSpaceId,
-                roles: invitationRequest.acceptedRole
+                roles: invitationRequest.acceptedRole ? invitationRequest.acceptedRole : "employee"
             });
         }
 
@@ -174,12 +176,14 @@ exports.acceptInvitationRequest = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
 exports.declineInvitationRequest = async (req, res) => {
     try {
-        const { requestId, userId } = req.body;
+        const { id } = req.body;
+        const userId = req.user.id;
 
         // Fetch the invitation request
-        const invitationRequest = await InvitationRequest.findByPk(requestId);
+        const invitationRequest = await InvitationRequest.findByPk(id);
         if (!invitationRequest) {
             return res.status(404).json({ message: "Invitation request not found" });
         }
@@ -233,7 +237,8 @@ exports.declineInvitationRequest = async (req, res) => {
 };
 exports.cancelInvitationRequest = async (req, res) => {
     try {
-        const { requestId, userId } = req.body;
+        const { id } = req.body;
+        const userId = req.user.id;
 
         // Fetch the invitation request
         const invitationRequest = await InvitationRequest.findByPk(requestId);
@@ -242,7 +247,7 @@ exports.cancelInvitationRequest = async (req, res) => {
         }
 
         // Check if the user is the one who sent the invitation or has permissions to cancel it
-        if (invitationRequest.userId === userId) {
+        if (invitationRequest.userId === userId || checkRight(userId, invitationRequest.companyId, "admin")) {
             // Case 1: Inviter cancelling their own invitation
             if (invitationRequest.status !== 'pending') {
                 return res.status(400).json({ message: "Only pending requests can be cancelled." });
