@@ -6,10 +6,10 @@ exports.add = async (req, res) => {
   try {
     const file = req.body;
     await File.create(file);
-    res.status(201).json("File added");
+    res.status(201).json({ status: 201, message: "File added successfully" });
   } catch (error) {
     console.error("Error adding file:", error);
-    res.status(500).json({ error: "Error adding file" });
+    res.status(500).json({ status: 500, error: "Error adding file" });
   }
 };
 
@@ -20,13 +20,13 @@ exports.delete = async (req, res) => {
     const result = await File.findByPk(idP);
     if (result) {
       await result.destroy();
-      res.status(200).json("File successfully deleted");
+      res.status(201).json({ status: 201, message: "File deleted successfully" });
     } else {
-      res.status(404).json({ error: "File not found" });
+      res.status(404).json({ status: 404, error: "File not found" });
     }
   } catch (error) {
     console.error("Error deleting file:", error);
-    res.status(500).json({ error: "Error deleting file" });
+    res.status(500).json({ status: 500, error: "Error deleting file" });
   }
 };
 
@@ -38,13 +38,13 @@ exports.update = async (req, res) => {
     const result = await File.findByPk(idP);
     if (result) {
       await result.update(file);
-      res.status(200).json(result);
+      res.status(201).json({ status: 201, message: "File updated successfully" });
     } else {
-      res.status(404).json({ error: "File not found" });
+      res.status(404).json({ status: 404, error: "File not found" });
     }
   } catch (error) {
     console.error("Error updating file:", error);
-    res.status(500).json({ error: "Error updating file" });
+    res.status(500).json({ status: 500, error: "Error updating file" });
   }
 };
 
@@ -56,13 +56,13 @@ exports.getById = async (req, res) => {
       include: [{ model: Subscription, as: "subscription" }],
     });
     if (result) {
-      res.status(200).json(result);
+      res.status(201).json({status: 201, data: result});
     } else {
-      res.status(404).json({ error: "File not found" });
+      res.status(404).json({ status: 404, error: "File not found" });
     }
   } catch (error) {
     console.error("Error retrieving the file:", error);
-    res.status(500).json({ error: "Error retrieving the file" });
+    res.status(500).json({ status: 500, error: "Error retrieving the file" });
   }
 };
 
@@ -86,9 +86,9 @@ exports.getAll = async (req, res) => {
       subscriptionDuration: result.subscription ? result.subscription.duration : null,
     }));
 
-    res.status(200).json(fileDetails);
+    res.status(201).json({ status: 201, data: fileDetails });
   } catch (error) {
     console.error("Error retrieving the files:", error);
-    res.status(500).json({ error: "Error retrieving the files" });
+    res.status(500).json({ status: 500, error: "Error retrieving the files" });
   }
 };

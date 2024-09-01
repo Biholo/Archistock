@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import ComponentsTest from './pages/ComponentsTest/ComponentsTest';
@@ -16,7 +16,10 @@ import Statistics from './pages/Statistics/Statistics';
 import Usersubscriptions from './pages/UserSubscriptions/Usersubscriptions';
 import UploadFiles from './pages/UploadFiles/UploadFiles';
 import EGModal from './components/Modals/EG';
-import { StorageProvider } from './contexts/StorageContext';
+import ContactSupport from './components/Support/ContactSupport';
+import AnswerClient from './components/Support/AnswerClient';
+import 'react-toastify/dist/ReactToastify.css';
+
 import Company from './pages/Company/Company';
 import RegisterInvitation from './pages/RegisterInvitation/RegisterInvitation';
 
@@ -105,31 +108,19 @@ const UserLogged = () => {
 
   return (
     <div className="flex min-h-dvh text-black">
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-      <EGModal show={show} handleClose={() => setShow(false)} />
+      <ToastContainer />
+      <EGModal  show={show} handleClose={() => setShow(false)} />
       <div className="w-2/12 bg-white">
         <Aside />
       </div>
       <div className="w-10/12 mx-4 my-4 bg-white-100 shadow-md">
         <div className='m-4'></div>
         <Routes>
-          <Route path="/statistics" element={<Statistics />} />
-
-          <Route path="/components" element={<ComponentsTest />} />
-          <Route path="/storage" element={
-            <StorageProvider>
+          <Route path="statistics" element={<Statistics />} />
+          
+          <Route path="components" element={<ComponentsTest />} />
+          <Route path="storage" element={
               <Usersubscriptions />
-            </StorageProvider>
           } />
           <Route path="/extend" element={<ExtendStorage />} />
           <Route path="/*" element={<Company />} />
@@ -137,6 +128,8 @@ const UserLogged = () => {
           <Route path="/settings" element={<div>Settings</div>} />
           <Route path="/profile" element={<Profil />} />
           <Route path="/profile/change-password" element={<NewPassword />} />
+          <Route path="/contact-support" element={<ContactSupport />} />
+          <Route path="/answer-client" element={<AnswerClient />} />
         </Routes>
       </div>
     </div>

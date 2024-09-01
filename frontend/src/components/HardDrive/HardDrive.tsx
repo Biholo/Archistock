@@ -1,8 +1,9 @@
 import { HardDrive } from "@phosphor-icons/react";
 import { Fragment, useState, useEffect, useRef } from "react";
 import ArchistockApiService from "../../services/ArchistockApiService";
+import { toast } from "react-toastify";
 
-const HardDriveStorage = ({ storage, onStorageClick}: { storage: any, onStorageClick: any}): any => {
+const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, onStorageClick: any, onUpdate: any}): any => {
     const [showMenu, setShowMenu] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
     const [editStorage, setEditStorage] = useState(false);
@@ -26,7 +27,12 @@ const HardDriveStorage = ({ storage, onStorageClick}: { storage: any, onStorageC
     const handleUpdateStorage = () => {
         setEditStorage(false);
         archistockApiService.updateStorage(storage.id, { name: storageName }).then((res) => {
-            console.log(res);
+            if(res.status === 201) {
+                toast.success("Storage updated successfully");
+                onUpdate();
+            } else {
+                toast.error("An error occured while updating storage. Please retry.");
+            }
         });
     }
 
@@ -73,7 +79,7 @@ const HardDriveStorage = ({ storage, onStorageClick}: { storage: any, onStorageC
                 onClick={() => editStorage ? null : onStorageClick(storage)}
                 onContextMenu={handleRightClick}
             >
-                <HardDrive size={32} />
+                <HardDrive size={40} />
                 <div className="ml-2">
                     {editStorage ? (
                         <>
@@ -87,10 +93,10 @@ const HardDriveStorage = ({ storage, onStorageClick}: { storage: any, onStorageC
                             <br />
                         </>
                     ) : (
-                        <p className="text-sm font-semibold text-gray-600">{storageName}</p>
+                        <p className="text-md font-semibold text-gray-600">{storageName}</p>
                     )}
                     <progress className={`progress ${getStorageColor()} w-56 h-3.5`} value={getFilesSize()} max={storage.subscription.size}></progress>
-                    <p className="text-xs text-gray-400">{getFilesSize()} Go / {storage.subscription.size.toFixed(2)} Go</p>
+                    <p className="text-sm text-gray-400">{getFilesSize()} Go / {storage.subscription.size.toFixed(2)} Go</p>
                 </div>
             </div>
 
@@ -108,7 +114,7 @@ const HardDriveStorage = ({ storage, onStorageClick}: { storage: any, onStorageC
                                     setShowMenu(false);
                                 }}
                             >
-                                <p className="text-xs">Propriétés</p>
+                                <p className="text-sm">Propriétés</p>
                             </button>
                         </li>
                         <li>
@@ -119,7 +125,7 @@ const HardDriveStorage = ({ storage, onStorageClick}: { storage: any, onStorageC
                                     setShowMenu(false);
                                 }}
                             >
-                                <p className="text-xs">Renommer</p>
+                                <p className="text-sm">Renommer</p>
                             </button>
                         </li>
                     </ul>

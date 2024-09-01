@@ -185,6 +185,22 @@ class ArchistockApiService {
             }
     }
 
+    async getStorageRoot(storageId:number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/folder/root/${storageId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to fetch root folder:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
     async updateStorage(storageId:number, storage:any): Promise<any> {
         try {
             const response = await fetch(`${this.url}/usersubscription/update/${storageId}`, {
@@ -217,6 +233,22 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to create folder:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
+    async getFolder(folderId:number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/folder/${folderId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to fetch folder:", error);
             throw error;  // rethrow the error if you want to handle it further up in your components
         }
     }
@@ -254,6 +286,40 @@ class ArchistockApiService {
             throw error;  // rethrow the error if you want to handle it further up in your components
         }
     }
+
+    async uploadFileWithProgress(formData: FormData, onProgress: (progress: number) => void): Promise<any> {
+      const token = getCookie('accessToken');
+      if (!token) {
+          throw new Error("No access token found.");
+      }
+
+      return new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', `${this.url}/usersubscription/add-files`, true);
+
+          xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+          xhr.upload.onprogress = (event) => {
+              if (event.lengthComputable) {
+                  const percentage = (event.loaded / event.total) * 100;
+                  onProgress(Math.round(percentage));
+              }
+          };
+
+          xhr.onload = () => {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                  resolve(JSON.parse(xhr.response));
+              } else {
+                  reject(new Error(`Failed to upload file: ${xhr.status} ${xhr.statusText}`));
+              }
+          };
+
+          xhr.onerror = () => reject(new Error("Network error"));
+
+          xhr.send(formData);
+      });
+  }
+  
 
     async updateFile(fileId:number, file:any): Promise<any> {
         try {

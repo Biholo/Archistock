@@ -31,7 +31,7 @@ export default function Aside() {
         <div className="title flex flex-row justify-center md:justify-between items-center">
           <h1>
             <span className="font-bold hidden md:block text-lg xl:text-xl">
-              🔗Archistock
+              🔗ArchiStock
             </span>
             <span className="font-black block md:hidden text-xl text-center">
               AS
@@ -82,6 +82,22 @@ export default function Aside() {
           active={active === "profile"}
           onClick={() => handleChangeItem("profile")}
         ></AsideItem>
+        // ContactSupport
+        <AsideItem
+          title="Contact Support"
+          icon={<User size={20} />}
+          link="contact-support"
+          active={active === "contact-support"}
+          onClick={() => handleChangeItem("contact-support")}
+        ></AsideItem>
+        // AnswerClient
+        <AsideItem
+          title="Answer Client"
+          icon={<User size={20} />}
+          link="answer-client"
+          active={active === "answer-client"}
+          onClick={() => handleChangeItem("answer-client")}
+        />
         <AsideItem
           title="Company"
           icon={<Factory size={20} />}

@@ -27,11 +27,11 @@ export default function Profil() {
    
 
   return (
-    <div className='profile p-10'>
+    <div className='profile p-5'>
         <h1>
             {capitalizeFirstLetter(profileUser?.firstName || '')} {capitalizeFirstLetter(profileUser?.lastName || '')}
         </h1>
-        <div className='flex justify-between'>
+        <div className='flex flex-col'>
             <div className="user-informations w-2/5 mt-2">
                 <h2>Informations personnelles</h2>
                 <div >
@@ -42,7 +42,7 @@ export default function Profil() {
                     <Input css={'w-full mt-2'} label="Email" value={profileUser.email} disabled={true} />
                     <Input css={'w-full mt-2'} label="Téléphone" value={profileUser.phoneNumner} disabled={true} />
                 
-                    <button className='w-full p-3 mt-4' onClick={e => handleCLickOnNewPassword()}>Changer de mot de passe</button>
+                    <button className='w-full p-3 mt-2' onClick={e => handleCLickOnNewPassword()}>Changer de mot de passe</button>
                 </div>
 
             </div>
