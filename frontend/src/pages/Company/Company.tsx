@@ -38,6 +38,21 @@ export default function Company() {
         }
     }, [user]);
 
+    const updateCompanies = () => {
+        if (user && user.id) {
+            archistockApiService.findCompaniesByUserId(user.id).then((response) => {
+                setRights(response);
+                const companies = response.map((right) => right.company);
+                setCompanies(companies);
+                if (companies.length === 0) {
+                    navigate("/company/no-company")
+                }
+
+            });
+        }
+    }
+
+
 
     return (
         <div className="company p-10 h-full">
@@ -46,7 +61,7 @@ export default function Company() {
                 <Route path="/company/find" element={<FindCompany />} />
                 <Route path="/company/create" element={<CreateCompany />} />
                 <Route path="/company/detail/:id" element={<CompanyDetail />} />
-                <Route path="/company" element={<IndexCompagnies companies={companies} />} />
+                <Route path="/company" element={<IndexCompagnies companies={companies} updateCompanies={updateCompanies} />} />
                 <Route path="/company/:id/parameter" element={<Parameter />} />
             </Routes>
         </div>

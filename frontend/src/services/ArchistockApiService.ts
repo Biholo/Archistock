@@ -471,7 +471,7 @@ class ArchistockApiService {
 
     async findAllInfosByCompanyId (companyId:string, userId: number): Promise<any> {
         try {
-            const response = await fetch(`${this.url}/company/informations/one/${companyId}?userId=${userId}`, {
+            const response = await fetch(`${this.url}/company/informations/one/${companyId}`, {
                 method: 'GET',
                 headers: {
                     Authorization: `${getCookie('accessToken')}`,
@@ -526,6 +526,71 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to register invitation:", error);
+            throw error; 
+        }
+    }
+
+    //invitation request
+    async getInvitationRequestByUserId(userId:number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/invitation-request/all/user/${userId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse.data;
+        } catch (error) {
+            console.error("Failed to fetch invitation request:", error);
+            throw error; 
+        }
+    }
+
+    async acceptInvitationRequest(invitationId:number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/invitation-request/accept/${invitationId}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse.data;
+        } catch (error) {
+            console.error("Failed to accept invitation request:", error);
+            throw error; 
+        }
+    }
+
+    async declineInvitationRequest(invitationId:number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/invitation-request/decline/${invitationId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse.data;
+        } catch (error) {
+            console.error("Failed to decline invitation request:", error);
+            throw error; 
+        }
+    }
+
+    async cancelInvitationRequest(invitationId:number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/invitation-request/cancel/${invitationId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse.data;
+        } catch (error) {
+            console.error("Failed to cancel invitation request:", error);
             throw error; 
         }
     }

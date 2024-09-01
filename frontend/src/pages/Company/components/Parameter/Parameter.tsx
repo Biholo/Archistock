@@ -7,6 +7,7 @@ import StockageList from '../StockageList/StockageList';
 import InvitationList from '../InvitationList/InvitationList';
 import Button from '../../../../components/Button/Button';
 import Input from '../../../../components/Input/Input';
+import Subscription from '../Subscription/Subscription';
 
 import {
     Cloud,
@@ -25,7 +26,7 @@ export default function Parameter() {
     const [userInvitations, setUserInvitations] = useState([]);
     const [sharedStorageSpaces, setSharedStorageSpaces] = useState([]);
     const [company, setCompany] = useState(null);
-    const [page, setPage] = useState('users');
+    const [page, setPage] = useState('stockages');
 
     const [inviteUsers, setInviteUsers] = useState([]);
     const [searchEmail, setSearchEmail] = useState({
@@ -138,6 +139,8 @@ export default function Parameter() {
                 return <StockageList sharedStorageSpaces={sharedStorageSpaces} />;
             case 'invitations':
                 return <InvitationList invitations={invitations} userInvitations={userInvitations}/>;
+            case 'subscriptions':
+                return <Subscription />;
             default:
                 return <UserList users={users} />;
         }
@@ -258,7 +261,8 @@ export default function Parameter() {
             <ul className='flex mt-2'>
                 <li onClick={e => setPage('stockages')} className={`mr-5 ${page === 'stockages' ? 'selected' : ''}`}>Stockages</li>
                 <li onClick={e => setPage('users')} className={`mr-5 ${page === 'users' ? 'selected' : ''}`}>Utilisateurs</li>
-                <li onClick={e => setPage('invitations')} className={`${page === 'invitations' ? 'selected' : ''}`}>Invitations</li>
+                <li onClick={e => setPage('invitations')} className={`mr-5  ${page === 'invitations' ? 'selected' : ''}`}>Invitations</li>
+                <li onClick={e => setPage('subscriptions')} className={`${page === 'subscriptions' ? 'selected' : ''}`}>Abonnements</li>
             </ul>
             <div>
                 {renderPage()}
