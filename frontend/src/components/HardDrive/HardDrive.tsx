@@ -3,19 +3,19 @@ import { Fragment, useState, useEffect, useRef } from "react";
 import ArchistockApiService from "../../services/ArchistockApiService";
 import { toast } from "react-toastify";
 
+const archistockApiService = new ArchistockApiService();
+
 const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, onStorageClick: any, onUpdate: any}): any => {
     const [showMenu, setShowMenu] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
     const [editStorage, setEditStorage] = useState(false);
     const [storageName, setStorageName] = useState(storage.name);
     const menuRef = useRef(null);
-    
-    const archistockApiService = new ArchistockApiService();
 
     const handleRightClick = (e: any) => {
         e.preventDefault();
         setShowMenu(true);
-        setMenuPosition({ x:200, y: 130 });
+        setMenuPosition({ x: e.clientX - 300, y: e.clientY - 200 });
     };
 
     const handleClickOutside = (e: any) => {
@@ -103,20 +103,10 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
             {showMenu && (
                 <div
                     ref={menuRef}
-                    className="absolute rounded z-10 bg-gray-800 text-white p-1"
+                    className="absolute rounded z-10"
                     style={{ top: menuPosition.y, left: menuPosition.x }}
                 >
-                    <ul className="menu bg-base-100 rounded-box">
-                        <li>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowMenu(false);
-                                }}
-                            >
-                                <p className="text-sm">Propriétés</p>
-                            </button>
-                        </li>
+                    <ul className="menu bg-base-100 rounded-box text-white">
                         <li>
                             <button
                                 onClick={(e) => {

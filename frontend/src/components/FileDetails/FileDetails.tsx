@@ -52,7 +52,7 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
 
     return (
         <div
-            className="relative flex flex-col items-center hover:bg-slate-200 p-2 rounded cursor-pointer min-w-20"
+            className="relative flex flex-col items-center hover:bg-slate-200 p-2 rounded cursor-pointer min-w-30"
             onClick={() => editFile ? null : onClick(file)}
             onContextMenu={handleRightClick}
         >
@@ -66,7 +66,7 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
                     onBlur={() => handleUpdateFile()}
                 />
             ) : (
-                <p className="text-md">{fileName}</p>
+                <p className="text-md max-w-20 word-wrap">{fileName}.{file.format}</p>
             )}
 
             {showMenu && (

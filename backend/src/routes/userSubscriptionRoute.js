@@ -2,22 +2,28 @@ const express = require("express");
 const router = express.Router();
 const UserSubscriptionController = require("../controllers/userSubscriptionController");
 const middleware = require("../middleware/middleware");
-
 const multer = require('multer');
 const path = require('path');
 
-// Configuration de multer pour conserver le nom original des fichiers
+// Configuration of multer for retaining the original file name
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'src/files/');  // Le dossier où les fichiers seront sauvegardés
+    cb(null, 'src/files/');  // Folder where files will be stored
   },
   filename: function (req, file, cb) {
-    // cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname)); // Option pour ajouter une date au nom
-    cb(null, file.originalname);  // Conserve le nom original du fichier
+    cb(null, file.originalname);  // Preserve the original file name
   }
 });
 
-const upload = multer({ storage: storage });
+// File filter to accept any file type
+const fileFilter = (req, file, cb) => {
+  cb(null, true);  // Accept all file types
+};
+
+const upload = multer({ 
+  storage: storage, 
+  fileFilter: fileFilter 
+});
 
 // Create an subscription (POST)
 router.post("/add", middleware.authenticator, UserSubscriptionController.add);

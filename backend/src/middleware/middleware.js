@@ -28,7 +28,7 @@ exports.authenticator = (req, res, next) => {
       }
     });
   } else {
-    res.status(401).json({ erreur: "NON GROS CHIEN" });
+    res.status(401).json({ erreur: "Access denied" });
   }
 };
 

@@ -64,13 +64,13 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties, onUp
                     onBlur={handleUpdateFolder}
                 />
             ) : (
-                <p className="text-md truncate">{folderName}</p>
+                <p className="text-md max-w-20 word-wrap">{folderName}</p>
             )}
 
             {showMenu && (
                 <div
                     ref={menuRef}
-                     className="absolute rounded z-10"
+                    className="absolute rounded z-10"
                     style={{ top: menuPosition.y, left: menuPosition.x }}
                 >
                     <ul className="menu bg-base-100 rounded-box text-white">

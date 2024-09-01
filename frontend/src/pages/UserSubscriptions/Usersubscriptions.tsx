@@ -4,21 +4,17 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import ArchistockApiService from '../../services/ArchistockApiService';
 import StatsCard from '../../components/StatsCard/StatsCard';
 import Card from '../../components/Card/Card';
-import FileDetails from '../../components/FileDetails/FileDetails';
 import HardDriveStorage from '../../components/HardDrive/HardDrive';
-import FolderIcon from '../../components/FolderIcon/FolderIcon';
 import PreviewFileModal from '../../components/Modals/PreviewFileModal';
 import Button from '../../components/Button/Button';
-import { Drop, FolderSimplePlus } from '@phosphor-icons/react';
+import { Download, Eye, FolderSimplePlus, Trash } from '@phosphor-icons/react';
 import FolderCreate from '../../components/FolderIcon/FolderCreate';
 import { toast } from 'react-toastify';
-import PreviewFolderModal from '../../components/Modals/PreviewFolderModal';
 import FolderSkeleton from '../../components/FolderSkeleton/FolderSkeleton';
-import IconSkeleton from '../../components/IconSkeleton/IconSkeleton';
-import Input from '../../components/Input/Input';
-import DraggableFolder from '../../components/Draggable/DraggableFolder';
 import DroppableFolder from '../../components/Draggable/DroppableFolder';
 import DraggableFile from '../../components/Draggable/DraggableFile';
+import DebouncedInput from '../../components/Input/DebouncedInput';
+import FileIcon from '../../components/FileIcon/FileIcon';
 
 // Services
 const archistockApiService = new ArchistockApiService();
@@ -40,12 +36,20 @@ const UserSubscriptions = () => {
   const [displayStorage, setDisplayStorage] = useState<boolean>(true);
   const [parentId, setParentId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<any>(null);
+  const [search, setSearch] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
   // Récupération des données
   useEffect(() => {
     setLoading(true);
-
-    if (selectedStorage && parentId) {
+    if(search !== "") {
+      archistockApiService.searchFiles(search).then((res) => {
+        console.log("RESULT", res);
+        setSearchResults(res);
+        setLoading(false);
+      });
+    }
+    else if (selectedStorage && parentId) {
       archistockApiService.getFolder(parseInt(parentId!)).then((res) => {
         console.log(res);
         setSelectedFolderContent(res);
@@ -146,7 +150,7 @@ const UserSubscriptions = () => {
         toast.error("An error occurred while moving the file. Please retry.");
       }
     })
-    };
+  };
 
   return (
     <Fragment>
@@ -183,64 +187,116 @@ const UserSubscriptions = () => {
                     </Button>
                   )}
                 </div>
-                <Input placeholder="Rechercher les fichiers" css="w-full" color="input-primary" />
-                {displayStorage ? (
-                  <div className="flex flex-row mt-5">
-                    {storages.map((storage, index) => (
-                      <div key={index} className="mr-5">
-                        <HardDriveStorage storage={storage} onStorageClick={onStorageClick} onUpdate={() => setUpdated(!updated)} />
-                      </div>
-                    ))}
+                <DebouncedInput placeholder='Rechercher des fichiers' onChange={(e) => { setSearch(e); setUpdated(!updated) }} />
+                {search !== "" ? (
+                  <div className="overflow-x-auto">
+                    <table className="table">
+                      <thead>
+                        <tr className='text-black'>
+                          <th>Nom</th>
+                          <th>Type</th>
+                          <th>Taille</th>
+                          <th>Storage</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          <Fragment>
+                            {searchResults.map((file, index) => (
+                              <tr className={index%2===0 ? "bg-blue-100" : ""}>
+                                <th className='flex flex-row items-center gap-3'>
+                                  <FileIcon type={file.format} />
+                                  <p className="">{file.name}.{file.format}</p>
+                                </th>
+                                <td>{file.format}</td>
+                                <td>{(parseFloat(file.size) / 1000).toFixed(2)} Go</td>
+                                <td className='link'>{file.usersubscription.name}</td>
+                                <td>
+                                  <ul className="flex flex-row gap-5">
+                                    <li>
+                                      <Button color="success">
+                                        <Download size={16} />
+                                      </Button>
+                                    </li>
+                                    <li>
+                                      <Button color="primary" onClick={() => setSelectedFile(file)}>
+                                        <Eye size={16} />
+                                      </Button>
+                                    </li>
+                                    <li>
+                                      <Button color="danger" onClick={() => {}}>
+                                        <Trash size={16} />
+                                      </Button>
+                                    </li>
+                                  </ul>
+                                </td>
+                              </tr>
+                            ))}
+                          </Fragment>
+                        
+                      </tbody>
+                    </table>
                   </div>
+                  
                 ) : (
-                  selectedFolderContent && (
-                    <div className="flex flex-wrap gap-5 mt-5 w-full">
-                      <DroppableFolder 
-                        folder={{ name: "...", id: breadcrumb.length > 2 ? breadcrumb[breadcrumb.length - 3].id : null }}
-                        onDrop={(file: any, folder: any) => handleDrop(file, folder)}
-                        onClick={() => onBreadcrumbClick(breadcrumb.length - 2)}
-                        onDelete={() => {}}
-                        onUpdate={() => setUpdated(!updated)}
-
-                      />
-                      {loading ? (
-                        <Fragment>
-                          <FolderSkeleton />
-                        </Fragment>
-                      ) : (
-                        <Fragment>
-                          {selectedFolderContent && (
-                            <Fragment>
-                              {selectedFolderContent.children.map((folder: any, index: number) => (
-                                <DroppableFolder 
-                                  key={index} 
-                                  folder={folder} 
-                                  onDrop={(file: any) => handleDrop(file, folder)} 
-                                  onClick={() => { onFolderClick(folder) }} 
-                                  onDelete={() => { onDeleteFolder(folder) }}
-                                  onUpdate={() => setUpdated(!updated)}
-                              />
-                              ))}
-                              {createFolder && (
-                                <FolderCreate onCreate={(e: any) => handleCreateFolder(e)} />
-                              )}
-                              {selectedFolderContent.files.map((file: any, index: number) => (
-                                <DraggableFile 
-                                  key={index} 
-                                  file={file} 
-                                  onDrop={(folder: any) => console.log(`Dropping file ${file.name} into folder ${folder.name}`)}
-                                  onClick={() => {console.log("File clicked"); setSelectedFile(file)}}
-                                  onDelete={() => {setUpdated(!updated)}}
-                                  onUpdate={() => setUpdated(!updated)}
-                              />
-                              ))}
-                            </Fragment>
-                          )}
-                        </Fragment>
-                      )}
+                  displayStorage ? (
+                    <div className="flex flex-row flex-wrap mt-5">
+                      {storages.map((storage, index) => (
+                        <div key={index} className="mr-5">
+                          <HardDriveStorage storage={storage} onStorageClick={onStorageClick} onUpdate={() => setUpdated(!updated)} />
+                        </div>
+                      ))}
                     </div>
-                  )
-                  )}
+                  ) : (
+                    selectedFolderContent && (
+                      <div className="flex flex-wrap gap-5 mt-5 w-full">
+                        <DroppableFolder 
+                          folder={{ name: "...", id: breadcrumb.length > 2 ? breadcrumb[breadcrumb.length - 3].id : null }}
+                          onDrop={(file: any, folder: any) => handleDrop(file, folder)}
+                          onClick={() => onBreadcrumbClick(breadcrumb.length - 2)}
+                          onDelete={() => {}}
+                          onUpdate={() => setUpdated(!updated)}
+  
+                        />
+                        {loading ? (
+                          <Fragment>
+                            <FolderSkeleton />
+                          </Fragment>
+                        ) : (
+                          <Fragment>
+                            {selectedFolderContent && (
+                              <Fragment>
+                                {selectedFolderContent.children.map((folder: any, index: number) => (
+                                  <DroppableFolder 
+                                    key={index} 
+                                    folder={folder} 
+                                    onDrop={(file: any) => handleDrop(file, folder)} 
+                                    onClick={() => { onFolderClick(folder) }} 
+                                    onDelete={() => { onDeleteFolder(folder) }}
+                                    onUpdate={() => setUpdated(!updated)}
+                                />
+                                ))}
+                                {createFolder && (
+                                  <FolderCreate onCreate={(e: any) => handleCreateFolder(e)} />
+                                )}
+                                {selectedFolderContent.files.map((file: any, index: number) => (
+                                  <DraggableFile 
+                                    key={index} 
+                                    file={file} 
+                                    onDrop={(folder: any) => console.log(`Dropping file ${file.name} into folder ${folder.name}`)}
+                                    onClick={() => {console.log("File clicked"); setSelectedFile(file)}}
+                                    onDelete={() => {setUpdated(!updated)}}
+                                    onUpdate={() => setUpdated(!updated)}
+                                />
+                                ))}
+                              </Fragment>
+                            )}
+                          </Fragment>
+                        )}
+                      </div>
+                    )
+                    )
+                )}
               </Card>
               </div>
           )}

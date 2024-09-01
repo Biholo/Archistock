@@ -16,7 +16,6 @@ const UploadFiles = () => {
     useEffect(() => {
         archistockApiService.getUserStorage().then((res) => {
             setStorage(res);
-            setSelectedStorage(res[0].id);
             console.log(res);
         });
     }, []);
@@ -63,7 +62,7 @@ const UploadFiles = () => {
                             <Input type="select" label="Select Storage" onChange={(e: any) => setSelectedStorage(e.target.value)}>
                                 <option>Select Storage</option>
                                 {storage && storage.map((item: any, index: number) => (
-                                    <option key={index} value={item.id} selected={selectedStorage} >{item.name} - {(parseInt(item.totalSize) / 1000).toFixed(2)} / {item.subscription.size.toFixed(2)} Go</option>
+                                    <option key={index} value={item.id}>{item.name} - {(parseInt(item.totalSize) / 1000).toFixed(2)} / {item.subscription.size.toFixed(2)} Go</option>
                                 ))}
                             </Input>
 

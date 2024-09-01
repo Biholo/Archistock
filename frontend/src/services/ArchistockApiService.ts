@@ -141,7 +141,6 @@ class ArchistockApiService {
                 Authorization: `${getCookie('accessToken')}`,
             },
         });
-        
         const jsonResponse = await response.json();
         return jsonResponse;
     } catch (error) {
@@ -319,6 +318,23 @@ class ArchistockApiService {
           xhr.send(formData);
       });
   }
+
+    async searchFiles(searchTerm:string): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/usersubscription/files/me?searchTerm=${searchTerm}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            console.log("json response", jsonResponse);
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to search files:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
   
 
     async updateFile(fileId:number, file:any): Promise<any> {
@@ -338,6 +354,36 @@ class ArchistockApiService {
             throw error;  // rethrow the error if you want to handle it further up in your components
         }
     }
+    
+    async downloadFile(filename: string) {
+        try {
+          const response = await fetch(`${this.url}/file/download/${filename}`, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${getCookie('accessToken')}`,
+            },
+          });
+      
+          if (!response.ok) {
+            console.error(`Failed to download file: ${response.statusText}`);
+            throw new Error(`Failed to download file: ${response.statusText}`);
+          }
+      
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+      
+        } catch (error) {
+          console.error("Failed to download file:", error);
+          throw error;
+        }
+      }
+      
 
     async findAllCountries(): Promise<any> {
         try {

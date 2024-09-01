@@ -6,6 +6,8 @@ const jwt = require("jsonwebtoken");
 const Folder = require("../models/folderModel");
 const fs = require("fs");
 const crypto = require("crypto");
+const path = require("path");
+const { Op, where } = require("sequelize");
 require("dotenv").config();
 
 // Create a user subscription (POST)
@@ -164,6 +166,9 @@ exports.getByUserId = async (req, res) => {
 
 // Get user subscriptions by user Id with files (GET)
 exports.getByUserIdWithFiles = async (req, res) => {
+
+  // get searchTerm from query
+  const searchTerm = req.query.searchTerm;
   setTimeout(() => {
     console.log("Timeout completed");
   }, 5000);
@@ -181,15 +186,42 @@ exports.getByUserIdWithFiles = async (req, res) => {
 
   try {
     const user = await User.findOne({ where: { email: email } });
-    const result = await UserSubscription.findAll({
-      where: { userId: user.id },
-      include: [
-        { model: User, as: 'user' },
-        { model: Subscription, as: 'subscription' },
-        { model: File, as: 'files' },
-        { model: Folder, as: 'folders', include: [{ model: File, as: 'files' }] },
-      ],
+    let result = null;
+    if(searchTerm) {
+      result = await File.findAll({
+        where: {
+            name: {
+                [Op.like]: `%${searchTerm}%`
+            }
+        },
+        include: [
+            {
+                model: UserSubscription,
+                as: 'usersubscription',
+                where: {
+                    userId: user.id
+                },
+                include: [
+                    { model: Subscription, as: 'subscription' }
+                ]
+            },
+            { model: Folder, as: 'parent' }
+        ],
+        limit: 10,
     });
+    } else {
+      result = await UserSubscription.findAll({
+        where: { userId: user.id },
+        include: [
+          { model: User, as: 'user' },
+          { model: Subscription, as: 'subscription' },
+          { model: File, as: 'files' },
+          { model: Folder, as: 'folders', include: [{ model: File, as: 'files' }] },
+        ],
+        limit: 10,
+      });
+    }
+    
 
     console.log(result);  // Log the result directly
     res.status(200).json(result);  // Send the result as a JSON response
@@ -212,34 +244,46 @@ router.post(
 exports.addFile = async (req, res) => {
   let files = req.files;
   let userSubscriptionId = req.body.userSubscriptionId;
+  setTimeout(() => {console.log(userSubscriptionId);}, 3000);
   try {
+    
     for (let i = 0; i < files.length; i++) {
-
-      // if file size is > 2 GB, do not add it to the subscription
-      if(files[i].size > 2147483648) {
+    
+      // Si la taille du fichier est > 2 GB, ne pas l'ajouter à l'abonnement
+      if (files[i].size > 2147483648) {
+        // Supprimer le fichier
+        await fs.unlink(`src/files/${files[i].filename}`);
         continue;
       }
-
+    
       let hash = crypto.randomBytes(20).toString("hex");
-
-      // rename file
-      fs.renameSync(`src/files/${files[i].filename}`, `src/files/${hash}.${files[i].mimetype.split("/")[1]}`);
-
-      // if file name is > 128 characters, generate hash for the file name
-      if(files[i].originalname.split("").length > 128) {
-        // generate hash for the file name
+    
+      setTimeout(() => {
+        console.log(`${files[i].filename} ${files[i].mimetype}`);
+      }, 5000);
+    
+      // Récupérer l'extension du fichier de manière correcte
+      const extension = path.extname(files[i].filename);
+    
+      // Renommer le fichier
+      await fs.rename(`src/files/${files[i].filename}`, `src/files/${hash}${extension}`);
+    
+      // Si le nom du fichier est > 128 caractères, générer un hash pour le nom du fichier
+      if (files[i].originalname.length > 128) {
         files[i].originalname = hash;
       }
-
+    
+      // Stocker les informations du fichier dans la base de données
       await File.create({
         name: files[i].originalname.split('.')[0],
         pathName: hash,
-        size: (files[i].size / 1048576).toFixed(2),
-        format: files[i].mimetype.split("/")[1],
+        size: (files[i].size / 1048576).toFixed(2), // Convertir la taille en MB
+        format: extension.slice(1), // Enlever le point de l'extension
         parentId: null,
         userSubscriptionId: userSubscriptionId,
       });
     }
+    
     res.status(201).json("Files added to subscription");
   } catch (error) {
     console.error("Error adding files to subscription: ", error);
