@@ -30,6 +30,15 @@ const UserSubscription = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: true,
         },
+        status: {
+            type: DataTypes.ENUM("active", "cancelled", "blocked"),
+            allowNull: false,
+            defaultValue: "active",
+        },
+        lastPaymentDate: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
     },
     {
         sequelize,

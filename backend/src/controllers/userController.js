@@ -9,14 +9,16 @@ const Mailer = require("../services/mailer");
 const multer = require("multer");
 require("dotenv").config();
 
+
 const { v4: uuidv4 } = require("uuid");
 const mailer = new Mailer();
 //--------- Create a user ---------//
 
 exports.register = async (req, res) => {
   try {
-    const { email, password, firstName, lastName, phoneNumner } = req.body.user;
+    const { email, password, firstName, lastName, phoneNumber } = req.body.user;
     const { street, city, postalCode, countryId } = req.body.address;
+
 
     const existingUser = await User.findOne({ where: { email: email } });
     if (existingUser) {
@@ -24,9 +26,10 @@ exports.register = async (req, res) => {
     }
 
     const address = await Address.create({
-      street: street,
-      city: city,
-      postalCode: postalCode,
+      street,
+      city,
+      postalCode,
+      countryId, // Ajout du pays s'il est nécessaire
     });
 
     const hash = await bcrypt.hashSync(password, 10);
@@ -35,21 +38,19 @@ exports.register = async (req, res) => {
       password: hash,
       firstName,
       lastName,
-      phoneNumner,
+      phoneNumber, // Correction de l'erreur typographique
       addressId: address.id,
     });
 
-    // Generate a refresh token with expiration
     const refreshToken = uuidv4();
-
-    // Update the refresh token in the database
     user.refreshToken = refreshToken;
     await user.save();
 
-    // Return the JWT token and the refresh token
     const token = jwt.sign({ email }, process.env.SECRET_KEY, {
       expiresIn: "1h",
     });
+
+    mailer.sendAccountConfirmationEmail(email, user.id);
 
     res.cookie("access_token", token, {
       httpOnly: true,
@@ -66,15 +67,12 @@ exports.register = async (req, res) => {
   }
 };
 
-//--------- Login a user ---------//
-
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(email, password);
     const existingUser = await User.findOne({
-      where: {
-        email: email,
-      },
+      where: { email },
       include: [
         {
           model: Address,
@@ -87,47 +85,36 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "Incorrect email." });
     }
 
-    const hash = bcrypt.compareSync(password, existingUser.password);
-    if (!hash) {
+    const passwordMatch = bcrypt.compareSync(password, existingUser.password); // Accès direct à password
+    if (!passwordMatch) {
       return res.status(401).json({ message: "Incorrect email or password." });
     }
 
-    // Generate a refresh token
     const refreshToken = uuidv4();
-
-    // Update the refresh token in the database
     existingUser.refreshToken = refreshToken;
     await existingUser.save();
 
-    // Return the JWT token and the refresh token
     const token = jwt.sign(
-      {
-        email: existingUser.email,
-        id: existingUser.id,
-        role: existingUser.role,
-      },
+      { email: existingUser.email, id: existingUser.id, role: existingUser.role },
       process.env.SECRET_KEY,
-      {
-        expiresIn: "1h",
-      }
+      { expiresIn: "1h" }
     );
 
     res.cookie("access_token", token, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production", // Seulement en production
       sameSite: "strict",
       expires: new Date(Date.now() + 3600000),
       path: "/",
     });
 
-    res
-      .status(200)
-      .json({ user: existingUser, accessToken: token, refreshToken });
+    res.status(200).json({ user: existingUser, accessToken: token, refreshToken });
   } catch (error) {
     console.error("Error during user authentication: ", error);
     res.status(500).json({ message: "Error during user authentication" });
   }
 };
+
 
 // Verify the validity of the access token
 exports.verifyAccessToken = async (req, res) => {
@@ -188,7 +175,7 @@ exports.getById = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const userId = req.params.id; // Assume the user ID to be updated is passed in the URL parameters
-    const { email, password } = req.body;
+    const updates = req.body; // Object containing the fields to update
 
     // Check if the user to update exists in the database
     const userToUpdate = await User.findByPk(userId);
@@ -196,12 +183,17 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (email) {
-      userToUpdate.email = email;
-    }
-    if (password) {
-      const hash = await bcrypt.hashSync(password, 10);
-      userToUpdate.password = hash;
+    // Iterate over the updates object and update only the provided fields
+    for (const key in updates) {
+      if (Object.hasOwnProperty.call(updates, key)) {
+        // Check if the key is "password" to handle hashing
+        if (key === "password") {
+          const hash = await bcrypt.hashSync(updates[key], 10);
+          userToUpdate[key] = hash;
+        } else {
+          userToUpdate[key] = updates[key];
+        }
+      }
     }
 
     // Save the modifications to the database
@@ -211,9 +203,53 @@ exports.updateUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Error while updating user information",
+      error: error.message, // Optionally include the error message for debugging
     });
   }
 };
+
+//confirm account 
+// confirmAccount
+exports.confirmAccount = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ message: "Token is required" });
+    }
+
+    const tokenDecoded = jwt.verify(token, process.env.SECRET_KEY);
+
+    if (!tokenDecoded || !tokenDecoded.userId) {
+      return res.status(400).json({ message: "Invalid token" });
+    }
+
+    console.log(tokenDecoded.userId);
+    const user = await User.findByPk(tokenDecoded.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.accountIsConfirmed) {
+      return res.status(200).json({ message: "Account is already confirmed" });
+    }
+
+    user.accountIsConfirmed = true;
+    await user.save();
+
+    res.status(200).json({ message: "Account confirmed successfully" });
+  } catch (error) {
+    console.error("Error while confirming account:", error);
+
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(400).json({ message: "Invalid token" });
+    }
+
+    res.status(500).json({ message: "Error while confirming account" });
+  }
+};
+
 
 //--------- Delete a user ---------//
 

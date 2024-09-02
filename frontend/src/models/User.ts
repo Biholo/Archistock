@@ -4,7 +4,7 @@ interface User {
     email: string;
     firstName: string;
     lastName: string;
-    phoneNumner: string;
+    phoneNumber: string;
     password?: string | null;
     passwordConfirm?: string | null;
 
