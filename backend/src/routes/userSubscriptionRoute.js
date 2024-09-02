@@ -66,6 +66,12 @@ router.post(
   UserSubscriptionController.addFile
 );
 
+// Route to get all users with their storage usage and available storage
+router.get(
+  "/users-with-storage",
+  middleware.authenticator,
+  UserSubscriptionController.getAllUsersWithStorage
+);
 
 
 module.exports = router;

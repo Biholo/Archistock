@@ -1,7 +1,16 @@
-import React from 'react';
-import { PieChart, Pie, ResponsiveContainer, Cell } from 'recharts';
+import React from "react";
+import { PieChart, Pie, ResponsiveContainer, Cell } from "recharts";
 
-const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, index, colors, data }) => {
+const CustomLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  index,
+  colors,
+  data,
+}) => {
   const RADIAN = Math.PI / 180;
   const radius = 25 + innerRadius + (outerRadius - innerRadius);
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -11,8 +20,8 @@ const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, index, colors
     <text
       x={x}
       y={y}
-      fill={colors[index % colors.length]}  // Utilisation de la couleur correspondante
-      textAnchor={x > cx ? 'start' : 'end'}
+      fill={colors[index % colors.length]}
+      textAnchor={x > cx ? "start" : "end"}
       dominantBaseline="central"
     >
       {`${data[index].name}: ${data[index].value}`}
@@ -21,6 +30,7 @@ const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, index, colors
 };
 
 const CustomPieChart = ({ data, colors, width, height }) => {
+  
   return (
     <ResponsiveContainer width={width} height={height}>
       <PieChart>
@@ -31,7 +41,9 @@ const CustomPieChart = ({ data, colors, width, height }) => {
           cy="50%"
           innerRadius={70}
           outerRadius={90}
-          label={(props) => <CustomLabel {...props} colors={colors} data={data} />}
+          label={(props) => (
+            <CustomLabel {...props} colors={colors} data={data} />
+          )}
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
