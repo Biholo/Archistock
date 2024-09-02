@@ -24,6 +24,14 @@ import Company from './pages/Company/Company';
 import RegisterInvitation from './pages/RegisterInvitation/RegisterInvitation';
 import Administrator from './pages/Administrator/Administrator';
 
+import Pricing from './pages/Pricing/Pricing';
+import Homepage from './pages/Homepage/Homepage';
+import ApiPage from './pages/ApiPage/ApiPage';
+import Navbar from './components/Navbar/Navbar';
+import Footer from './components/Footer/Footer';
+import AdminStatistics from './components/AdminStatistics/AdminStatistics';
+import UserStatistics from './components/UserStatistics/UserStatistics';
+
 const App = () => {
   return (
     <Router>
@@ -44,15 +52,32 @@ const AuthRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={loggedIn ? <Navigate to="/storage" /> : <Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+
       <Route path="/register-invitation/:uuid" element={<RegisterInvitation />} />
-      <Route path="/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
-      <Route path="/temp/reset-password/:jwt" element={<ResetPassword/>} />
+      <Route path="/temp/reset-password/:jwt" element={<ResetPassword />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+
+      <Route path="/*" element={loggedIn ? <UserLogged /> : <PublicRoutes />} />
+      <Route path="/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
     </Routes>
   );
 };
+
+const PublicRoutes = () => {
+  return (
+    <div className='flex flex-col'>
+      <Navbar />
+      <Routes>
+        <Route path="/api" element={<ApiPage />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/" element={<Homepage />} />
+      </Routes>
+      <Footer />
+    </div>
+  );
+}
 
 const UserLogged = () => {
 
@@ -93,8 +118,8 @@ const UserLogged = () => {
       <div className="w-10/12 mx-4 my-4 bg-white-100 shadow-md">
         <div className='m-4'></div>
         <Routes>
-          <Route path="components" element={<ComponentsTest />} />
-          <Route path="storage" element={
+          <Route path="/components" element={<ComponentsTest />} />
+          <Route path="/storage" element={
               <Usersubscriptions />
           } />
           <Route path="/extend" element={<ExtendStorage />} />
@@ -105,7 +130,7 @@ const UserLogged = () => {
           <Route path="/profile/change-password" element={<NewPassword />} />
           <Route path="/contact-support" element={<ContactSupport />} />
           <Route path="/answer-client" element={<AnswerClient />} />
-          <Route path="/statistics" element={<Statistics />} />
+          <Route path="/statistics" element={<UserStatistics />} />
           <Route path="/administrator" element={<Administrator />} />
         </Routes>
       </div>
