@@ -5,11 +5,9 @@ import {
   Cloud,
   Lightning,
   UploadSimple,
-  Sliders,
   Cube,
   User,
   X,
-  ChartLine,
   Factory,
   Detective
 } from "@phosphor-icons/react";
@@ -71,20 +69,12 @@ export default function Aside() {
           onClick={() => handleChangeItem("components")}
         ></AsideItem>
         <AsideItem
-          title="Statistics"
-          icon={<ChartLine size={20} />}
-          link="statistics"
-          active={active === "statistics"}
-          onClick={() => handleChangeItem("statistics")}
-        ></AsideItem>
-        <AsideItem
           title="Profil"
           icon={<User size={20} />}
           link="profile"
           active={active === "profile"}
           onClick={() => handleChangeItem("profile")}
         ></AsideItem>
-        // ContactSupport
         <AsideItem
           title="Contact Support"
           icon={<User size={20} />}
@@ -92,7 +82,6 @@ export default function Aside() {
           active={active === "contact-support"}
           onClick={() => handleChangeItem("contact-support")}
         ></AsideItem>
-        // AnswerClient
         <AsideItem
           title="Answer Client"
           icon={<User size={20} />}

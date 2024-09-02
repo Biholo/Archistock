@@ -12,7 +12,6 @@ import NewPassword from './pages/NewPassword/NewPassword';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ExtendStorage from './pages/ExtendStorage/ExtendStorage';
 import { ToastContainer } from 'react-toastify';
-import Statistics from './pages/Statistics/Statistics';
 import Usersubscriptions from './pages/UserSubscriptions/Usersubscriptions';
 import UploadFiles from './pages/UploadFiles/UploadFiles';
 import EGModal from './components/Modals/EG';
@@ -29,8 +28,6 @@ import Homepage from './pages/Homepage/Homepage';
 import ApiPage from './pages/ApiPage/ApiPage';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
-import AdminStatistics from './components/AdminStatistics/AdminStatistics';
-import UserStatistics from './components/UserStatistics/UserStatistics';
 
 const App = () => {
   return (
@@ -130,7 +127,6 @@ const UserLogged = () => {
           <Route path="/profile/change-password" element={<NewPassword />} />
           <Route path="/contact-support" element={<ContactSupport />} />
           <Route path="/answer-client" element={<AnswerClient />} />
-          <Route path="/statistics" element={<UserStatistics />} />
           <Route path="/administrator" element={<Administrator />} />
         </Routes>
       </div>
