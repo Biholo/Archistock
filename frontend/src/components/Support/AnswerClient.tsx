@@ -39,25 +39,37 @@ const AnswerClient = () => {
   const handleSendMessage = () => {
     if (selectedClient && messageInput) {
       socket.emit('sendMessage', { recipientId: selectedClient, message: messageInput });
-      setMessageInput('');
       setMessages((prevMessages) => [...prevMessages, { senderId: 'You', message: messageInput }]);
-
+      setMessageInput('');
     }
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-screen p-4">
       <h1 className='text-4xl font-bold'>Answer Client</h1>
       {supportAssigned ? (
-        <div>
-          <p>You are connected with client: {supportAssigned}</p>
-          <div>
-            <h2 className='mt-5 text-xl font-bold'>Messages:</h2>
-            <ul>
+        <div className="flex flex-col flex-grow">
+          <p className="mb-4">You are connected with client: {supportAssigned}</p>
+          <div className="flex flex-col flex-grow bg-blue-100 p-4 rounded overflow-y-auto max-h-full">
+            <h2 className='text-xl font-bold mb-4'>Messages:</h2>
+            <ul className="flex flex-col space-y-2">
               {messages.map((msg, index) => (
-                <li key={index}><strong>{msg.senderId}: </strong>{msg.message}</li>
+                <li
+                  key={index}
+                  className={`flex ${msg.senderId === 'You' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`p-2 rounded-lg max-w-xs ${
+                      msg.senderId === 'You' ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'
+                    }`}
+                  >
+                    <strong>{msg.senderId === 'You' ? 'You' : 'Client'}: </strong><br/>{msg.message}
+                  </div>
+                </li>
               ))}
             </ul>
+          </div>
+          <div className='flex flex-row w-full'>
             <input
               type="text"
               value={messageInput}
@@ -65,7 +77,9 @@ const AnswerClient = () => {
               onChange={(e) => setMessageInput(e.target.value)}
               placeholder="Type your message"
             />
-            <button className='btn btn-primary text-white' onClick={handleSendMessage}>Send</button>
+            <button className='btn btn-primary text-white ml-2' onClick={handleSendMessage}>
+              Send
+            </button>
           </div>
         </div>
       ) : (

@@ -7,6 +7,7 @@ const Subscription = require("../models/subscriptionModel");
 const File = require("../models/fileModel");
 const Mailer = require("../services/mailer");
 const multer = require("multer");
+const Invoices = require("../models/invoicesModel");
 require("dotenv").config();
 
 const { v4: uuidv4 } = require("uuid");
@@ -29,13 +30,15 @@ exports.register = async (req, res) => {
       postalCode: postalCode,
     });
 
+    const phoneNumber = phoneNumner;
     const hash = await bcrypt.hashSync(password, 10);
+    console.log("Created hashed password: ", hash);
     const user = await User.create({
       email,
       password: hash,
       firstName,
       lastName,
-      phoneNumner,
+      phoneNumber,
       addressId: address.id,
     });
 
@@ -88,6 +91,7 @@ exports.login = async (req, res) => {
     }
 
     const hash = bcrypt.compareSync(password, existingUser.password);
+    console.log(password, existingUser.password)
     if (!hash) {
       return res.status(401).json({ message: "Incorrect email or password." });
     }
@@ -393,3 +397,50 @@ exports.getFilesByUserId = async (req, res) => {
     res.status(500).json({ error: 'Erreur lors de la récupération des fichiers' });
   }
 };
+
+exports.getInvoices = async (req, res) => {
+  try {
+    let token = req.headers.authorization;
+    let email = null;
+
+    if (token && token.startsWith("Bearer ")) {
+      token = token.split(" ")[1];
+    }
+
+    if (token) {
+      email = jwt.verify(token, process.env.SECRET_KEY).email;
+    }
+
+    const user = await User.findOne({
+      where: { email: email },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const invoices = await Invoices.findAll({
+      where: { userId: user.id },
+      include: [
+        {
+          model: UserSubscription,
+          as: "usersubscription",  // Use 'as' to specify the alias
+          include: [
+            {
+              model: Subscription,
+              as: "subscription",
+            }
+          ],
+        },
+      ],
+    });
+
+    res.status(200).json(invoices);
+
+  } catch (error) {
+    console.error('Erreur lors de la récupération des factures :', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des factures' });
+  }
+}
+

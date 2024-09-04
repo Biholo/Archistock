@@ -1,9 +1,10 @@
 const sequelize = require("../database/database");
 const { DataTypes } = require("sequelize");
+const User = require("./userModel");
 const UserSubscription = require("./userSubscriptionModel");
 
-const Folder = sequelize.define(
-    "folder",
+const Invoice = sequelize.define(
+    "invoice",
     {
         id: {
             type: DataTypes.INTEGER,
@@ -12,35 +13,35 @@ const Folder = sequelize.define(
             allowNull: false
         },
         name: {
-            type: DataTypes.STRING(50),
-            allowNull: false,
+            type: DataTypes.STRING,
         },
-        parentId: {
+        invoiceDate: {
+            type: DataTypes.DATE,
+        },
+        userId: {
             type: DataTypes.INTEGER,
-            allowNull: true,
             references: {
-                model: "folder",
+                model: User,
                 key: "id",
             },
         },
         userSubscriptionId: {
             type: DataTypes.INTEGER,
-            allowNull: true,
             references: {
                 model: UserSubscription,
                 key: "id",
             },
-        },
+        }
     },
     {
-        sequelize,
-        freezeTableName: true,
+        tableName: "invoices",
     }
-);
+)
 
-Folder.belongsTo(Folder, { foreignKey: "parentId", as: "parent" });
-Folder.hasMany(Folder, { foreignKey: "parentId", as: "children" });
-Folder.belongsTo(UserSubscription, { foreignKey: "userSubscriptionId", as: "usersubscription" });
-UserSubscription.hasMany(Folder, { foreignKey: "userSubscriptionId", as: "folders" });
+User.hasMany(Invoice, { foreignKey: "userId", as: "invoices" });    
+Invoice.belongsTo(User, { foreignKey: "userId", as: "user" });
 
-module.exports = Folder;
+UserSubscription.hasMany(Invoice, { foreignKey: "userSubscriptionId", as: "invoices" });
+Invoice.belongsTo(UserSubscription, { foreignKey: "userSubscriptionId", as: "usersubscription" });
+
+module.exports = Invoice;

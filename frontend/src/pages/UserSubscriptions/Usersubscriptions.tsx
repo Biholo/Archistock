@@ -7,7 +7,7 @@ import Card from '../../components/Card/Card';
 import HardDriveStorage from '../../components/HardDrive/HardDrive';
 import PreviewFileModal from '../../components/Modals/PreviewFileModal';
 import Button from '../../components/Button/Button';
-import { Download, Eye, FolderSimplePlus, Trash } from '@phosphor-icons/react';
+import { Download, Eye, FolderSimplePlus, Funnel, Trash } from '@phosphor-icons/react';
 import FolderCreate from '../../components/FolderIcon/FolderCreate';
 import { toast } from 'react-toastify';
 import FolderSkeleton from '../../components/FolderSkeleton/FolderSkeleton';
@@ -38,13 +38,16 @@ const UserSubscriptions = () => {
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [search, setSearch] = useState<string>('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [filter, setFilter] = useState<string>('');
 
   // Récupération des données
   useEffect(() => {
     setLoading(true);
-    if(search !== "") {
+    const searchTerm = search.trim().replace(/\s+/g, ' ');
+    if(searchTerm !== '') {
       archistockApiService.searchFiles(search).then((res) => {
         console.log("RESULT", res);
+        console.log("SEARCH", search);
         setSearchResults(res);
         setLoading(false);
       });
@@ -68,6 +71,81 @@ const UserSubscriptions = () => {
       });
     }
   }, [updated, selectedStorage, parentId]);
+
+  useEffect(() => {
+    if(search !== "") {
+      console.log("SEARCH", search);
+      let filteredFiles = [...searchResults];
+      switch (filter) {
+        case 'name':
+          filteredFiles.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+        case 'altname':
+          filteredFiles.sort((a, b) => b.name.localeCompare(a.name));
+          break;
+        case 'date':
+          filteredFiles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          break;
+        case 'altdate':
+          filteredFiles.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+          break;
+        case 'size':
+          filteredFiles.sort((a, b) => parseFloat(b.size) - parseFloat(a.size));
+          break;
+        case 'altsize':
+          filteredFiles.sort((a, b) => parseFloat(a.size) - parseFloat(b.size));
+          break;
+        case 'format':
+          filteredFiles.sort((a, b) => a.format.localeCompare(b.format));
+          break;
+        case 'altformat':
+          filteredFiles.sort((a, b) => b.format.localeCompare(a.format));
+          break;
+        default:
+          break;
+      }
+      setSearchResults(filteredFiles);
+    } else {
+      if (selectedFolderContent && selectedFolderContent.files) {
+        let filteredFiles = [...selectedFolderContent.files];
+    
+        switch (filter) {
+          case 'name':
+            filteredFiles.sort((a, b) => a.name.localeCompare(b.name));
+            break;
+          case 'altname':
+            filteredFiles.sort((a, b) => b.name.localeCompare(a.name));
+            break;
+          case 'date':
+            filteredFiles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            break;
+          case 'altdate':
+            filteredFiles.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            break;
+          case 'size':
+            filteredFiles.sort((a, b) => parseFloat(b.size) - parseFloat(a.size));
+            break;
+          case 'altsize':
+            filteredFiles.sort((a, b) => parseFloat(a.size) - parseFloat(b.size));
+            break;
+          case 'format':
+            filteredFiles.sort((a, b) => a.format.localeCompare(b.format));
+            break;
+          case 'altformat':
+            filteredFiles.sort((a, b) => b.format.localeCompare(a.format));
+            break;
+          default:
+            break;
+        }
+    
+        setSelectedFolderContent({
+          ...selectedFolderContent,
+          files: filteredFiles
+        });
+      }
+    }
+  }, [filter]);
+  
 
   // Récupération de la taille totale des fichiers
   const getAllFilesSize = (files: any[]) => {
@@ -152,6 +230,12 @@ const UserSubscriptions = () => {
     })
   };
 
+  const handleDownload = (filename: string) => {
+    archistockApiService.downloadFile(filename).then((res) => {
+      console.log(res);
+    });
+  }
+
   return (
     <Fragment>
         <DndProvider backend={HTML5Backend}>
@@ -187,8 +271,31 @@ const UserSubscriptions = () => {
                     </Button>
                   )}
                 </div>
-                <DebouncedInput placeholder='Rechercher des fichiers' onChange={(e) => { setSearch(e); setUpdated(!updated) }} />
-                {search !== "" ? (
+                <div className='flex flex-row'>
+                <DebouncedInput placeholder='Rechercher des fichiers' onChange={(e) => { setSearch(e); setUpdated(!updated) }} css='w-11/12' />
+                <details className="dropdown dropdown-bottom dropdown-end">
+                  <summary className="btn m-1">Filters <Funnel /></summary>
+                  <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow text-white">
+                    <li className="menu-title">Sort by</li>
+                    <li className={filter == "" ? 'bg-gray-700 w-full rounded' : ''}>
+                      <a onClick={() => setFilter('')}>None</a>
+                    </li>
+                    <li className={filter == "name" || filter == 'altname' ? 'bg-gray-700 w-full rounded' : ''}>
+                      <a onClick={() => filter === 'name' ? setFilter('altname') : setFilter("name")}>Name</a>
+                    </li>
+                    <li className={filter == "date" || filter == 'altdate' ? 'bg-gray-700 w-full rounded' : ''}>
+                      <a onClick={() => filter === 'date' ? setFilter('altdate') : setFilter("date")}>Date</a>
+                    </li>
+                    <li className={filter == "size" || filter == 'altsize' ? 'bg-gray-700 w-full rounded' : ''}>
+                      <a onClick={() => filter === 'size' ? setFilter('altsize') : setFilter("size")}>Size</a>
+                    </li>
+                    <li className={filter == "format" || filter == 'altformat' ? 'bg-gray-700 w-full rounded' : ''}>
+                      <a onClick={() => filter === 'format' ? setFilter('altformat') : setFilter("format")}>Format</a>
+                    </li>
+                  </ul>
+                </details>
+                </div>
+                {search.trim().replace(/\s+/g, ' ') !== "" ? (
                   <div className="overflow-x-auto">
                     <table className="table">
                       <thead>
@@ -214,12 +321,12 @@ const UserSubscriptions = () => {
                                 <td>
                                   <ul className="flex flex-row gap-5">
                                     <li>
-                                      <Button color="success">
+                                      <Button color="primary" onClick={() => handleDownload(file.name)}>
                                         <Download size={16} />
                                       </Button>
                                     </li>
                                     <li>
-                                      <Button color="primary" onClick={() => setSelectedFile(file)}>
+                                      <Button color="info" onClick={() => setSelectedFile(file)}>
                                         <Eye size={16} />
                                       </Button>
                                     </li>
@@ -280,14 +387,32 @@ const UserSubscriptions = () => {
                                   <FolderCreate onCreate={(e: any) => handleCreateFolder(e)} />
                                 )}
                                 {selectedFolderContent.files.map((file: any, index: number) => (
-                                  <DraggableFile 
-                                    key={index} 
-                                    file={file} 
-                                    onDrop={(folder: any) => console.log(`Dropping file ${file.name} into folder ${folder.name}`)}
-                                    onClick={() => {console.log("File clicked"); setSelectedFile(file)}}
-                                    onDelete={() => {setUpdated(!updated)}}
-                                    onUpdate={() => setUpdated(!updated)}
-                                />
+                                  <div className='flex flex-col gap-0'>
+                                    <DraggableFile 
+                                      key={index} 
+                                      file={file} 
+                                      onDrop={(folder: any) => console.log(`Dropping file ${file.name} into folder ${folder.name}`)}
+                                      onClick={() => {console.log("File clicked"); setSelectedFile(file)}}
+                                      onDelete={() => {setUpdated(!updated)}}
+                                      onUpdate={() => setUpdated(!updated)}
+                                    />
+                                    <div className='flex flex-row items-center justify-center'>
+                                      {filter === 'name' || filter === 'altname' ? (
+                                        <p className='text-xs text-center'>{file.name}</p>
+                                      ) : null}
+                                      {filter === 'date' || filter === 'altdate' ? (
+                                        <p className='text-xs text-center'>{new Date(file.createdAt).toLocaleDateString()}</p>
+                                      ) : null}
+                                      {filter === 'size' || filter === 'altsize' ? (
+                                        <p className='text-xs text-center'>{(parseFloat(file.size) / 1000).toFixed(2)} Go</p>
+                                      ) : null}
+                                      {filter === 'format' || filter === 'altformat' ? (
+                                        <p className='text-xs text-center'>{file.format}</p>
+                                      ) : null}
+
+
+                                    </div>
+                                  </div>
                                 ))}
                               </Fragment>
                             )}

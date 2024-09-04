@@ -26,11 +26,12 @@ const User = sequelize.define(
       unique: true,
       allowNull: false,
     },
-    phoneNumner: {
+    phoneNumber: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     password: {
+      length: 255,
       type: DataTypes.STRING,
       allowNull: false,
     },

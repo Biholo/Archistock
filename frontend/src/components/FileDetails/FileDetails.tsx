@@ -38,6 +38,18 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
         });
     }
 
+    const handleDeleteFile = () => {
+        archistockApiService.deleteFile(file.name).then((res) => {
+            console.log(res.status);
+            if(res.status === 201) {
+                toast.success("File deleted successfully");
+                onDelete(file);
+            } else {
+                toast.error("An error occured while deleting file. Please retry.");
+            }
+        });
+    }
+
     useEffect(() => {
         if (showMenu) {
             document.addEventListener("mousedown", handleClickOutside);
@@ -66,7 +78,7 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
                     onBlur={() => handleUpdateFile()}
                 />
             ) : (
-                <p className="text-md max-w-20 word-wrap">{fileName}.{file.format}</p>
+                <p className="text-md max-w-20 word-wrap">{file.name}.{file.format}</p>
             )}
 
             {showMenu && (
@@ -102,7 +114,7 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    onDelete(file);
+                                    handleDeleteFile();
                                     setShowMenu(false);
                                 }}
                             >

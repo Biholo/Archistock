@@ -1,49 +1,167 @@
 const UserSubscription = require("../models/userSubscriptionModel");
 const User = require("../models/userModel");
 const File = require("../models/fileModel");
+const Invoice = require("../models/invoicesModel");
 const Subscription = require("../models/subscriptionModel");
+const Address = require("../models/addressModel");
 const jwt = require("jsonwebtoken");
 const Folder = require("../models/folderModel");
-const fs = require("fs");
 const crypto = require("crypto");
 const path = require("path");
 const { Op, where } = require("sequelize");
+const { jsPDF } = require("jspdf");
+const Mailer = require("../services/mailer");
 require("dotenv").config();
 
+const mailer = new Mailer();
 // Create a user subscription (POST)
 exports.add = async (req, res) => {
   try {
+    let token = req.headers.authorization;
     const userSubscription = req.body;
-    const token = req.headers.authorization;
     let email = null;
+
     if (token && token.startsWith("Bearer ")) {
       token = token.split(" ")[1];
     }
+
     if (token) {
       email = jwt.verify(token, process.env.SECRET_KEY).email;
     }
 
-    const user = await User.findOne({ where: { email: email } });
+    const user = await User.findOne({
+      where: { email: email },
+      include: [
+        {
+          model: Address,
+          as: "address",
+        },
+      ],
+    });
+
     if (!user) {
       res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const subId = userSubscription.subscriptionId;
+
+    const subscription = await Subscription.findByPk(subId);
+    if (!subscription) {
+      res.status(404).json({ error: "Subscription not found" });
       return;
     }
 
     userSubscription.userId = user.id;
     userSubscription.startDate = new Date();
 
-    let subscription = await UserSubscription.create(userSubscription);
-    
+    let newSubscription = await UserSubscription.create(userSubscription);
+
     await Folder.create({
       name: "root",
-      userSubscriptionId: subscription.id,
+      userSubscriptionId: newSubscription.id,
     });
 
-    res.status(201).json("User subscription added");
+    // create invoice 
+    await this.createInvoice(user, subscription, newSubscription);
+
+    mailer.sendSubscriptionThankYouEmail(email, user);
+
+    // Envoyer la réponse avec le chemin de la facture
+    res.status(201).json({
+      message: "User subscription added",
+    });
+
   } catch (error) {
     console.error("Error adding user subscription: ", error);
     res.status(500).json({ error: "Error adding user subscription" });
   }
+};
+
+exports.createInvoice = async (user, subscription, userSubscription) => {
+  const fs = require('fs')
+  const invoicesDir = path.join(__dirname, '../files/invoices');
+
+  // Vérifier et créer le répertoire src/factures s'il n'existe pas
+  if (!fs.existsSync(invoicesDir)) {
+    fs.mkdirSync(invoicesDir, { recursive: true });
+  }
+
+  const today = new Date().getTime().toString();
+  const invoiceFileName = `facture_${userSubscription.id}_${today}.pdf`;
+  const invoicePath = path.join(invoicesDir, invoiceFileName);
+
+  const doc = new jsPDF();
+
+  // Contenu du PDF
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text("Archistock", 20, 20);
+  doc.text(`Facture n° ${today}`, 140, 20, { align: "center" });
+  doc.setFontSize(12);
+  doc.text(`Acheteur:`, 20, 30);
+  doc.setFont("helvetica", "bold");
+  doc.text(`${user.firstName} ${user.lastName}`, 20, 35);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${user.email}`, 20, 40);
+  doc.text(`${user.phoneNumber}`, 20, 45);
+  doc.text(`${user.address.street}`, 20, 50);
+  doc.text(`${user.address.postalCode} ${user.address.city}`, 20, 55);
+
+  const sellerX = 140;  
+  const sellerY = 40;
+  doc.setFont("helvetica", "normal");
+  doc.text("Vendeur:", sellerX, sellerY);
+  doc.setFont("helvetica", "bold");
+  doc.text("AZ Architecture Sarl", sellerX, sellerY + 5);
+  doc.text("contact@az-architectes.com", sellerX, sellerY + 10);
+  doc.text("107 All. François Mitterrand,", sellerX, sellerY + 15);
+  doc.text("76100 Rouen", sellerX, sellerY + 20);
+
+  const tableTop = 100;
+  const tableLeft = 20;
+  const rowHeight = 10;
+  const columnWidths = [90, 40, 40];
+  const columnPositions = [tableLeft, tableLeft + columnWidths[0], tableLeft + columnWidths[0] + columnWidths[1]];
+  const headers = ["Nom", "Quantité", "Prix"];
+
+  doc.setFont("helvetica", "bold");
+  headers.forEach((header, i) => {
+    doc.rect(columnPositions[i], tableTop, columnWidths[i], rowHeight); 
+    doc.text(header, columnPositions[i] + 5, tableTop + 7); 
+  });
+
+  const itemName = `${subscription.name} - ${subscription.size} Go`;
+  const itemData = [itemName, "1", `${subscription.price} €`];
+
+  doc.setFont("helvetica", "normal");
+  itemData.forEach((data, i) => {
+    doc.rect(columnPositions[i], tableTop + rowHeight, columnWidths[i], rowHeight); 
+    doc.text(data, columnPositions[i] + 5, tableTop + rowHeight + 7); 
+  });
+
+  const prixTTC = subscription.price;
+  const tauxTVA = 0.20;
+  const prixHT = prixTTC / (1 + tauxTVA);
+  const prixTVA = prixTTC - prixHT;
+
+  doc.setFont("helvetica", "bold");
+  doc.text(`Prix HT: ${prixHT.toFixed(2)} €`, columnPositions[2], tableTop + 3 * rowHeight + 20);
+  doc.text(`Prix TVA: ${prixTVA.toFixed(2)} €`, columnPositions[2], tableTop + 3 * rowHeight + 30);
+  doc.text(`Prix TTC: ${prixTTC.toFixed(2)} €`, columnPositions[2], tableTop + 3 * rowHeight + 40);
+
+  doc.setFont("helvetica", "normal");
+  doc.text("Merci pour votre achat!", 105, tableTop + 3 * rowHeight + 60, { align: "center" });
+  doc.text("Si vous avez des questions, contactez-nous via la page Support", 105, doc.internal.pageSize.height - 20, { align: "center" });
+
+  doc.save(invoicePath);
+
+  await Invoice.create({
+    userId: user.id,
+    userSubscriptionId: userSubscription.id,
+    name: invoiceFileName,
+    invoiceDate: new Date(),
+  });
 };
 
 // Delete user subscription (DELETE)
@@ -187,6 +305,10 @@ exports.getByUserIdWithFiles = async (req, res) => {
   try {
     const user = await User.findOne({ where: { email: email } });
     let result = null;
+    setTimeout(() => {
+      
+    console.log("Search term", searchTerm)
+    }, 2000)
     if(searchTerm) {
       result = await File.findAll({
         where: {
@@ -221,9 +343,6 @@ exports.getByUserIdWithFiles = async (req, res) => {
         limit: 10,
       });
     }
-    
-
-    console.log(result);  // Log the result directly
     res.status(200).json(result);  // Send the result as a JSON response
   } catch (error) {
     console.error("Error retrieving the user subscriptions:", error);
@@ -242,51 +361,59 @@ router.post(
 
 */
 exports.addFile = async (req, res) => {
+  
+  const fs = require('fs').promises;
   let files = req.files;
   let userSubscriptionId = req.body.userSubscriptionId;
-  setTimeout(() => {console.log(userSubscriptionId);}, 3000);
+  
+  setTimeout(() => {
+    console.log(userSubscriptionId);
+  }, 3000);
+
   try {
-    
     for (let i = 0; i < files.length; i++) {
-    
-      // Si la taille du fichier est > 2 GB, ne pas l'ajouter à l'abonnement
+      
+      // If file size is > 2 GB, do not add it to the subscription
       if (files[i].size > 2147483648) {
-        // Supprimer le fichier
+        // Delete the file
         await fs.unlink(`src/files/${files[i].filename}`);
         continue;
       }
-    
+
       let hash = crypto.randomBytes(20).toString("hex");
-    
+
       setTimeout(() => {
         console.log(`${files[i].filename} ${files[i].mimetype}`);
       }, 5000);
-    
-      // Récupérer l'extension du fichier de manière correcte
+
+      // Get the file extension correctly
       const extension = path.extname(files[i].filename);
-    
-      // Renommer le fichier
+
+      console.log(`src/files/${files[i].filename}`);
+      console.log(`src/files/${hash}${extension}`);
+
+      // Rename the file
       await fs.rename(`src/files/${files[i].filename}`, `src/files/${hash}${extension}`);
-    
-      // Si le nom du fichier est > 128 caractères, générer un hash pour le nom du fichier
+
+      // If the original filename is > 128 characters, generate a hash for the filename
       if (files[i].originalname.length > 128) {
         files[i].originalname = hash;
       }
-    
-      // Stocker les informations du fichier dans la base de données
+
+      // Store the file information in the database
       await File.create({
         name: files[i].originalname.split('.')[0],
         pathName: hash,
-        size: (files[i].size / 1048576).toFixed(2), // Convertir la taille en MB
-        format: extension.slice(1), // Enlever le point de l'extension
+        size: (files[i].size / 1048576).toFixed(2), // Convert size to MB
+        format: extension.slice(1), // Remove the dot from the extension
         parentId: null,
         userSubscriptionId: userSubscriptionId,
       });
     }
-    
+
     res.status(201).json("Files added to subscription");
   } catch (error) {
     console.error("Error adding files to subscription: ", error);
     res.status(500).json({ error: "Error adding files to subscription" });
   }
-}
+};

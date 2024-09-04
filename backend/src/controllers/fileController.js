@@ -22,15 +22,53 @@ exports.add = async (req, res) => {
 
 // Delete file (DELETE)
 exports.delete = async (req, res) => {
-  const idP = req.params.id;
+  const filename = req.params.filename;
   try {
-    const result = await File.findByPk(idP);
-    if (result) {
-      await result.destroy();
-      res.status(201).json({ status: 201, message: "File deleted successfully" });
-    } else {
-      res.status(404).json({ status: 404, error: "File not found" });
+    // check if file exists 
+    const file = await File.findOne({ where: { name: filename } });
+    if (!file) {
+      return res.status(404).json({ status: 404, error: "File not found" });
     }
+
+    // check if file belongs to user with token
+    let token = req.headers.authorization;
+    if (token && token.startsWith("Bearer ")) {
+      token = token.split(" ")[1];
+    }
+
+    if (!token) {
+      return res.status(401).json({ status: 401, error: "Unauthorized" });
+    }
+
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const email = decoded.email;
+
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) {
+      return res.status(404).json({ status: 404, error: "User not found" });
+    }
+
+    const fileOwner = await File.findOne({
+      where: { id: file.id },
+      include: [
+        { model: UserSubscription, as: "usersubscription", where: { userId: user.id } },
+      ],
+    });
+
+    if (!fileOwner) {
+      return res.status(403).json({ status: 403, error: "You are not authorized to delete this file" });
+    }
+
+    // delete file from folder
+    const filePath = path.join(__dirname, "../files/", `${file.pathName}.${file.format}`);
+
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    // delete file from database
+    await file.destroy();
+    res.status(201).json({ status: 201, message: "File deleted successfully" });
   } catch (error) {
     console.error("Error deleting file:", error);
     res.status(500).json({ status: 500, error: "Error deleting file" });

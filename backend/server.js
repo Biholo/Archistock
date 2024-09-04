@@ -2,7 +2,16 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const app = express();
+const fs = require("fs");
+const path = require("path");
 const { Server } = require('socket.io');
+
+const UserSubscription = require('./src/models/userSubscriptionModel');
+const User = require("./src/models/userModel");
+const Subscription = require("./src/models/subscriptionModel");
+const Address = require("./src/models/addressModel");
+const { createInvoice } = require("./src/controllers/userSubscriptionController");
+const cron = require('node-cron');
 
 app.use(express.json());
 app.use(cors({ origin: "*" }));
@@ -36,6 +45,7 @@ app.use('/user-invitation', userInvitationRoute);
 
 
 app.use("/files", express.static("src/files"));
+app.use("/invoices", express.static("src/files/invoices"));
 app.use('/Images', express.static('./Images'));
 
 const httpServer = require('http').createServer(app);
@@ -87,6 +97,76 @@ io.on('connection', (socket) => {
     supports.delete(socket.id);
     io.emit('clientsWaiting', waitingClients.map(id => ({ id })));
   });
+});
+
+// check if 'src/files' directory exists, if not create it
+if (!fs.existsSync(path.join(__dirname, "src/files"))) {
+  fs.mkdirSync(path.join(__dirname, "src/files"));
+}
+
+// check if 'invoices' directory exists, if not create it
+
+if (!fs.existsSync(path.join(__dirname, "src/files/invoices"))) {
+  fs.mkdirSync(path.join(__dirname, "src/files/invoices"));
+}
+
+// check if 'Images' directory exists, if not create it
+if (!fs.existsSync(path.join(__dirname, "Images"))) {
+  fs.mkdirSync(path.join(__dirname, "Images"));
+}
+
+cron.schedule('* * * * *', async () => {
+  try {
+    console.log("Running the billing cron job...");
+
+    // Récupérer tous les abonnements actifs
+    const userSubscriptions = await UserSubscription.findAll({
+      include: [
+        {
+          model: Subscription,
+          as: 'subscription'
+        },
+        {
+          model: User,
+          as: 'user',
+          include: [
+            {
+              model: Address,
+              as: 'address',
+            },
+          ],
+        },
+      ]
+    });
+
+    const today = new Date();
+
+    // Parcourir chaque abonnement pour vérifier si une nouvelle facture doit être créée
+    for (let userSubscription of userSubscriptions) {
+      const { subscription, user, startDate } = userSubscription;
+      const { duration } = subscription;
+
+      const nextBillingDate = new Date(startDate);
+      nextBillingDate.setMonth(nextBillingDate.getMonth() + duration);
+
+      if (today >= nextBillingDate) {
+        // Créer une facture
+        await createInvoice(user, subscription, userSubscription);
+
+        // Mettre à jour la date de début pour refléter la nouvelle période de facturation
+        await userSubscription.update({
+          startDate: today,
+        });
+
+        console.log(`Invoice created for user: ${user.email}`);
+      }
+    }
+
+    console.log("Billing cron job completed.");
+
+  } catch (error) {
+    console.error("Error running the billing cron job:", error);
+  }
 });
 
 httpServer.listen(8000, function () {

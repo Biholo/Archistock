@@ -42,6 +42,8 @@ router.post("/reset-password", UserController.resetPassword);
 
 router.post("/update-password", UserController.updatePassword);
 
+router.get("/invoices", middleware.authenticator, UserController.getInvoices);
+
 router.get(
   "/files/:userId",
   middleware.authenticator,

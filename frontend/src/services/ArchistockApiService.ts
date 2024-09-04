@@ -382,7 +382,39 @@ class ArchistockApiService {
           console.error("Failed to download file:", error);
           throw error;
         }
-      }
+    }
+
+    async deleteFile(filename: string): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/file/delete/${filename}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to delete file:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
+    async getUserInvoices(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user/invoices`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to fetch user invoices:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
       
 
     async findAllCountries(): Promise<any> {
