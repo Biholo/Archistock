@@ -3,6 +3,7 @@ import ArchistockApiService from "../../services/ArchistockApiService";
 import SubscriptionCard from "../../components/Card/Subscription/SubscriptionCard";
 import PurchaseModal from "../../components/Modals/PurchaseModal";
 import { getCookie, useAuth } from "../../contexts/AuthContext";
+import { toast } from "react-toastify";
 
 const ExtendStorage = () => {
 
@@ -31,8 +32,15 @@ const ExtendStorage = () => {
 
     const handlePurchase = () => {
         archistockApiService.purchaseSubscription(selectedSubscription.id).then((res) => {
-            console.log(res);
-            setStorage(storage + 1);
+            if(res.status == 201) {
+                toast.success("Achat effectué avec succès.");
+                setShowModal(false);
+                setStorage(storage + 1);
+            }
+            else {
+                toast.error("Une erreur s'est produite lors de l'achat. Veuillez réessayer.");
+                setShowModal(false);
+            }
         });
     }
 

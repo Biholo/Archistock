@@ -70,6 +70,7 @@ exports.add = async (req, res) => {
     // Envoyer la réponse avec le chemin de la facture
     res.status(201).json({
       message: "User subscription added",
+      status: 201,
     });
 
   } catch (error) {
@@ -329,7 +330,6 @@ exports.getByUserIdWithFiles = async (req, res) => {
             },
             { model: Folder, as: 'parent' }
         ],
-        limit: 10,
     });
     } else {
       result = await UserSubscription.findAll({
@@ -360,60 +360,153 @@ router.post(
 );
 
 */
+
 exports.addFile = async (req, res) => {
-  
   const fs = require('fs').promises;
+  const crypto = require('crypto');
+  const path = require('path');
+
   let files = req.files;
   let userSubscriptionId = req.body.userSubscriptionId;
-  
-  setTimeout(() => {
-    console.log(userSubscriptionId);
-  }, 3000);
+
+  let savedFiles = [];
+  let unsavedFiles = [];
 
   try {
-    for (let i = 0; i < files.length; i++) {
-      
-      // If file size is > 2 GB, do not add it to the subscription
-      if (files[i].size > 2147483648) {
-        // Delete the file
-        await fs.unlink(`src/files/${files[i].filename}`);
-        continue;
-      }
+    // Récupérer les informations de la souscription de l'utilisateur, y compris les fichiers associés
+    const userSubscription = await UserSubscription.findOne({
+      where: { id: userSubscriptionId },
+      include: [
+        { model: User, as: 'user' },
+        { model: Subscription, as: 'subscription' },
+        { model: File, as: 'files' },
+      ],
+    });
 
-      let hash = crypto.randomBytes(20).toString("hex");
-
-      setTimeout(() => {
-        console.log(`${files[i].filename} ${files[i].mimetype}`);
-      }, 5000);
-
-      // Get the file extension correctly
-      const extension = path.extname(files[i].filename);
-
-      console.log(`src/files/${files[i].filename}`);
-      console.log(`src/files/${hash}${extension}`);
-
-      // Rename the file
-      await fs.rename(`src/files/${files[i].filename}`, `src/files/${hash}${extension}`);
-
-      // If the original filename is > 128 characters, generate a hash for the filename
-      if (files[i].originalname.length > 128) {
-        files[i].originalname = hash;
-      }
-
-      // Store the file information in the database
-      await File.create({
-        name: files[i].originalname.split('.')[0],
-        pathName: hash,
-        size: (files[i].size / 1048576).toFixed(2), // Convert size to MB
-        format: extension.slice(1), // Remove the dot from the extension
-        parentId: null,
-        userSubscriptionId: userSubscriptionId,
-      });
+    if (!userSubscription) {
+      return res.status(404).json({ error: "Souscription introuvable." });
     }
 
-    res.status(201).json("Files added to subscription");
+    // Calculer la taille totale utilisée par les fichiers existants
+    const totalUsedStorage = userSubscription.files.reduce((acc, file) => acc + parseFloat(file.size) * 1048576, 0); // Taille en octets
+    const totalStorage = userSubscription.subscription.size * 1073741824; // Go en octets
+    let remainingStorage = totalStorage - totalUsedStorage;
+
+    for (let i = 0; i < files.length; i++) {
+      try {
+        const fileSize = files[i].size;
+
+        // Vérifier si la taille du fichier est > 2 Go
+        if (fileSize > 2147483648) {
+          await fs.unlink(`src/files/${files[i].filename}`);
+          unsavedFiles.push({ name: files[i].originalname, reason: "Le fichier dépasse la taille maximale de 2 Go." });
+          continue;
+        }
+
+        // Vérifier si le fichier peut être stocké dans l'espace restant
+        if (fileSize > remainingStorage) {
+          unsavedFiles.push({ name: files[i].originalname, reason: "Espace de stockage insuffisant." });
+          continue;
+        }
+
+        let hash = crypto.randomBytes(20).toString("hex");
+
+        const extension = path.extname(files[i].filename);
+
+        // Renommer le fichier
+        await fs.rename(`src/files/${files[i].filename}`, `src/files/${hash}${extension}`);
+
+        // Si le nom de fichier original est > 128 caractères, générer un hash pour le nom de fichier
+        if (files[i].originalname.length > 128) {
+          files[i].originalname = hash;
+        }
+
+        // Stocker les informations du fichier dans la base de données
+        await File.create({
+          name: files[i].originalname.split('.')[0],
+          pathName: hash,
+          size: (fileSize / 1048576).toFixed(2), // Convertir la taille en Mo
+          format: extension.slice(1), // Retirer le point de l'extension
+          parentId: null,
+          userSubscriptionId: userSubscriptionId,
+        });
+
+        // Mettre à jour le stockage restant
+        remainingStorage -= fileSize;
+
+        // Ajouter à la liste des fichiers sauvegardés
+        savedFiles.push(files[i].originalname);
+      } catch (fileError) {
+        console.error(`Erreur lors du traitement du fichier ${files[i].originalname}: `, fileError);
+        unsavedFiles.push({ name: files[i].originalname, reason: "Erreur lors du traitement du fichier." });
+      }
+    }
+
+    // Envoyer la réponse avec les fichiers sauvegardés et non sauvegardés
+    res.status(201).json({
+      message: "Files processed",
+      status: 201,
+      savedFiles: savedFiles,
+      unsavedFiles: unsavedFiles.map(file => `${file.name}: ${file.reason}`)
+    });
   } catch (error) {
-    console.error("Error adding files to subscription: ", error);
-    res.status(500).json({ error: "Error adding files to subscription" });
+    console.error("Erreur lors de l'ajout des fichiers à l'abonnement: ", error);
+    res.status(500).json({ error: "Erreur lors de l'ajout des fichiers à l'abonnement" });
   }
 };
+
+exports.renewSubscription = async (req, res) => {
+  let token = req.headers.authorization;
+  let email = null;
+  
+  if (token && token.startsWith("Bearer ")) {
+    token = token.split(" ")[1];
+  }
+  
+  if (token) {
+    email = jwt.verify(token, process.env.SECRET_KEY).email;
+  }
+  
+  try {
+    // check if user exists
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) {
+      return res.status(404).json({ error: "Utilisateur introuvable." });
+    }
+
+    // check if userSubscription belongs to the user and userSubscriptionId
+    const userSubscription = await UserSubscription.findOne({
+      where: { userId: user.id, id: req.params.userSubscriptionId },
+      include: [
+        { model: User, as: 'user' },
+        { model: Subscription, as:'subscription' },
+        { model: File, as: 'files' },
+      ],
+    });
+
+    if(!userSubscription) {
+      return res.status(404).json({ error: "Souscription introuvable ou non appartenant à l'utilisateur." });
+    }
+    
+    setTimeout(() => {
+      console.log("Timeout completed");
+    }, 1000)
+
+    // switch renew 
+    if (userSubscription.renew) {
+      userSubscription.renew = false;
+    } else {
+      userSubscription.renew = true;
+    }
+
+    // save changes
+    await userSubscription.save();
+    res.status(201).json({status: 201, storage: userSubscription});
+    return;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des informations de l'utilisateur ou de la souscription:", error);
+    res.status(500).json({ error: "Erreur lors de la récupération des informations de l'utilisateur ou de la souscription" });
+    return;
+  }
+}
+

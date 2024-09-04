@@ -68,9 +68,16 @@ router.get(
 router.post(
   "/add-files",
   middleware.authenticator,
-  upload.array('files', 10),
+  upload.array('files', 50),
   UserSubscriptionController.addFile
 );
+
+// renew subscription
+router.post(
+  "/renew/:userSubscriptionId",
+  middleware.authenticator,
+  UserSubscriptionController.renewSubscription
+)
 
 
 

@@ -121,6 +121,7 @@ cron.schedule('* * * * *', async () => {
 
     // Récupérer tous les abonnements actifs
     const userSubscriptions = await UserSubscription.findAll({
+      where: { renew: true },
       include: [
         {
           model: Subscription,

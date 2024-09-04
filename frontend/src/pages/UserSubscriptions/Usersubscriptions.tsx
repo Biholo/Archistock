@@ -45,6 +45,7 @@ const UserSubscriptions = () => {
     setLoading(true);
     const searchTerm = search.trim().replace(/\s+/g, ' ');
     if(searchTerm !== '') {
+      console.log("1", search);
       archistockApiService.searchFiles(search).then((res) => {
         console.log("RESULT", res);
         console.log("SEARCH", search);
@@ -53,19 +54,24 @@ const UserSubscriptions = () => {
       });
     }
     else if (selectedStorage && parentId) {
+      console.log("2", search);
       archistockApiService.getFolder(parseInt(parentId!)).then((res) => {
         console.log(res);
         setSelectedFolderContent(res);
         setLoading(false);
       });
     } else if (selectedStorage && !parentId) {
+      console.log(selectedStorage);
+      console.log("3", search);
       archistockApiService.getStorageRoot(selectedStorage.id).then((res) => {
         setSelectedFolderContent(res);
         setLoading(false);
       });
     } else {
+      console.log("4", search);
       archistockApiService.getUserStorageWithFiles().then((res) => {
         setStorages(res);
+        console.log(res);
         setFiles(res.flatMap((storage: any) => storage.files));
         setLoading(false);
       });
@@ -176,6 +182,7 @@ const UserSubscriptions = () => {
   const onBreadcrumbClick = (index: number) => {
     if (index === 0) {
       setDisplayStorage(true);
+      setSelectedStorage(null);
       setParentId(null);
       setBreadcrumb([{ name: 'Subscriptions', id: null }]);
     } else if (index === 1) {
@@ -350,7 +357,7 @@ const UserSubscriptions = () => {
                     <div className="flex flex-row flex-wrap mt-5">
                       {storages.map((storage, index) => (
                         <div key={index} className="mr-5">
-                          <HardDriveStorage storage={storage} onStorageClick={onStorageClick} onUpdate={() => setUpdated(!updated)} />
+                          <HardDriveStorage storage={storage} onStorageClick={onStorageClick} onUpdate={() => {setUpdated(!updated)}} />
                         </div>
                       ))}
                     </div>

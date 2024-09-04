@@ -22,6 +22,10 @@ const UserSubscription = sequelize.define(
             type: DataTypes.DATE,
             allowNull: false,
         },
+        renew: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+        },
         userId: {
             type: DataTypes.INTEGER,
             allowNull: true,

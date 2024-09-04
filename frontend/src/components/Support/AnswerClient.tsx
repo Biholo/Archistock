@@ -60,7 +60,7 @@ const AnswerClient = () => {
                 >
                   <div
                     className={`p-2 rounded-lg max-w-xs ${
-                      msg.senderId === 'You' ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'
+                      msg.senderId === 'You' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-black'
                     }`}
                   >
                     <strong>{msg.senderId === 'You' ? 'You' : 'Client'}: </strong><br/>{msg.message}

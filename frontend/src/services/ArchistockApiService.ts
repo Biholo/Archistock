@@ -286,6 +286,22 @@ class ArchistockApiService {
         }
     }
 
+    async renewSubscription(userSubscriptionId: number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/usersubscription/renew/${userSubscriptionId}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to renew subscription:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
     async uploadFileWithProgress(formData: FormData, onProgress: (progress: number) => void): Promise<any> {
       const token = getCookie('accessToken');
       if (!token) {
