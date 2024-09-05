@@ -198,7 +198,7 @@ exports.getCompanyById = async (req, res) => {
 
 exports.getAllInformationsForACompany = async (req, res) => {
   const companyId = req.params.id;
-  const userId = req.query.userId;
+  const userId = req.user.id;
 
   try {
     // Vérification des droits de l'utilisateur pour accéder à la société
@@ -262,6 +262,7 @@ exports.getAllInformationsForACompany = async (req, res) => {
     const invitationRequests = await InvitationRequest.findAll({
       where: {
         companyId: companyId,
+        status: "pending",
       },
       include: [
         {
@@ -277,6 +278,7 @@ exports.getAllInformationsForACompany = async (req, res) => {
         isAccepted: null
       },
     });
+    
 
     // Envoi de la réponse avec toutes les données récupérées
     return res.status(200).json({

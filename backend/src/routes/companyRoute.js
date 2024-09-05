@@ -13,6 +13,6 @@ router.put("/update/:id", CompanyController.updateCompany);
 router.get("/all", middleware.authenticator, CompanyController.getAll);
 router.get("/all/user/:userId", CompanyController.getAllCompaniesForUser);
 router.get("/one/:id", CompanyController.getCompanyById);
-router.get("/informations/one/:id", CompanyController.getAllInformationsForACompany);
+router.get("/informations/one/:id", middleware.authenticator, CompanyController.getAllInformationsForACompany);
 
 module.exports = router;

@@ -18,12 +18,12 @@ exports.authenticator = (req, res, next) => {
   if (token && token.startsWith("Bearer ")) {
     token = token.split(" ")[1];
   }
-  // Décoder le token
   if (token && process.env.SECRET_KEY) {
     jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
       if (err) {
         res.status(401).json({ erreur: "Access denied" });
       } else {
+        req.user = decoded;
         next();
       }
     });

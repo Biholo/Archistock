@@ -7,9 +7,9 @@ router.post('/ask-to-join', invitationRequestController.askToJoin);
 router.post('/invite', invitationRequestController.inviteToJoin);
 router.post ('/many-person', invitationRequestController.inviteManyPersonByEmailToCompany);
 
-router.put('/accept', invitationRequestController.acceptInvitationRequest);
-router.put('/decline', invitationRequestController.declineInvitationRequest);
-router.put('/cancel', invitationRequestController.cancelInvitationRequest);
+router.put('/accept/:id', middleware.authenticator, invitationRequestController.acceptInvitationRequest);
+router.put('/decline/:id', middleware.authenticator, invitationRequestController.declineInvitationRequest);
+router.put('/cancel', middleware.authenticator, invitationRequestController.cancelInvitationRequest);
 
 router.get('/all/user/:userId', invitationRequestController.findAllInvitationRequestsNotDoneByUserId);
 router.get('/all/company/:companyId', invitationRequestController.findAllInvitationRequestsNotDoneByCompanyId);

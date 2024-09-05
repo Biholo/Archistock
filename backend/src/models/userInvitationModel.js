@@ -51,6 +51,11 @@ const UserInvitation = sequelize.define(
             type: DataTypes.ENUM("owner", "admin", "employee", "manager"),
             allowNull: false,
         },
+        status: {
+            type: DataTypes.ENUM("pending", "accepted", "cancelled"),
+            allowNull: false,
+            defaultValue: "pending",
+        }
     },
     {
         sequelize,
