@@ -2,10 +2,10 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const app = express();
-const { Server } = require('socket.io');
+const { Server } = require("socket.io");
 
 app.use(express.json());
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(cookieParser());
 
 const databaseRoute = require("./src/routes/databaseRoute");
@@ -28,7 +28,7 @@ app.use("/company", companyRoute);
 app.use("/file", fileRoute);
 app.use("/folder", folderRoute);
 app.use("/subscription", subscriptionRoute);
-app.use("/usersubscription", userSubscriptionRoute);
+app.use("/user-subscription", userSubscriptionRoute);
 app.use("/invitation-request", invitationRequestRoute);
 app.use("/sharedstorage-space", sharedStorageSpaceRoute);
 app.use("/right", rightRoute);
@@ -38,56 +38,62 @@ app.use('/stripe', stripeRoute);
 
 
 app.use("/files", express.static("src/files"));
-app.use('/Images', express.static('./Images'));
+app.use("/Images", express.static("./Images"));
 
-const httpServer = require('http').createServer(app);
+const httpServer = require("http").createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
-  }
+  },
 });
 
 const waitingClients = [];
 const supports = new Map();
 
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
 
   // Rejoindre une salle basée sur le rôle
-  socket.on('joinRoom', ({ role, room }) => {
+  socket.on("joinRoom", ({ role, room }) => {
     socket.join(room);
     console.log(`${role} joined room: ${room}`);
   });
 
   // Contacter le support
-  socket.on('contactSupport', () => {
+  socket.on("contactSupport", () => {
     waitingClients.push(socket.id);
-    io.emit('clientsWaiting', waitingClients.map(id => ({ id })));
+    io.emit(
+      "clientsWaiting",
+      waitingClients.map((id) => ({ id }))
+    );
   });
 
   // Répondre à un client
-  socket.on('answerClient', ({ clientId }) => {
+  socket.on("answerClient", ({ clientId }) => {
     if (waitingClients.includes(clientId)) {
       // Suppression du client de la liste d'attente
       waitingClients.splice(waitingClients.indexOf(clientId), 1);
-      io.to(clientId).emit('supportAssigned', { supportId: socket.id });
-      socket.emit('connected', { clientId });
+      io.to(clientId).emit("supportAssigned", { supportId: socket.id });
+      socket.emit("connected", { clientId });
     }
   });
 
   // Envoyer un message
-  socket.on('sendMessage', ({ recipientId, message }) => {
-    io.to(recipientId).emit('receiveMessage', { message, senderId: socket.id });
+  socket.on("sendMessage", ({ recipientId, message }) => {
+    io.to(recipientId).emit("receiveMessage", { message, senderId: socket.id });
   });
 
   // Déconnexion
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
     // Nettoyer les clients en attente et les supports
     const index = waitingClients.indexOf(socket.id);
     if (index > -1) waitingClients.splice(index, 1);
     supports.delete(socket.id);
-    io.emit('clientsWaiting', waitingClients.map(id => ({ id })));
+    io.emit(
+      "clientsWaiting",
+      waitingClients.map((id) => ({ id }))
+    );
   });
 });
 

@@ -10,11 +10,13 @@ import {
   User,
   X,
   ChartLine,
-  Factory
+  Factory,
+  Detective
 } from "@phosphor-icons/react";
 
 export default function Aside() {
   const { handleLogout } = useAuth();
+  const { user } = useAuth();
   const [active, setActive] = useState("storage" as string);
 
   useEffect(() => {
@@ -105,7 +107,18 @@ export default function Aside() {
           active={active === "company"}
           onClick={() => handleChangeItem("company")}
         ></AsideItem>
-        
+        {
+          user.role === 'admin' && (
+            <AsideItem
+              title="Administrateur"
+              icon={<Detective size={20} /> }
+              link="administrator"
+              active={active === "administrator"}
+              onClick={() => handleChangeItem("administrator")}
+            >
+            </AsideItem>
+          )
+        }
         <AsideItem
           title="Logout"
           icon={<X size={20} />}

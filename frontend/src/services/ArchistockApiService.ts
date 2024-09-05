@@ -1,8 +1,8 @@
-import User from "../models/User";
-import AccessTokenResponse from "../models/AccessTokenResponse";
+import User from "../models/UserModel";
+import AccessTokenResponse from "../models/AccessTokenResponseModel";
 import UserAndTokens from "../models/UserAndTokens";
-import LoginUser from "../models/LoginUser";
-import Address from "../models/Address";
+import LoginUser from "../models/LoginUserModel";
+import Address from "../models/AddressModel";
 import { getCookie } from "../contexts/AuthContext";
 
 class ArchistockApiService {
@@ -118,7 +118,7 @@ class ArchistockApiService {
 
     async getUserStorage(): Promise<any> {
         try {
-            const response = await fetch(`${this.url}/usersubscription/me`, {
+            const response = await fetch(`${this.url}/user-subscription/me`, {
                 method: 'GET',
                 headers: {
                     Authorization: `${getCookie('accessToken')}`,
@@ -135,7 +135,7 @@ class ArchistockApiService {
 
     async getUserStorageWithFiles(): Promise<any> {
         try {
-            const response = await fetch(`${this.url}/usersubscription/files/me`, {
+            const response = await fetch(`${this.url}/user-subscription/files/me`, {
                 method: 'GET',
                 headers: {
                     Authorization: `${getCookie('accessToken')}`,
@@ -169,7 +169,7 @@ class ArchistockApiService {
 
     async purchaseSubscription(subscriptionId: number): Promise<any> {
         try {
-            const response = await fetch(`${this.url}/usersubscription/add`, {
+            const response = await fetch(`${this.url}/user-subscription/add`, {
                 method: 'POST',
                 headers: {
                     Authorization: `${getCookie('accessToken')}`,
@@ -203,7 +203,7 @@ class ArchistockApiService {
 
     async updateStorage(storageId: number, storage: any): Promise<any> {
         try {
-            const response = await fetch(`${this.url}/usersubscription/update/${storageId}`, {
+            const response = await fetch(`${this.url}/user-subscription/update/${storageId}`, {
                 method: 'PUT',
                 headers: {
                     Authorization: `${getCookie('accessToken')}`,
@@ -295,7 +295,7 @@ class ArchistockApiService {
 
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', `${this.url}/usersubscription/add-files`, true);
+            xhr.open('POST', `${this.url}/user-subscription/add-files`, true);
 
             xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
@@ -629,6 +629,70 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             throw error;
+        }
+    }
+       
+    async findAllSubscriptionByUserId(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user-subscription/me`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            })
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to find subscription:", error);
+            throw error; 
+        }
+    }
+
+    async findAllUsers(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user/all`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            })
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to find subscription:", error);
+            throw error; 
+        }
+    }
+
+    async findAllSubscriptions(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user-subscription/all`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            })
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to find subscription:", error);
+            throw error; 
+        }
+    }
+
+    async findAllUserStorages(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user-subscription/users-with-storage`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            })
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to find subscription:", error);
+            throw error; 
         }
     }
 }

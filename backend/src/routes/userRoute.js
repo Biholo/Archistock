@@ -46,9 +46,8 @@ router.post("/confirm-account", UserController.confirmAccount);
 
 router.get(
   "/files/:userId",
-  middleware.authenticator,
+  // middleware.authenticator,
   UserController.getFilesByUserId
 );
-
 
 module.exports = router;

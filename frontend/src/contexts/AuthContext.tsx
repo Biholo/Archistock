@@ -6,8 +6,8 @@ import React, {
   ReactNode,
 } from "react";
 import ArchistockApiService from "../services/ArchistockApiService";
-import User from "../models/User";
-import AuthContextType from "../models/AuthContextType";
+import User from "../models/UserModel";
+import AuthContextType from "../models/AuthContextTypeModel";
 
 // Create the context with a default value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
