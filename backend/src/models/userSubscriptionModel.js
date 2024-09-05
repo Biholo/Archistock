@@ -11,7 +11,7 @@ const UserSubscription = sequelize.define(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
-      allowNull: false,
+      allowNull: false
     },
     name: {
       type: DataTypes.STRING(50),
@@ -22,15 +22,24 @@ const UserSubscription = sequelize.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    status: {
-      type: DataTypes.ENUM("active", "canceled"),
-      allowNull: false,
-      defaultValue: "active",
-    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    subscriptionId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    status: {
+      type: DataTypes.ENUM("active", "cancelled", "blocked"),
+      allowNull: false,
+      defaultValue: "active",
+    },
+    lastPaymentDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+
     subscriptionId: {
       type: DataTypes.INTEGER,
       allowNull: true,

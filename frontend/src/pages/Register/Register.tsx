@@ -17,7 +17,7 @@ const Register = () => {
     firstName: "",
     lastName: "",
     email: "",
-    phoneNumner: "",
+    phoneNumber: "",
     password: "",
     passwordConfirm: "",
   });
@@ -55,7 +55,7 @@ const Register = () => {
         newUser.firstName === "" ||
         newUser.lastName === "" ||
         newUser.email === "" ||
-        newUser.phoneNumner === "" ||
+        newUser.phoneNumber === "" ||
         newUser.password === "" ||
         newUser.passwordConfirm === ""
       ) {
@@ -66,7 +66,7 @@ const Register = () => {
         setMsgError("Veuillez entrer une adresse email valide");
         return;
       }
-      if (!validatePhone(newUser.phoneNumner)) {
+      if (!validatePhone(newUser.phoneNumber)) {
         setMsgError("Veuillez entrer un numéro de téléphone valide");
         return;
       }
@@ -167,10 +167,10 @@ const Register = () => {
                 required={true}
               />
               <Input
-                value={newUser.phoneNumner}
+                value={newUser.phoneNumber}
                 css={"w-full mb-3"}
                 onChange={(e) => handleInputChange(e, "user")}
-                name="phoneNumner"
+                name="phoneNumber"
                 label="Numéro de téléphone"
                 type="tel"
                 labelWeight="bold"

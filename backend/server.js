@@ -20,6 +20,7 @@ const sharedStorageSpaceRoute = require("./src/routes/sharedStorageSpaceRoute");
 const rightRoute = require("./src/routes/rightRoute");
 const countryRoute = require("./src/routes/countryRoute");
 const userInvitationRoute = require("./src/routes/userInvitationRoute");
+const stripeRoute = require("./src/routes/stripeRoute");
 
 app.use("/database", databaseRoute);
 app.use("/user", userRoute);
@@ -27,12 +28,14 @@ app.use("/company", companyRoute);
 app.use("/file", fileRoute);
 app.use("/folder", folderRoute);
 app.use("/subscription", subscriptionRoute);
-app.use("/usersubscription", userSubscriptionRoute);
+app.use("/user-subscription", userSubscriptionRoute);
 app.use("/invitation-request", invitationRequestRoute);
 app.use("/sharedstorage-space", sharedStorageSpaceRoute);
 app.use("/right", rightRoute);
 app.use("/country", countryRoute);
-app.use("/user-invitation", userInvitationRoute);
+app.use('/user-invitation', userInvitationRoute);
+app.use('/stripe', stripeRoute);
+
 
 app.use("/files", express.static("src/files"));
 app.use("/Images", express.static("./Images"));

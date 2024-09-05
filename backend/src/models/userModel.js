@@ -26,7 +26,7 @@ const User = sequelize.define(
       unique: true,
       allowNull: false,
     },
-    phoneNumner: {
+    phoneNumber: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -42,6 +42,11 @@ const User = sequelize.define(
       type: DataTypes.ENUM("admin"),
       defaultValue: null,
       allowNull: true,
+    },
+    accountIsConfirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
     },
     addressId: {
       type: DataTypes.INTEGER,
