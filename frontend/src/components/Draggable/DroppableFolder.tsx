@@ -1,5 +1,5 @@
 import { useDrop } from 'react-dnd';
-import { ItemTypes } from '../../models/ItemTypes';
+import { ItemTypes } from '../../models/ItemTypesModel';
 import DraggableFolder from './DraggableFolder';
 
 const DroppableFolder = ({ folder, onDrop, onClick, onDelete, onUpdate }: any) => {

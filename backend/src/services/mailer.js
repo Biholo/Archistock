@@ -49,7 +49,7 @@ class Mailer {
 
     // Méthode pour envoyer un e-mail de confirmation de compte
     sendAccountConfirmationEmail(to, userId) {
-        const confirmationLink = this.generateTemporaryLink(userId, '1h', 'confirm-account');
+        const confirmationLink = this.generateTemporaryLink(userId, '5d', 'confirm-account');
 
         const subject = 'Confirmation de compte';
         const text = `Bonjour,\n\nMerci de vous être inscrit sur notre site. Veuillez cliquer sur le lien suivant pour confirmer votre compte :\n${confirmationLink}\n\nCordialement, L'équipe du site`;

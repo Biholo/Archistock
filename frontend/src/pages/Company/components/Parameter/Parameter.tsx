@@ -8,6 +8,10 @@ import InvitationList from '../InvitationList/InvitationList';
 import Button from '../../../../components/Button/Button';
 import Input from '../../../../components/Input/Input';
 import Subscription from '../Subscription/Subscription';
+import { Company } from '../../../../models/CompanyModel';
+import { User } from '../../../../models/UserModel';
+import { InvitationRequest } from '../../../../models/InvitationRequestModel';
+import { SharedStorageSpace } from '../../../../models/SharedStorageSpaceModel';
 
 import {
     Cloud,
@@ -20,21 +24,21 @@ export default function Parameter() {
     const { user } = useAuth();
     const archistockApiService = new ArchistockApiService();
 
-    const [loading, setLoading] = useState(true);
-    const [users, setUsers] = useState([]);
-    const [invitations, setInvitations] = useState([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [users, setUsers] = useState<User[]>([]);
+    const [invitations, setInvitations] = useState<InvitationRequest[]>([]);
     const [userInvitations, setUserInvitations] = useState([]);
-    const [sharedStorageSpaces, setSharedStorageSpaces] = useState([]);
-    const [company, setCompany] = useState(null);
-    const [page, setPage] = useState('stockages');
+    const [sharedStorageSpaces, setSharedStorageSpaces] = useState<SharedStorageSpace>([]);
+    const [company, setCompany] = useState<Company|null>(null);
+    const [page, setPage] = useState<string>('stockages');
 
     const [inviteUsers, setInviteUsers] = useState([]);
     const [searchEmail, setSearchEmail] = useState({
         email: '',
         permission: null
     });
-    const [errorMessage, setErrorMessage] = useState('');
-    const [isShowInvite, setIsShowInvite] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [isShowInvite, setIsShowInvite] = useState<boolean>(false);
 
     useEffect(() => {
         if (user && user.id && id) {

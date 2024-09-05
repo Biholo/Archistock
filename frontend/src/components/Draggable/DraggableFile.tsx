@@ -1,5 +1,5 @@
 import { useDrag } from 'react-dnd';
-import { ItemTypes } from '../../models/ItemTypes';
+import { ItemTypes } from '../../models/ItemTypesModel';
 import FileDetails from '../FileDetails/FileDetails';
 
 const DraggableFile = ({ file, onClick, onDelete, onUpdate }: any) => {

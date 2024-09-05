@@ -4,6 +4,8 @@ import {
     DotsThreeVertical
 } from "@phosphor-icons/react";
 
+
+
 export default function InvitationList({ invitations, userInvitations }) {
     const [paramsInvitationRequest, setParamsInvitationRequest] = useState({
         type: '',

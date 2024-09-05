@@ -1,5 +1,5 @@
 import { useDrag } from 'react-dnd';
-import { ItemTypes } from '../../models/ItemTypes';
+import { ItemTypes } from '../../models/ItemTypesModel';
 import FolderIcon from '../FolderIcon/FolderIcon';
 
 const DraggableFolder = ({ folder, onFolderClick, onDelete }: any) => {

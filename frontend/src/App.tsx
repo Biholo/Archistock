@@ -18,6 +18,7 @@ import EGModal from './components/Modals/EG';
 import ContactSupport from './components/Support/ContactSupport';
 import AnswerClient from './components/Support/AnswerClient';
 import 'react-toastify/dist/ReactToastify.css';
+import ConfirmAccount from './pages/ConfirmAccount/ConfirmAccount';
 
 import Company from './pages/Company/Company';
 import RegisterInvitation from './pages/RegisterInvitation/RegisterInvitation';
@@ -54,6 +55,7 @@ const AuthRoutes = () => {
 
       <Route path="/register-invitation/:uuid" element={<RegisterInvitation />} />
       <Route path="/temp/reset-password/:jwt" element={<ResetPassword />} />
+      <Route path="/temp/confirm-account/:jwt" element={<ConfirmAccount />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
       <Route path="/*" element={loggedIn ? <UserLogged /> : <PublicRoutes />} />
