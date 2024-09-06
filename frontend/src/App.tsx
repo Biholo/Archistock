@@ -29,6 +29,7 @@ import ApiPage from './pages/ApiPage/ApiPage';
 import Solutions from './pages/Solutions/Solutions';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
+import Assistant from './components/Assistant/Assistant';
 
 const App = () => {
   return (
@@ -109,6 +110,7 @@ const UserLogged = () => {
   return (
     <div className="flex min-h-dvh text-black">
       <ToastContainer />
+      <Assistant />
       <EGModal  show={show} handleClose={() => setShow(false)} />
       <div className="w-2/12 bg-white">
         <Aside />

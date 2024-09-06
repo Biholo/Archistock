@@ -52,7 +52,7 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
         archistockApiService.renewSubscription(storage.id).then((res) => {
             console.log(res.status);
             if(res.status === 201) {
-                if(storage.renew == true) {
+                if(storage.status == "active") {
                     toast.success("Votre abonnement ne sera plus renouvelé.");
                 } else {
                     toast.success("Votre abonnement sera renouvelé.");
@@ -140,7 +140,7 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
                             <button
                                 onClick={handleRenewStorage}
                             >
-                                {storage.renew ? 'Ne plus renouveler' : 'Renouveler'}
+                                {storage.status === "active" ? 'Ne plus renouveler' : 'Renouveler'}
                             </button>
                         </li>
                     </ul>

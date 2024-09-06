@@ -257,7 +257,10 @@ exports.getByUserId = async (req, res) => {
   try {
     const user = await User.findOne({ where: { email: email } });
     const result = await UserSubscription.findAll({
-      where: { userId: user.id },
+      where: {
+        userId: user.id,
+        status: ["active", "inactive"]
+      },
       include: [
         { model: User, as: 'user' },
         { model: Subscription, as: 'subscription' },
@@ -322,7 +325,8 @@ exports.getByUserIdWithFiles = async (req, res) => {
                 model: UserSubscription,
                 as: 'usersubscription',
                 where: {
-                    userId: user.id
+                  userId: user.id,
+                  status: ["active", "inactive"]
                 },
                 include: [
                     { model: Subscription, as: 'subscription' }
@@ -333,7 +337,10 @@ exports.getByUserIdWithFiles = async (req, res) => {
     });
     } else {
       result = await UserSubscription.findAll({
-        where: { userId: user.id },
+        where: {
+          userId: user.id,
+          status: ["active", "inactive"]
+        },
         include: [
           { model: User, as: 'user' },
           { model: Subscription, as: 'subscription' },
@@ -493,11 +500,12 @@ exports.renewSubscription = async (req, res) => {
     }, 1000)
 
     // switch renew 
-    if (userSubscription.renew) {
-      userSubscription.renew = false;
-    } else {
-      userSubscription.renew = true;
+    if (userSubscription.status === "active") {
+      userSubscription.status = "inactive";
+    } else if(userSubscription.status === "inactive") {
+      userSubscription.status = "active";
     }
+      
 
     // save changes
     await userSubscription.save();

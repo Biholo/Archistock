@@ -1,64 +1,123 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Profil.scss'
-import { useAuth } from '../../contexts/AuthContext'
+import { useAuth } from '../../contexts/AuthContext';
 import Input from '../../components/Input/Input';
+import Button from '../../components/Button/Button';
+import Card from '../../components/Card/Card';
+import UserInvoices from '../../components/User/UserInvoices';
+import ArchistockApiService from '../../services/ArchistockApiService';
+import { toast } from 'react-toastify';
+
+const archistockApiService = new ArchistockApiService();
 
 export default function Profil() {
-    const { user } = useAuth();
-    const [profileUser, setProfileUser] = useState<any>({});
-    const navigate = useNavigate();
+  const { user, setUser } = useAuth(); // Access setUser from AuthContext
+  const [profileUser, setProfileUser] = useState<any>({});
+  const [currentTab, setCurrentTab] = useState('informations');
+  const navigate = useNavigate();
 
+  useEffect(() => {   
+    setProfileUser(user);
+  }, [user]);
 
-    useEffect(() => {   
-        setProfileUser(user);
-        console.log(user);
-    }, [user]);
+  const handleCLickOnNewPassword = () => {
+    navigate('/profile/change-password');
+  };
 
-    const capitalizeFirstLetter = (string: string) => {
-        if (!string) return '';
-        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-    };
-
-    const handleCLickOnNewPassword = () => {
-        navigate('/profile/change-password')
+  const handleUpdateInput = (e: any) => {
+    const { name, value } = e.target;
+    if(name == "street" || name == "city" || name == "postalCode") {
+      setProfileUser({
+        ...profileUser,
+        address: {
+          ...profileUser.address,
+          [name]: value
+        }
+      });
+    } else {
+        setProfileUser({
+            ...profileUser,
+            [name]: value
+        });
     }
-
-   
+  };
+  
+  const handleUpdateProfile = () => {
+    archistockApiService.updateProfile(profileUser).then((response) => {
+      setProfileUser(response.data);
+      setUser(response.data); // Update the AuthContext with the new user data
+      toast.success('Profile updated successfully');
+    }).catch((error) => {
+      toast.error('An error occurred while updating your profile');
+    });
+  };
 
   return (
-    <div className='profile p-5'>
-        <h1>
-            {capitalizeFirstLetter(profileUser?.firstName || '')} {capitalizeFirstLetter(profileUser?.lastName || '')}
-        </h1>
-        <div className='flex flex-col'>
-            <div className="user-informations w-2/5 mt-2">
-                <h2>Informations personnelles</h2>
-                <div >
-                    <div className='flex w-full'>
-                        <Input css={'w-1/2 mr-2'} label="Prénom" value={profileUser?.firstName} disabled={true} />
-                        <Input css={'w-1/2 ml-2'} label="Nom" value={profileUser.lastName} disabled={true} />
-                    </div>
-                    <Input css={'w-full mt-2'} label="Email" value={profileUser.email} disabled={true} />
-                    <Input css={'w-full mt-2'} label="Téléphone" value={profileUser.phoneNumner} disabled={true} />
-                
-                    <button className='w-full p-3 mt-2' onClick={e => handleCLickOnNewPassword()}>Changer de mot de passe</button>
+    <div className='m-5'>
+      <h1 className='text-3xl font-black mb-3'>Your Profile</h1>
+      <div role="tablist" className="tabs tabs-bordered ">
+        <a
+          role="tab"
+          className={`tab text-black ${currentTab === 'informations' && 'tab-active'}`}
+          onClick={() => { setCurrentTab('informations'); }}
+        >
+          Informations
+        </a>
+        <a
+          role="tab"
+          className={`tab text-black ${currentTab === 'factures' && 'tab-active'}`}
+          onClick={() => { setCurrentTab('factures'); }}
+        >
+          Factures
+        </a>
+        <a
+          role="tab"
+          className={`tab text-black ${currentTab === 'statistiques' && 'tab-active'}`}
+          onClick={() => { setCurrentTab('statistiques'); }}
+        >
+          Statistiques
+        </a>
+      </div>
+      <Card css="mt-10">
+        {currentTab === 'informations' ? (
+          <div className='flex flex-col'>
+            <div className='flex md:flex-row flex-col w-full justify-between gap-[40px]'>
+              <div className='flex flex-col gap-2 md:w-1/2 w-full'>
+                <h2 className='text-xl font-semibold'>Informations personnelles</h2>
+                <div className='flex flex-col gap-5 w-full'>
+                  <Input label='Nom' name="lastName" value={profileUser.lastName} onChange={handleUpdateInput} />
+                  <Input label='Prénom' name="firstName" value={profileUser.firstName} onChange={handleUpdateInput} />
+                  <Input label='Email' name="email" value={profileUser.email} onChange={handleUpdateInput} />
+                  <Input label="Téléphone" name="phoneNumber" value={profileUser.phoneNumber} onChange={handleUpdateInput} />
+                  <a className='text-primary cursor-pointer' onClick={handleCLickOnNewPassword}>Changer le mot de passe</a>
                 </div>
-
-            </div>
-            <div className="address-informations w-2/5 mt-2">
-                <h2>Adresse et coordonnées de facturation</h2>
-                <div>
-                    <Input css={'w-full mt-2'} label="Adresse" value={profileUser?.address?.street} disabled={true} />
-                    <Input css={'w-full mt-2'} label="Code postal" value={profileUser?.address?.postalCode} disabled={true} />
-                    <Input css={'w-full mt-2'} label="Ville" value={profileUser?.address?.city} disabled={true} />
-                    <Input css={'w-full mt-2'} label="Pays" value={profileUser?.address?.country} disabled={true} />
+              </div>
+              {profileUser && profileUser.address && (
+                <div className='flex flex-col gap-2 md:w-1/2 w-full'>
+                  <h2 className='text-xl font-semibold'>Adresse</h2>
+                  <div className='flex flex-col gap-5 w-full'>
+                    <Input label='Rue' name="street" value={profileUser.address.street} onChange={handleUpdateInput} />
+                    <Input label='Ville' name="city" value={profileUser.address.city} onChange={handleUpdateInput} />
+                    <Input label='Code Postal' name="postalCode" value={profileUser.address.postalCode} onChange={handleUpdateInput} />
+                  </div>
                 </div>
-
-
+              )}
             </div>
-        </div>
-        
+            <Button
+              color='primary'
+              css='mt-3'
+              onClick={handleUpdateProfile}
+              disabled={user === profileUser}
+            >
+              Mettre à jour
+            </Button>
+          </div>
+        ) : currentTab === 'factures' ? (
+          <UserInvoices />
+        ) : currentTab === 'statistiques' ? (
+          <p>Incoming</p>
+        ) : null}
+      </Card>
     </div>
-  )
+  );
 }

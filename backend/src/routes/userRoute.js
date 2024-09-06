@@ -25,7 +25,7 @@ router.get("/all", middleware.authenticator, UserController.getAllUsers);
 router.get("/one/:id", middleware.authenticator, UserController.getById);
 
 // Update a user (PUT)
-router.put("/update/:id", middleware.authenticator, UserController.updateUser);
+router.put("/update", middleware.authenticator, UserController.updateUser);
 
 // Delete a user (DELETE)
 router.delete(

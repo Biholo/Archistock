@@ -191,28 +191,55 @@ exports.getById = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const userId = req.params.id; // Assume the user ID to be updated is passed in the URL parameters
-    const { email, password } = req.body;
 
-    // Check if the user to update exists in the database
-    const userToUpdate = await User.findByPk(userId);
-    if (!userToUpdate) {
+    const token = req.headers.authorization;
+    let email = null;
+
+    if (token && token.startsWith("Bearer ")) {
+      token = token.split(" ")[1];
+    }
+
+    if (token) {
+      email = jwt.verify(token, process.env.SECRET_KEY).email;
+    }
+
+    const userToUpdate = await User.findOne({
+      where: { email: email },
+    });
+
+    if(!userToUpdate) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (email) {
-      userToUpdate.email = email;
-    }
-    if (password) {
-      const hash = await bcrypt.hashSync(password, 10);
-      userToUpdate.password = hash;
-    }
+    const user = req.body;
 
-    // Save the modifications to the database
+    // Update the user information
+    userToUpdate.email = user.email;
+    userToUpdate.firstName = user.firstName;
+    userToUpdate.lastName = user.lastName;
+    userToUpdate.phoneNumber = user.phoneNumber;
+
+    const addressToUpdate = await Address.findByPk(userToUpdate.addressId);
+    addressToUpdate.street = user.address.street;
+    addressToUpdate.city = user.address.city;
+    addressToUpdate.postalCode = user.address.postalCode;
+
+    await addressToUpdate.save();
     await userToUpdate.save();
 
-    res.status(200).json({ message: "User information updated successfully" });
+    const getUpdatedUser = await User.findOne({
+      where: { email: user.email },
+      include: [
+        {
+          model: Address,
+          as: "address",
+        },
+      ],
+    });
+
+    res.status(200).json({ message: "User information updated successfully", data: getUpdatedUser, status: 200 });
   } catch (error) {
+    console.error("Error while updating user information:", error);
     res.status(500).json({
       message: "Error while updating user information",
     });

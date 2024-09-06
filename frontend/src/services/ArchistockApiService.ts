@@ -67,6 +67,25 @@ class ArchistockApiService {
     return jsonResponse;
   }
 
+    async updateProfile(user: User) : Promise<any> {
+        console.log("user", user);
+        try {
+            const response = await fetch(`${this.url}/user/update`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user),
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to update profile:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
   async getNewAccessToken(refreshToken: string): Promise<AccessTokenResponse> {
     const response = await fetch(`${this.url}/user/refreshToken`, {
       method: "POST",

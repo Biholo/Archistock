@@ -114,14 +114,15 @@ if (!fs.existsSync(path.join(__dirname, "src/files/invoices"))) {
 if (!fs.existsSync(path.join(__dirname, "Images"))) {
   fs.mkdirSync(path.join(__dirname, "Images"));
 }
-
-cron.schedule('* * * * *', async () => {
+cron.schedule('0 2 * * *', async () => {
   try {
     console.log("Running the billing cron job...");
 
-    // Récupérer tous les abonnements actifs
+    // Récupérer les abonnements actifs et inactifs
     const userSubscriptions = await UserSubscription.findAll({
-      where: { renew: true },
+      where: { 
+        status: ["active", "inactive"] // On récupère les abonnements "active" et "inactive"
+      },
       include: [
         {
           model: Subscription,
@@ -142,24 +143,33 @@ cron.schedule('* * * * *', async () => {
 
     const today = new Date();
 
-    // Parcourir chaque abonnement pour vérifier si une nouvelle facture doit être créée
+    // Parcourir chaque abonnement pour vérifier si une nouvelle facture doit être créée ou terminer l'abonnement
     for (let userSubscription of userSubscriptions) {
-      const { subscription, user, startDate } = userSubscription;
+      const { subscription, user, startDate, status } = userSubscription;
       const { duration } = subscription;
 
       const nextBillingDate = new Date(startDate);
       nextBillingDate.setMonth(nextBillingDate.getMonth() + duration);
 
       if (today >= nextBillingDate) {
-        // Créer une facture
-        await createInvoice(user, subscription, userSubscription);
+        if (status === "active") {
+          // Si l'abonnement est actif, on crée une nouvelle facture
+          await createInvoice(user, subscription, userSubscription);
 
-        // Mettre à jour la date de début pour refléter la nouvelle période de facturation
-        await userSubscription.update({
-          startDate: today,
-        });
+          // Mettre à jour la date de début pour refléter la nouvelle période de facturation
+          await userSubscription.update({
+            startDate: today,
+          });
 
-        console.log(`Invoice created for user: ${user.email}`);
+          console.log(`Invoice created for user: ${user.email}`);
+        } else if (status === "inactive") {
+          // Si l'abonnement est inactif, on le termine
+          await userSubscription.update({
+            status: "ended",
+          });
+
+          console.log(`Subscription ended for user: ${user.email}`);
+        }
       }
     }
 
@@ -169,6 +179,7 @@ cron.schedule('* * * * *', async () => {
     console.error("Error running the billing cron job:", error);
   }
 });
+
 
 httpServer.listen(8000, function () {
   console.log("Serveur ouvert sur le port 8000");

@@ -1,3 +1,5 @@
+import Address from "./Address";
+
 interface User {
     id?: number | null;
     name: string;
@@ -5,6 +7,7 @@ interface User {
     firstName: string;
     lastName: string;
     phoneNumner: string;
+    address?: Address;
     password?: string | null;
     passwordConfirm?: string | null;
 
