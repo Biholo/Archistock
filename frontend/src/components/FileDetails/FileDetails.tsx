@@ -3,6 +3,8 @@ import FileIcon from "../FileIcon/FileIcon";
 import ArchistockApiService from "../../services/ArchistockApiService";
 import { toast } from "react-toastify";
 
+const archistockApiService = new ArchistockApiService();
+
 const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: any) => {
     const [showMenu, setShowMenu] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
@@ -10,7 +12,6 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
     const [fileName, setFileName] = useState(file.name);
     const menuRef = useRef(null);
     
-    const archistockApiService = new ArchistockApiService();
 
     const handleRightClick = (e: any) => {
         e.preventDefault();
@@ -37,6 +38,18 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
         });
     }
 
+    const handleDeleteFile = () => {
+        archistockApiService.deleteFile(file.name).then((res) => {
+            console.log(res.status);
+            if(res.status === 201) {
+                toast.success("File deleted successfully");
+                onDelete(file);
+            } else {
+                toast.error("An error occured while deleting file. Please retry.");
+            }
+        });
+    }
+
     useEffect(() => {
         if (showMenu) {
             document.addEventListener("mousedown", handleClickOutside);
@@ -51,7 +64,7 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
 
     return (
         <div
-            className="relative flex flex-col items-center hover:bg-slate-200 p-2 rounded cursor-pointer min-w-20"
+            className="relative flex flex-col items-center hover:bg-slate-200 p-2 rounded cursor-pointer min-w-[100px] max-w-[100px]"
             onClick={() => editFile ? null : onClick(file)}
             onContextMenu={handleRightClick}
         >
@@ -65,7 +78,7 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
                     onBlur={() => handleUpdateFile()}
                 />
             ) : (
-                <p className="text-md">{fileName}</p>
+                <p className="text-md max-w-20 word-wrap">{file.name}.{file.format}</p>
             )}
 
             {showMenu && (
@@ -101,7 +114,7 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    onDelete(file);
+                                    handleDeleteFile();
                                     setShowMenu(false);
                                 }}
                             >

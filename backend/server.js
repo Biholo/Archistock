@@ -2,7 +2,16 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const app = express();
-const { Server } = require("socket.io");
+const fs = require("fs");
+const path = require("path");
+const { Server } = require('socket.io');
+
+const UserSubscription = require('./src/models/userSubscriptionModel');
+const User = require("./src/models/userModel");
+const Subscription = require("./src/models/subscriptionModel");
+const Address = require("./src/models/addressModel");
+const { createInvoice } = require("./src/controllers/userSubscriptionController");
+const cron = require('node-cron');
 
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
@@ -38,64 +47,92 @@ app.use('/stripe', stripeRoute);
 
 
 app.use("/files", express.static("src/files"));
-app.use("/Images", express.static("./Images"));
+app.use("/invoices", express.static("src/files/invoices"));
+app.use('/Images', express.static('./Images'));
 
 const httpServer = require("http").createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-  },
-});
 
-const waitingClients = [];
-const supports = new Map();
+// check if 'src/files' directory exists, if not create it
+if (!fs.existsSync(path.join(__dirname, "src/files"))) {
+  fs.mkdirSync(path.join(__dirname, "src/files"));
+}
 
-io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
+// check if 'invoices' directory exists, if not create it
 
-  // Rejoindre une salle basée sur le rôle
-  socket.on("joinRoom", ({ role, room }) => {
-    socket.join(room);
-    console.log(`${role} joined room: ${room}`);
-  });
+if (!fs.existsSync(path.join(__dirname, "src/files/invoices"))) {
+  fs.mkdirSync(path.join(__dirname, "src/files/invoices"));
+}
 
-  // Contacter le support
-  socket.on("contactSupport", () => {
-    waitingClients.push(socket.id);
-    io.emit(
-      "clientsWaiting",
-      waitingClients.map((id) => ({ id }))
-    );
-  });
+// check if 'Images' directory exists, if not create it
+if (!fs.existsSync(path.join(__dirname, "Images"))) {
+  fs.mkdirSync(path.join(__dirname, "Images"));
+}
+cron.schedule('0 2 * * *', async () => {
+  try {
+    console.log("Running the billing cron job...");
 
-  // Répondre à un client
-  socket.on("answerClient", ({ clientId }) => {
-    if (waitingClients.includes(clientId)) {
-      // Suppression du client de la liste d'attente
-      waitingClients.splice(waitingClients.indexOf(clientId), 1);
-      io.to(clientId).emit("supportAssigned", { supportId: socket.id });
-      socket.emit("connected", { clientId });
+    // Récupérer les abonnements actifs et inactifs
+    const userSubscriptions = await UserSubscription.findAll({
+      where: { 
+        status: ["active", "inactive"] // On récupère les abonnements "active" et "inactive"
+      },
+      include: [
+        {
+          model: Subscription,
+          as: 'subscription'
+        },
+        {
+          model: User,
+          as: 'user',
+          include: [
+            {
+              model: Address,
+              as: 'address',
+            },
+          ],
+        },
+      ]
+    });
+
+    const today = new Date();
+
+    // Parcourir chaque abonnement pour vérifier si une nouvelle facture doit être créée ou terminer l'abonnement
+    for (let userSubscription of userSubscriptions) {
+      const { subscription, user, startDate, status } = userSubscription;
+      const { duration } = subscription;
+
+      const nextBillingDate = new Date(startDate);
+      nextBillingDate.setMonth(nextBillingDate.getMonth() + duration);
+
+      if (today >= nextBillingDate) {
+        if (status === "active") {
+          // Si l'abonnement est actif, on crée une nouvelle facture
+          await createInvoice(user, subscription, userSubscription);
+
+          // Mettre à jour la date de début pour refléter la nouvelle période de facturation
+          await userSubscription.update({
+            startDate: today,
+          });
+
+          console.log(`Invoice created for user: ${user.email}`);
+        } else if (status === "inactive") {
+          // Si l'abonnement est inactif, on le termine
+          await userSubscription.update({
+            status: "ended",
+          });
+
+          console.log(`Subscription ended for user: ${user.email}`);
+        }
+      }
     }
-  });
 
-  // Envoyer un message
-  socket.on("sendMessage", ({ recipientId, message }) => {
-    io.to(recipientId).emit("receiveMessage", { message, senderId: socket.id });
-  });
+    console.log("Billing cron job completed.");
 
-  // Déconnexion
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-    // Nettoyer les clients en attente et les supports
-    const index = waitingClients.indexOf(socket.id);
-    if (index > -1) waitingClients.splice(index, 1);
-    supports.delete(socket.id);
-    io.emit(
-      "clientsWaiting",
-      waitingClients.map((id) => ({ id }))
-    );
-  });
+  } catch (error) {
+    console.error("Error running the billing cron job:", error);
+  }
 });
+
 
 httpServer.listen(8000, function () {
   console.log("Serveur ouvert sur le port 8000");

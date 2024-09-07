@@ -15,8 +15,6 @@ import { ToastContainer } from 'react-toastify';
 import Usersubscriptions from './pages/UserSubscriptions/Usersubscriptions';
 import UploadFiles from './pages/UploadFiles/UploadFiles';
 import EGModal from './components/Modals/EG';
-import ContactSupport from './components/Support/ContactSupport';
-import AnswerClient from './components/Support/AnswerClient';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmAccount from './pages/ConfirmAccount/ConfirmAccount';
 
@@ -29,6 +27,8 @@ import Homepage from './pages/Homepage/Homepage';
 import ApiPage from './pages/ApiPage/ApiPage';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
+import Assistant from './components/Assistant/Assistant';
+import AdminStatistics from './components/AdminStatistics/AdminStatistics';
 import UserStatistics from './components/UserStatistics/UserStatistics';
 
 const App = () => {
@@ -111,8 +111,9 @@ const UserLogged = () => {
   return (
     <div className="flex min-h-dvh text-black">
       <ToastContainer />
+      <Assistant />
       <EGModal  show={show} handleClose={() => setShow(false)} />
-      <div className="w-2/12 bg-white">
+      <div className="w-2/12 bg-white max-w-[300px]">
         <Aside />
       </div>
       <div className="w-10/12 mx-4 my-4 bg-white-100 shadow-md">
@@ -128,8 +129,7 @@ const UserLogged = () => {
           <Route path="/settings" element={<div>Settings</div>} />
           <Route path="/profile" element={<Profil />} />
           <Route path="/profile/change-password" element={<NewPassword />} />
-          <Route path="/contact-support" element={<ContactSupport />} />
-          <Route path="/answer-client" element={<AnswerClient />} />
+          <Route path="/statistics" element={<UserStatistics />} />
           <Route path="/administrator" element={<Administrator />} />
           <Route path="/test" element={<UserStatistics />} />
         </Routes>

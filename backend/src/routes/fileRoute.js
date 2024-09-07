@@ -9,8 +9,11 @@ const middleware = require("../middleware/middleware");
 // Create an file (POST)
 router.post("/add", middleware.authenticator, FileController.add);
 
+// Download file (GET)
+router.get("/download/:filename", middleware.authenticator, FileController.download);
+
 // Delete file (DELETE)
-router.delete("/delete/:id", middleware.authenticator, FileController.delete);
+router.delete("/delete/:filename", middleware.authenticator, FileController.delete);
 
 // Get all file (GET)
 router.get("/all", middleware.authenticator, FileController.getAll);

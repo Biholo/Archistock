@@ -19,12 +19,17 @@ const File = sequelize.define(
             allowNull: false,
         },
         size: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.FLOAT,
             allowNull: false,
         },
         name: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.STRING(128),
             allowNull: false,
+        },
+        pathName: {
+            type: DataTypes.STRING(256),
+            allowNull: false,
+            defaultValue: "src/files/",
         },
         parentId: {
             type: DataTypes.INTEGER,

@@ -18,7 +18,7 @@ function Button({children, onClick, color, css, loading, disabled} : {children: 
                 setState('btn btn-success text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'danger':
-                setState('btn btn-danger text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
+                setState('btn btn-error text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
                 break;
             case 'error':
                 setState('btn btn-error text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');
@@ -35,7 +35,7 @@ function Button({children, onClick, color, css, loading, disabled} : {children: 
             default:
                 setState('btn btn-primary text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-800');   
         }
-    }, []);
+    }, [color]);
 
     return (
         <React.Fragment>

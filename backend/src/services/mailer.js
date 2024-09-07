@@ -112,7 +112,7 @@ class Mailer {
     }
 
      // Méthode pour envoyer un e-mail de réinitialisation de mot de passe
-     sendPasswordResetEmail(to, user) {
+    sendPasswordResetEmail(to, user) {
         const resetLink = this.generateTemporaryLink(user.id, '1h', 'reset-password');
         const subject = 'Réinitialisation de mot de passe';
         const html = this.templateService.renderTemplate('resetPasswordTemplate', { 
@@ -121,6 +121,26 @@ class Mailer {
             resetLink 
         });
 
+        return this.sendMail(this.senderEmail, to, subject, '', html);
+    }
+
+    sendSubscriptionThankYouEmail(to, user) {
+        const subject = 'Merci pour votre abonnement';
+        const html = this.templateService.renderTemplate('subscriptionThankYouTemplate', { 
+            firstName: user.firstName, 
+            lastName: user.lastName, 
+        });
+    
+        return this.sendMail(this.senderEmail, to, subject, '', html);
+    }
+
+    sendWelcomeEmail(to, user) {
+        const subject = 'Bienvenue sur ArchiStock';
+        const html = this.templateService.renderTemplate('welcomeTemplate', { 
+            firstName: user.firstName, 
+            lastName: user.lastName, 
+        });
+    
         return this.sendMail(this.senderEmail, to, subject, '', html);
     }
     

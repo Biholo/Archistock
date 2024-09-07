@@ -5,46 +5,37 @@ const User = require("./userModel");
 const Subscription = require("./subscriptionModel");
 
 const UserSubscription = sequelize.define(
-  "userSubscription",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false
+    "userSubscription",
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+            allowNull: false
+        },
+        name: {
+            type: DataTypes.STRING(50),
+            allowNull: false,
+            defaultValue: "New storage",
+        },
+        startDate: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+        status: {
+            type: DataTypes.STRING(50),
+            allowNull: false,
+            defaultValue: "active",
+        },
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        subscriptionId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
     },
-    name: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-      defaultValue: "New storage",
-    },
-    startDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    subscriptionId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    status: {
-      type: DataTypes.ENUM("active", "cancelled", "blocked"),
-      allowNull: false,
-      defaultValue: "active",
-    },
-    lastPaymentDate: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-
-    subscriptionId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-  },
   {
     sequelize,
     freezeTableName: true,

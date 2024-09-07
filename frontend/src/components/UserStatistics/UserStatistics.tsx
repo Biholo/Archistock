@@ -13,6 +13,7 @@ import CustomPieChart from "../Stats/CustomPieChart/CustomPieChart";
 import { useAuth } from "../../contexts/AuthContext";
 import { userApi } from "../../services/apiService.js";
 import ArchistockApiService from "../../services/ArchistockApiService";
+import Card from "../Card/Card.js";
 
 // Interface pour typer les données de l'Api
 interface FileData {
@@ -112,7 +113,7 @@ const UserStatistics = () => {
           totalFileSize += file.size;
         });
 
-        setTotalSize(totalFileSize);
+        setTotalSize(parseFloat(totalFileSize.toFixed(2)));
 
         // Conversion des tailles en tableau pour les graphiques
         const sizesArray = Object.entries(sizesByCategory).map(
@@ -162,35 +163,39 @@ const UserStatistics = () => {
         }}
         className="my-5"
       >
-        <h2 style={{ textAlign: "center" }}>Taille par catégorie</h2>
-        <div style={{ display: "flex", width: "100%", height: 250 }}>
-          <ResponsiveContainer width="50%" height="100%">
-            <CustomPieChart
-              data={pieChartData}
-              colors={COLORS}
-              width="100%"
-              height="100%"
-            />
-          </ResponsiveContainer>
-          <ResponsiveContainer width="50%" height="100%">
-            <BarChart
-              data={fileSizesByCategory}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" fill="#8884d8">
-                {fileSizesByCategory.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={getColorByCategory(entry.name, categoryColorMap)}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full min-h-[350px]">
+          <Card css="flex flex-col justify-center min-h-[400px]" title="Occupation du stockage (en Mo)">
+            <ResponsiveContainer width="100%" height="100%">
+              <CustomPieChart
+                data={pieChartData}
+                colors={COLORS}
+                width="100%"
+                height="100%"
+              />
+            </ResponsiveContainer>
+          </Card>
+
+          <Card css="flex flex-col justify-center min-h-[350px]" title="Occupation du stockages (en Mo)">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={fileSizesByCategory}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#8884d8">
+                  {fileSizesByCategory.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={getColorByCategory(entry.name, categoryColorMap)}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
         </div>
       </div>
     </div>

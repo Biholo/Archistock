@@ -25,7 +25,7 @@ router.get("/all", middleware.authenticator, UserController.getAllUsers);
 router.get("/one/:id", middleware.authenticator, UserController.getById);
 
 // Update a user (PUT)
-router.put("/update/:id", middleware.authenticator, UserController.updateUser);
+router.put("/update", middleware.authenticator, UserController.updateUser);
 
 // Delete a user (DELETE)
 router.delete(
@@ -33,6 +33,8 @@ router.delete(
   middleware.authenticator,
   UserController.deleteUser
 );
+
+router.get('/email-available/:email', UserController.isEmailUnique);
 
 router.get("/profile", UserController.getProfile);
 
@@ -43,6 +45,8 @@ router.post("/reset-password", UserController.resetPassword);
 router.post("/update-password", UserController.updatePassword);
 
 router.post("/confirm-account", UserController.confirmAccount);
+
+router.get("/invoices", middleware.authenticator, UserController.getInvoices);
 
 router.get(
   "/files/:userId",

@@ -10,6 +10,8 @@ const Folder = require("../models/folderModel");
 const InvitationRequest = require("../models/invitationRequestModel");
 const Mailer = require("../services/mailer");
 const multer = require("multer");
+const Invoices = require("../models/invoicesModel");
+const userSubscriptionController = require("./userSubscriptionController");
 require("dotenv").config();
 
 const { v4: uuidv4 } = require("uuid");
@@ -30,26 +32,33 @@ exports.register = async (req, res) => {
       street,
       city,
       postalCode,
-      countryId, // Ajout du pays s'il est nécessaire
     });
-
-    const hash = await bcrypt.hashSync(password, 10);
-    const user = await User.create({
+    
+    // create user and get address 
+    const createUser = await User.create({
       email,
-      password: hash,
+      password,
       firstName,
       lastName,
-      phoneNumber, // Correction de l'erreur typographique
+      phoneNumber,
       addressId: address.id,
+    });
+
+    const user = await User.findOne({
+      where: { email: email },
+      include: [
+        {
+          model: Address,
+          as: "address",
+        },
+      ],
     });
 
     const refreshToken = uuidv4();
     user.refreshToken = refreshToken;
     await user.save();
 
-    const token = jwt.sign({ email }, process.env.SECRET_KEY, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: "1h" });
 
     mailer.sendAccountConfirmationEmail(email, user.id);
 
@@ -61,6 +70,28 @@ exports.register = async (req, res) => {
       path: "/",
     });
 
+    mailer.sendWelcomeEmail(email, user);
+
+    const subscription = await Subscription.findOne({ where: { id: 1 } });
+
+    let userSubscription = {};
+
+    userSubscription.subscriptionId = subscription.id;
+    userSubscription.userId = user.id;
+    userSubscription.startDate = new Date();
+
+    let newSubscription = await UserSubscription.create(userSubscription);
+
+    await Folder.create({
+      name: "root",
+      userSubscriptionId: newSubscription.id,
+    });
+
+    // create invoice 
+    await userSubscriptionController.createInvoice(user, subscription, newSubscription);
+
+    mailer.sendSubscriptionThankYouEmail(email, user);
+
     res.status(201).json({ user, accessToken: token, refreshToken });
   } catch (error) {
     console.error("Error while registering the user: ", error);
@@ -68,26 +99,24 @@ exports.register = async (req, res) => {
   }
 };
 
+
+//--------- Login a user ---------//
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log(email, password);
     const existingUser = await User.findOne({
       where: { email },
-      include: [
-        {
-          model: Address,
-          as: "address",
-        },
-      ],
+      include: [{ model: Address, as: "address" }],
     });
 
     if (!existingUser) {
       return res.status(401).json({ message: "Incorrect email." });
     }
 
-    const passwordMatch = bcrypt.compareSync(password, existingUser.password); // Accès direct à password
-    if (!passwordMatch) {
+    const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+    if (!isPasswordValid) {
       return res.status(401).json({ message: "Incorrect email or password." });
     }
 
@@ -180,33 +209,55 @@ exports.getById = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const userId = req.params.id; // Assume the user ID to be updated is passed in the URL parameters
-    const updates = req.body; // Object containing the fields to update
 
-    // Check if the user to update exists in the database
-    const userToUpdate = await User.findByPk(userId);
-    if (!userToUpdate) {
+    const token = req.headers.authorization;
+    let email = null;
+
+    if (token && token.startsWith("Bearer ")) {
+      token = token.split(" ")[1];
+    }
+
+    if (token) {
+      email = jwt.verify(token, process.env.SECRET_KEY).email;
+    }
+
+    const userToUpdate = await User.findOne({
+      where: { email: email },
+    });
+
+    if(!userToUpdate) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Iterate over the updates object and update only the provided fields
-    for (const key in updates) {
-      if (Object.hasOwnProperty.call(updates, key)) {
-        // Check if the key is "password" to handle hashing
-        if (key === "password") {
-          const hash = await bcrypt.hashSync(updates[key], 10);
-          userToUpdate[key] = hash;
-        } else {
-          userToUpdate[key] = updates[key];
-        }
-      }
-    }
+    const user = req.body;
 
-    // Save the modifications to the database
+    // Update the user information
+    userToUpdate.email = user.email;
+    userToUpdate.firstName = user.firstName;
+    userToUpdate.lastName = user.lastName;
+    userToUpdate.phoneNumber = user.phoneNumber;
+
+    const addressToUpdate = await Address.findByPk(userToUpdate.addressId);
+    addressToUpdate.street = user.address.street;
+    addressToUpdate.city = user.address.city;
+    addressToUpdate.postalCode = user.address.postalCode;
+
+    await addressToUpdate.save();
     await userToUpdate.save();
 
-    res.status(200).json({ message: "User information updated successfully" });
+    const getUpdatedUser = await User.findOne({
+      where: { email: user.email },
+      include: [
+        {
+          model: Address,
+          as: "address",
+        },
+      ],
+    });
+
+    res.status(200).json({ message: "User information updated successfully", data: getUpdatedUser, status: 200 });
   } catch (error) {
+    console.error("Error while updating user information:", error);
     res.status(500).json({
       message: "Error while updating user information",
       error: error.message, // Optionally include the error message for debugging
@@ -502,3 +553,65 @@ exports.deleteUserAccount = async (req, res) => {
       .json({ message: "Erreur lors de la suppression du compte." });
   }
 };
+
+exports.getInvoices = async (req, res) => {
+  try {
+    let token = req.headers.authorization;
+    let email = null;
+
+    if (token && token.startsWith("Bearer ")) {
+      token = token.split(" ")[1];
+    }
+
+    if (token) {
+      email = jwt.verify(token, process.env.SECRET_KEY).email;
+    }
+
+    const user = await User.findOne({
+      where: { email: email },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const invoices = await Invoices.findAll({
+      where: { userId: user.id },
+      include: [
+        {
+          model: UserSubscription,
+          as: "usersubscription",  // Use 'as' to specify the alias
+          include: [
+            {
+              model: Subscription,
+              as: "subscription",
+            }
+          ],
+        },
+      ],
+    });
+
+    res.status(200).json(invoices);
+
+  } catch (error) {
+    console.error('Erreur lors de la récupération des factures :', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des factures' });
+  }
+}
+
+exports.isEmailUnique = async (req, res) => {
+  try {
+    const email = req.params.email;
+    const user = await User.findOne({ where: { email: email } });
+    if (user) {
+      res.status(200).json({ unique: false });
+    } else {
+      res.status(200).json({ unique: true });
+    }
+  }
+  catch (error) {
+    console.error('Error while checking email uniqueness:', error);
+    res.status(500).json({ message: 'Error while checking email uniqueness' });
+  }
+}

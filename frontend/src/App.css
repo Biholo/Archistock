@@ -19,3 +19,16 @@ body {
 #root, html {
     height: 100vh;
 }
+
+.word-wrap {
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
+    word-break: break-all; 
+    max-height: 3.6em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}

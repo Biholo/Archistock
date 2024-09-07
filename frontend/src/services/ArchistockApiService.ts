@@ -52,33 +52,7 @@ class ArchistockApiService {
         return jsonResponse;
     }
 
-    async getUserByToken(accessToken: string): Promise<User | null> {
-        if (!accessToken) {
-            return null;
-        }
-
-        const response = await fetch(`${this.url}/user/profile`, {
-            method: "GET",
-            headers: {
-                Authorization: accessToken,
-            },
-        });
-        const jsonResponse = await response.json();
-        return jsonResponse;
-    }
-
-    async getNewAccessToken(refreshToken: string): Promise<AccessTokenResponse> {
-        const response = await fetch(`${this.url}/user/refreshToken`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ refreshToken }),
-        });
-        const jsonResponse = await response.json();
-        return jsonResponse;
-    }
-
+   
     async updatePassword(
         password: string,
         jwtToken: string | undefined
@@ -108,6 +82,32 @@ class ArchistockApiService {
         return true;
     }
 
+     async isEmailAvailable(email: string): Promise<boolean> {
+    const response = await fetch(`${this.url}/user/email-available/${email}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const jsonResponse = await response.json();
+    return jsonResponse
+  }
+
+  async getUserByToken(accessToken: string): Promise<User | null> {
+    if (!accessToken) {
+      return null; 
+        }
+
+    const response = await fetch(`${this.url}/user/profile`, {
+      method: "GET",
+      headers: {
+        Authorization: accessToken,
+      },
+    });
+    const jsonResponse = await response.json();
+    return jsonResponse;
+  }        
+
     private setCookie(name: string, value: string) {
         document.cookie = `${name}=${value}; Secure; SameSite=Strict; Path=/;`;
     }
@@ -115,38 +115,67 @@ class ArchistockApiService {
     private getCookie(name: string): string | null {
         return getCookie(name);
     }
-
-    async getUserStorage(): Promise<any> {
+    async updateProfile(user: User) : Promise<any> {
+        console.log("user", user);
         try {
-            const response = await fetch(`${this.url}/user-subscription/me`, {
-                method: 'GET',
+            const response = await fetch(`${this.url}/user/update`, {
+                method: 'PUT',
                 headers: {
                     Authorization: `${getCookie('accessToken')}`,
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify(user),
             });
-
             const jsonResponse = await response.json();
             return jsonResponse;
         } catch (error) {
-            console.error("Failed to fetch user storage:", error);
+            console.error("Failed to update profile:", error);
             throw error;  // rethrow the error if you want to handle it further up in your components
         }
     }
 
-    async getUserStorageWithFiles(): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/user-subscription/files/me`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-            });
+  async getNewAccessToken(refreshToken: string): Promise<AccessTokenResponse> {
+    const response = await fetch(`${this.url}/user/refreshToken`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+    const jsonResponse = await response.json();
+    return jsonResponse;
+  }
 
-            const jsonResponse = await response.json();
-            return jsonResponse;
-        } catch (error) {
-            console.error("Failed to fetch user storage:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+  async getUserStorage(): Promise<any> {
+      try {
+          const response = await fetch(`${this.url}/user-subscription/me`, {
+              method: 'GET',
+              headers: {
+                  Authorization: `${getCookie('accessToken')}`,
+              },
+          });
+          
+          const jsonResponse = await response.json();
+          return jsonResponse;
+      } catch (error) {
+          console.error("Failed to fetch user storage:", error);
+          throw error;  // rethrow the error if you want to handle it further up in your components
+      }
+  }
+
+  async getUserStorageWithFiles(): Promise<any> {
+    try {
+        const response = await fetch(`${this.url}/user-subscription/files/me`, {
+            method: 'GET',
+            headers: {
+                Authorization: `${getCookie('accessToken')}`,
+            },
+        });
+        const jsonResponse = await response.json();
+        return jsonResponse;
+    } catch (error) {
+        console.error("Failed to fetch user storage:", error);
+        throw error;  // rethrow the error if you want to handle it further up in your components
         }
     }
 
@@ -287,6 +316,22 @@ class ArchistockApiService {
         }
     }
 
+    async renewSubscription(userSubscriptionId: number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user-subscription/renew/${userSubscriptionId}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to renew subscription:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
     async uploadFileWithProgress(formData: FormData, onProgress: (progress: number) => void): Promise<any> {
         const token = getCookie('accessToken');
         if (!token) {
@@ -316,9 +361,27 @@ class ArchistockApiService {
 
             xhr.onerror = () => reject(new Error("Network error"));
 
-            xhr.send(formData);
-        });
+          xhr.send(formData);
+      });
+  }
+
+    async searchFiles(searchTerm:string): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user-subscription/files/me?searchTerm=${searchTerm}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            console.log("json response", jsonResponse);
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to search files:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
     }
+  
 
 
     async updateFile(fileId: number, file: any): Promise<any> {
@@ -338,6 +401,68 @@ class ArchistockApiService {
             throw error;  // rethrow the error if you want to handle it further up in your components
         }
     }
+    
+    async downloadFile(filename: string) {
+        try {
+          const response = await fetch(`${this.url}/file/download/${filename}`, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${getCookie('accessToken')}`,
+            },
+          });
+      
+          if (!response.ok) {
+            console.error(`Failed to download file: ${response.statusText}`);
+            throw new Error(`Failed to download file: ${response.statusText}`);
+          }
+      
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+      
+        } catch (error) {
+          console.error("Failed to download file:", error);
+          throw error;
+        }
+    }
+
+    async deleteFile(filename: string): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/file/delete/${filename}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to delete file:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
+    async getUserInvoices(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user/invoices`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to fetch user invoices:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+      
 
     async findAllCountries(): Promise<any> {
         try {

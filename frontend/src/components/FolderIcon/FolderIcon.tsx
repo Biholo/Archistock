@@ -50,7 +50,7 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties, onUp
 
     return (
         <div
-            className="relative flex flex-col items-center hover:bg-slate-200 p-2 rounded cursor-pointer min-w-20"
+            className="relative flex flex-col items-center hover:bg-slate-200 p-2 rounded cursor-pointer min-w-[100px] max-w-[100px]"
             onClick={() => editFolder ? null : onFolderClick(folder)}
             onContextMenu={handleRightClick}
         >
@@ -64,13 +64,13 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties, onUp
                     onBlur={handleUpdateFolder}
                 />
             ) : (
-                <p className="text-md truncate">{folderName}</p>
+                <p className="text-md max-w-20 word-wrap">{folderName}</p>
             )}
 
             {showMenu && (
                 <div
                     ref={menuRef}
-                     className="absolute rounded z-10"
+                    className="absolute rounded z-10"
                     style={{ top: menuPosition.y, left: menuPosition.x }}
                 >
                     <ul className="menu bg-base-100 rounded-box text-white">

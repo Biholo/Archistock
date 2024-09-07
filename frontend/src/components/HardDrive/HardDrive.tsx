@@ -3,19 +3,19 @@ import { Fragment, useState, useEffect, useRef } from "react";
 import ArchistockApiService from "../../services/ArchistockApiService";
 import { toast } from "react-toastify";
 
+const archistockApiService = new ArchistockApiService();
+
 const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, onStorageClick: any, onUpdate: any}): any => {
     const [showMenu, setShowMenu] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
     const [editStorage, setEditStorage] = useState(false);
     const [storageName, setStorageName] = useState(storage.name);
     const menuRef = useRef(null);
-    
-    const archistockApiService = new ArchistockApiService();
 
     const handleRightClick = (e: any) => {
         e.preventDefault();
         setShowMenu(true);
-        setMenuPosition({ x:200, y: 130 });
+        setMenuPosition({ x: e.clientX - 300, y: e.clientY - 650 });
     };
 
     const handleClickOutside = (e: any) => {
@@ -48,6 +48,24 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
         };
     }, [showMenu]);
 
+    const handleRenewStorage = () => {
+        archistockApiService.renewSubscription(storage.id).then((res) => {
+            console.log(res.status);
+            if(res.status === 201) {
+                if(storage.status == "active") {
+                    toast.success("Votre abonnement ne sera plus renouvelé.");
+                } else {
+                    toast.success("Votre abonnement sera renouvelé.");
+                }
+                setEditStorage(false);
+                setShowMenu(false);
+                onUpdate();
+            } else {
+                toast.error("An error occured while renewing storage. Please retry.");
+            }
+        });
+    }
+
     const getFilesSize = () => {
         let totalSize = 0;
         storage.files.forEach((file: any) => {
@@ -68,7 +86,7 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
         } else if (percentage < 80) {
             return 'progress-warning';
         } else {
-            return 'progress-danger';
+            return 'progress-error ';
         }
     }
 
@@ -95,28 +113,18 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
                     ) : (
                         <p className="text-md font-semibold text-gray-600">{storageName}</p>
                     )}
-                    <progress className={`progress ${getStorageColor()} w-56 h-3.5`} value={getFilesSize()} max={storage.subscription.size}></progress>
-                    <p className="text-sm text-gray-400">{getFilesSize()} Go / {storage.subscription.size.toFixed(2)} Go</p>
+                    <progress className={`progress ${getStorageColor()} w-56 h-3.5`} value={getFilesSize()} max={storage.subscription.size / 1000}></progress>
+                    <p className="text-sm text-gray-400">{getFilesSize()} Go / {(storage.subscription.size / 1000).toFixed(2)} Go</p>
                 </div>
             </div>
 
             {showMenu && (
                 <div
                     ref={menuRef}
-                    className="absolute rounded z-10 bg-gray-800 text-white p-1"
+                    className="absolute rounded z-10"
                     style={{ top: menuPosition.y, left: menuPosition.x }}
                 >
-                    <ul className="menu bg-base-100 rounded-box">
-                        <li>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowMenu(false);
-                                }}
-                            >
-                                <p className="text-sm">Propriétés</p>
-                            </button>
-                        </li>
+                    <ul className="menu bg-base-100 rounded-box text-white">
                         <li>
                             <button
                                 onClick={(e) => {
@@ -126,6 +134,13 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
                                 }}
                             >
                                 <p className="text-sm">Renommer</p>
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                onClick={handleRenewStorage}
+                            >
+                                {storage.status === "active" ? 'Ne plus renouveler' : 'Renouveler'}
                             </button>
                         </li>
                     </ul>

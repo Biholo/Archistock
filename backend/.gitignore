@@ -6,3 +6,10 @@ node_modules/
 .env
 ./.env
 ./env
+
+./src/files
+./src/files/*
+
+src/files
+/src/files
+/src/files/*

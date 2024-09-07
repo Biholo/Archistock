@@ -98,7 +98,7 @@ function Input({
                 {label} {required ? <span className='text-red-400'>*</span> : ''}
             </label>
             <input
-                className={`input input-bordered bg-white w-full shadow-sm ${state} ${disabled ? 'cursor-not-allowed disabled:bg-white' : ''}`}
+                className={`input input-bordered text-black bg-white w-full shadow-sm ${state} ${disabled ? 'cursor-not-allowed disabled:bg-white' : ''}`}
                 id={name}
                 name={name}
                 type={type}
