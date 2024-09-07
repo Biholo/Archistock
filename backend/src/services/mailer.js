@@ -133,6 +133,16 @@ class Mailer {
     
         return this.sendMail(this.senderEmail, to, subject, '', html);
     }
+
+    sendWelcomeEmail(to, user) {
+        const subject = 'Bienvenue sur ArchiStock';
+        const html = this.templateService.renderTemplate('welcomeTemplate', { 
+            firstName: user.firstName, 
+            lastName: user.lastName, 
+        });
+    
+        return this.sendMail(this.senderEmail, to, subject, '', html);
+    }
     
 }
 

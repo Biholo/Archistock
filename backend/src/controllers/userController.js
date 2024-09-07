@@ -5,9 +5,11 @@ const Address = require("../models/addressModel");
 const UserSubscription = require("../models/userSubscriptionModel");
 const Subscription = require("../models/subscriptionModel");
 const File = require("../models/fileModel");
+const Folder = require("../models/folderModel");
 const Mailer = require("../services/mailer");
 const multer = require("multer");
 const Invoices = require("../models/invoicesModel");
+const userSubscriptionController = require("./userSubscriptionController");
 require("dotenv").config();
 
 const { v4: uuidv4 } = require("uuid");
@@ -25,34 +27,38 @@ exports.register = async (req, res) => {
     }
 
     const address = await Address.create({
-      street: street,
-      city: city,
-      postalCode: postalCode,
+      street,
+      city,
+      postalCode,
     });
 
     const phoneNumber = phoneNumner;
-    const hash = await bcrypt.hashSync(password, 10);
-    console.log("Created hashed password: ", hash);
-    const user = await User.create({
+    
+    // create user and get address 
+    const createUser = await User.create({
       email,
-      password: hash,
+      password,
       firstName,
       lastName,
       phoneNumber,
       addressId: address.id,
     });
 
-    // Generate a refresh token with expiration
-    const refreshToken = uuidv4();
+    const user = await User.findOne({
+      where: { email: email },
+      include: [
+        {
+          model: Address,
+          as: "address",
+        },
+      ],
+    });
 
-    // Update the refresh token in the database
+    const refreshToken = uuidv4();
     user.refreshToken = refreshToken;
     await user.save();
 
-    // Return the JWT token and the refresh token
-    const token = jwt.sign({ email }, process.env.SECRET_KEY, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: "1h" });
 
     res.cookie("access_token", token, {
       httpOnly: true,
@@ -62,6 +68,28 @@ exports.register = async (req, res) => {
       path: "/",
     });
 
+    mailer.sendWelcomeEmail(email, user);
+
+    const subscription = await Subscription.findOne({ where: { id: 1 } });
+
+    let userSubscription = {};
+
+    userSubscription.subscriptionId = subscription.id;
+    userSubscription.userId = user.id;
+    userSubscription.startDate = new Date();
+
+    let newSubscription = await UserSubscription.create(userSubscription);
+
+    await Folder.create({
+      name: "root",
+      userSubscriptionId: newSubscription.id,
+    });
+
+    // create invoice 
+    await userSubscriptionController.createInvoice(user, subscription, newSubscription);
+
+    mailer.sendSubscriptionThankYouEmail(email, user);
+
     res.status(201).json({ user, accessToken: token, refreshToken });
   } catch (error) {
     console.error("Error while registering the user: ", error);
@@ -69,51 +97,34 @@ exports.register = async (req, res) => {
   }
 };
 
+
 //--------- Login a user ---------//
 
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const existingUser = await User.findOne({
-      where: {
-        email: email,
-      },
-      include: [
-        {
-          model: Address,
-          as: "address",
-        },
-      ],
+      where: { email },
+      include: [{ model: Address, as: "address" }],
     });
 
     if (!existingUser) {
       return res.status(401).json({ message: "Incorrect email." });
     }
 
-    const hash = bcrypt.compareSync(password, existingUser.password);
-    console.log(password, existingUser.password)
-    if (!hash) {
+    const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+    if (!isPasswordValid) {
       return res.status(401).json({ message: "Incorrect email or password." });
     }
 
-    // Generate a refresh token
     const refreshToken = uuidv4();
-
-    // Update the refresh token in the database
     existingUser.refreshToken = refreshToken;
     await existingUser.save();
 
-    // Return the JWT token and the refresh token
     const token = jwt.sign(
-      {
-        email: existingUser.email,
-        id: existingUser.id,
-        role: existingUser.role,
-      },
+      { email: existingUser.email, id: existingUser.id, role: existingUser.role },
       process.env.SECRET_KEY,
-      {
-        expiresIn: "1h",
-      }
+      { expiresIn: "1h" }
     );
 
     res.cookie("access_token", token, {
@@ -124,14 +135,13 @@ exports.login = async (req, res) => {
       path: "/",
     });
 
-    res
-      .status(200)
-      .json({ user: existingUser, accessToken: token, refreshToken });
+    res.status(200).json({ user: existingUser, accessToken: token, refreshToken });
   } catch (error) {
     console.error("Error during user authentication: ", error);
     res.status(500).json({ message: "Error during user authentication" });
   }
 };
+
 
 // Verify the validity of the access token
 exports.verifyAccessToken = async (req, res) => {
@@ -471,3 +481,18 @@ exports.getInvoices = async (req, res) => {
   }
 }
 
+exports.isEmailUnique = async (req, res) => {
+  try {
+    const email = req.params.email;
+    const user = await User.findOne({ where: { email: email } });
+    if (user) {
+      res.status(200).json({ unique: false });
+    } else {
+      res.status(200).json({ unique: true });
+    }
+  }
+  catch (error) {
+    console.error('Error while checking email uniqueness:', error);
+    res.status(500).json({ message: 'Error while checking email uniqueness' });
+  }
+}

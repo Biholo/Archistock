@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
-import "./Login.scss";
 import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
+import Card from "../../components/Card/Card";
 import ArchistockApiService from "../../services/ArchistockApiService";
 import { useAuth, setCookie } from "../../contexts/AuthContext";
 
@@ -51,25 +51,21 @@ const Login = () => {
 
 
     return (
-        <div className="login flex items-center justify-center h-full">
-            <div className="card p-2">
-                <div className="top flex flex-col items-center py-4">
-                    <h1>🔗Archistock</h1>
-                    <p>1.0.0</p>
-                </div>
-                <div className="main-content flex flex-col justify-center">
-                    <h2 className="text-center mb-5">Connexion</h2>
-                    <Input value={loginUser.email} onChange={e => handleChangeInput(e)} css={'w-full mb-3'} name="email" label="Email" type="email" labelWeight="bold" placeholder="Veuillez renseigner votre adresse email" required={true}/>
-                    <Input value={loginUser.password} onChange={e => handleChangeInput(e)} css={'w-full mb-3'} name="password" label="Mot de passe" type="password" labelWeight="bold" placeholder="Veuillez renseigner votre mot de passe" required={true}/>
-                    <button onClick={e => handleLogin()} className="w-full py-2">Se connecter</button>
-                    <p onClick={e => navigate('/forgot-password')} className="text-center mt-3 p-password-forgot">mot de passe oublié</p>
-                </div>
-                <div className="flex flex-col items-center py-4 bottom">
-                    <button className="py-1" onClick={handleRegisterClick}>Créer un compte</button>
-                    <p className="right mt-5">archistock 2024®</p>
-                </div>
-            </div>
-        </div>
+       <div className="flex flex-row justify-center items-center w-full h-full">
+            <Card css="max-w-[1000px] w-1/2">
+            <h1 className="text-4xl text-black text-center font-bold">🧷Archistock</h1>
+            <p className="text-sm text-slate-400 text-center">1.0.0</p>
+            <hr className="w-full h-[1px] mx-auto my-4 bg-slate-400 border-0 rounded md:my-5" />
+            <h2 className="text-2xl text-black font-bold text-center">Connexion</h2>
+            <Input label="Email" name="email" required={true} type="email" placeholder="Email" value={loginUser.email} onChange={handleChangeInput} />
+            <Input label="Mot de passe" name="password" required={true} type="password" placeholder="Password" value={loginUser.password} onChange={handleChangeInput} />
+            <a href="/forgot-password" className="text-xs text-slate-400 text-right">Mot de passe oublié ?</a>
+            <Button color="primary" css="w-full mt-4" onClick={handleLogin}>Connexion</Button>
+            <hr className="w-full h-[1px] mx-auto my-4 bg-slate-400 border-0 rounded md:my-5" />
+            <Button color="neutral" css="w-full" onClick={handleRegisterClick}>Créer un compte</Button>
+            
+            </Card>
+         </div>
     );
 };
 

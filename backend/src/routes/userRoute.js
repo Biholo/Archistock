@@ -34,6 +34,8 @@ router.delete(
   UserController.deleteUser
 );
 
+router.get('/email-available/:email', UserController.isEmailUnique);
+
 router.get("/profile", UserController.getProfile);
 
 router.post("/refreshToken", UserController.refreshToken);

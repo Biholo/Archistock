@@ -52,6 +52,17 @@ class ArchistockApiService {
     return jsonResponse;
   }
 
+  async isEmailAvailable(email: string): Promise<boolean> {
+    const response = await fetch(`${this.url}/user/email-available/${email}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const jsonResponse = await response.json();
+    return jsonResponse
+  }
+
   async getUserByToken(accessToken: string): Promise<User | null> {
     if (!accessToken) {
       return null;
