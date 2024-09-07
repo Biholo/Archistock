@@ -3,12 +3,14 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const Address = require("../models/addressModel");
 const UserSubscription = require("../models/userSubscriptionModel");
+const Right = require("../models/rightModel");
 const Subscription = require("../models/subscriptionModel");
 const File = require("../models/fileModel");
+const Folder = require("../models/folderModel");
+const InvitationRequest = require("../models/invitationRequestModel");
 const Mailer = require("../services/mailer");
 const multer = require("multer");
 require("dotenv").config();
-
 
 const { v4: uuidv4 } = require("uuid");
 const mailer = new Mailer();
@@ -18,7 +20,6 @@ exports.register = async (req, res) => {
   try {
     const { email, password, firstName, lastName, phoneNumber } = req.body.user;
     const { street, city, postalCode, countryId } = req.body.address;
-
 
     const existingUser = await User.findOne({ where: { email: email } });
     if (existingUser) {
@@ -95,7 +96,11 @@ exports.login = async (req, res) => {
     await existingUser.save();
 
     const token = jwt.sign(
-      { email: existingUser.email, id: existingUser.id, role: existingUser.role },
+      {
+        email: existingUser.email,
+        id: existingUser.id,
+        role: existingUser.role,
+      },
       process.env.SECRET_KEY,
       { expiresIn: "1h" }
     );
@@ -108,13 +113,14 @@ exports.login = async (req, res) => {
       path: "/",
     });
 
-    res.status(200).json({ user: existingUser, accessToken: token, refreshToken });
+    res
+      .status(200)
+      .json({ user: existingUser, accessToken: token, refreshToken });
   } catch (error) {
     console.error("Error during user authentication: ", error);
     res.status(500).json({ message: "Error during user authentication" });
   }
 };
-
 
 // Verify the validity of the access token
 exports.verifyAccessToken = async (req, res) => {
@@ -208,8 +214,8 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-//confirm account 
-// confirmAccount
+//--------- Confirm account ---------//
+
 exports.confirmAccount = async (req, res) => {
   try {
     const { token } = req.body;
@@ -242,14 +248,13 @@ exports.confirmAccount = async (req, res) => {
   } catch (error) {
     console.error("Error while confirming account:", error);
 
-    if (error.name === 'JsonWebTokenError') {
+    if (error.name === "JsonWebTokenError") {
       return res.status(400).json({ message: "Invalid token" });
     }
 
     res.status(500).json({ message: "Error while confirming account" });
   }
 };
-
 
 //--------- Delete a user ---------//
 
@@ -434,5 +439,66 @@ exports.getFilesByUserId = async (req, res) => {
   } catch (error) {
     console.error("Error retrieving files:", error);
     res.status(500).json({ error: "An error occurred while retrieving files" });
+  }
+};
+
+//--------- Delete all about user ---------//
+exports.deleteUserAccount = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé." });
+    }
+
+    const subscriptions = await UserSubscription.findAll({
+      where: { userId: user.id },
+    });
+    let totalFilesDeleted = 0;
+
+    for (const subscription of subscriptions) {
+      const folders = await Folder.findAll({
+        where: { userSubscriptionId: subscription.id },
+      });
+      for (const folder of folders) {
+        await File.destroy({ where: { parentId: folder.id } });
+      }
+      totalFilesDeleted += await File.destroy({
+        where: { userSubscriptionId: subscription.id },
+      });
+      await Folder.destroy({ where: { userSubscriptionId: subscription.id } });
+    }
+
+    await InvitationRequest.destroy({ where: { userId: user.id } });
+    await UserSubscription.destroy({ where: { userId: user.id } });
+    await Right.destroy({ where: { userId: user.id } });
+    await user.destroy();
+
+    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: 'strict' });
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'strict' });
+
+    // Envoyer un email à l'utilisateur pour confirmer la suppression de son compte
+    await mailer.sendAccountDeletionEmail(user.email);
+
+    // Envoyer un email aux administrateurs avec le nombre de fichiers supprimés
+    const admins = await User.findAll({ where: { role: "admin" } })
+    for (const admin of admins) {
+      await mailer.sendAccountDeletionEmailAdmin(
+        admin.email,
+        user,
+        totalFilesDeleted
+      );
+    }
+
+    // Répondre au client avec un message de succès
+    res.status(200).json({
+      message: `Compte supprimé avec succès, ${totalFilesDeleted} fichiers ont été supprimés.`,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppression du compte:", error);
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la suppression du compte." });
   }
 };

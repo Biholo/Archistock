@@ -4,8 +4,8 @@
       "data": {
         "firstName": "John",
         "lastName": "Doe",
-        "email": "john.doe@example.com",
-        "phoneNumner": "+1234567890",
+        "email": "dlortiethibaut@gmail.com",
+        "phoneNumber": "+1234567890",
         "password": "password123",
         "role": "user",
         "addressId": 1
@@ -16,8 +16,8 @@
       "data": {
         "firstName": "Jane",
         "lastName": "Smith",
-        "email": "jane.smith@example.com",
-        "phoneNumner": "+0987654321",
+        "email": "ttfl.smurf@gmail.com",
+        "phoneNumber": "+0987654321",
         "password": "mysecretpassword",
         "role": "admin",
         "addressId": 2

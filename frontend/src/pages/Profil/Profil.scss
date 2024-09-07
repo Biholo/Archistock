@@ -1,21 +1,28 @@
 .profile {
-    h1 {
-        font-size: 36px;
-        font-weight: 700;
-        color: black;
-    }
+  h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: black;
+  }
 
-    h2 {
-        font-size: 30px;
-        font-weight: 500;
-        color: black;
-        margin-bottom: 10px;
-    }
+  h2 {
+    font-size: 30px;
+    font-weight: 500;
+    color: black;
+    margin-bottom: 10px;
+  }
+  button{
+    border-radius: 8px;
+  }
+  .user-informations {
     button {
-        background: none;
-        color: #4338CA;
-        outline: solid 1px #4338CA;
-        
-        border-radius: 8px;
+      background: none;
+      color: #4338ca;
+      outline: solid 1px #4338ca;
+      &:hover {
+        background: #4338ca;
+        color: white;
+      }
     }
+  }
 }

@@ -29,6 +29,7 @@ import Homepage from './pages/Homepage/Homepage';
 import ApiPage from './pages/ApiPage/ApiPage';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
+import UserStatistics from './components/UserStatistics/UserStatistics';
 
 const App = () => {
   return (
@@ -130,6 +131,7 @@ const UserLogged = () => {
           <Route path="/contact-support" element={<ContactSupport />} />
           <Route path="/answer-client" element={<AnswerClient />} />
           <Route path="/administrator" element={<Administrator />} />
+          <Route path="/test" element={<UserStatistics />} />
         </Routes>
       </div>
     </div>

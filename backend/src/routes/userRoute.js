@@ -50,4 +50,6 @@ router.get(
   UserController.getFilesByUserId
 );
 
+router.delete('/account/:id', UserController.deleteUserAccount);
+
 module.exports = router;
