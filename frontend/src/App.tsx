@@ -22,14 +22,16 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import Company from './pages/Company/Company';
 import RegisterInvitation from './pages/RegisterInvitation/RegisterInvitation';
+import Administrator from './pages/Administrator/Administrator';
 
 import Pricing from './pages/Pricing/Pricing';
 import Homepage from './pages/Homepage/Homepage';
 import ApiPage from './pages/ApiPage/ApiPage';
-import Solutions from './pages/Solutions/Solutions';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
 import Assistant from './components/Assistant/Assistant';
+import AdminStatistics from './components/AdminStatistics/AdminStatistics';
+import UserStatistics from './components/UserStatistics/UserStatistics';
 
 const App = () => {
   return (
@@ -112,13 +114,12 @@ const UserLogged = () => {
       <ToastContainer />
       <Assistant />
       <EGModal  show={show} handleClose={() => setShow(false)} />
-      <div className="w-2/12 bg-white">
+      <div className="w-2/12 bg-white max-w-[300px]">
         <Aside />
       </div>
       <div className="w-10/12 mx-4 my-4 bg-white-100 shadow-md">
         <div className='m-4'></div>
         <Routes>
-          <Route path="/statistics" element={<Statistics />} />
           <Route path="/components" element={<ComponentsTest />} />
           <Route path="/storage" element={
               <Usersubscriptions />
@@ -131,6 +132,8 @@ const UserLogged = () => {
           <Route path="/profile/change-password" element={<NewPassword />} />
           <Route path="/contact-support" element={<ContactSupport />} />
           <Route path="/answer-client" element={<AnswerClient />} />
+          <Route path="/statistics" element={<UserStatistics />} />
+          <Route path="/administrator" element={<Administrator />} />
         </Routes>
       </div>
     </div>

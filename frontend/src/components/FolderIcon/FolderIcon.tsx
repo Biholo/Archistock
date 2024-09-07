@@ -50,7 +50,7 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties, onUp
 
     return (
         <div
-            className="relative flex flex-col items-center hover:bg-slate-200 p-2 rounded cursor-pointer min-w-20"
+            className="relative flex flex-col items-center hover:bg-slate-200 p-2 rounded cursor-pointer min-w-[100px] max-w-[100px]"
             onClick={() => editFolder ? null : onFolderClick(folder)}
             onContextMenu={handleRightClick}
         >

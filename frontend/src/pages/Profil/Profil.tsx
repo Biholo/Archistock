@@ -7,6 +7,7 @@ import Card from '../../components/Card/Card';
 import UserInvoices from '../../components/User/UserInvoices';
 import ArchistockApiService from '../../services/ArchistockApiService';
 import { toast } from 'react-toastify';
+import UserStatistics from '../../components/UserStatistics/UserStatistics';
 
 const archistockApiService = new ArchistockApiService();
 
@@ -115,7 +116,7 @@ export default function Profil() {
         ) : currentTab === 'factures' ? (
           <UserInvoices />
         ) : currentTab === 'statistiques' ? (
-          <p>Incoming</p>
+          <UserStatistics />
         ) : null}
       </Card>
     </div>

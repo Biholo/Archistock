@@ -18,23 +18,25 @@ const SubscriptionCard = ({ subscription, onSelect } : any) => {
 
     return (
         <Fragment>
-            <Card title={""} css="w-auto">
+            <Card title={""} css="w-auto min-h-[400px]">
                 {subscription.name === "Basic" && (
                     <Badge color="success" css="absolute text-white fw-black -translate-x-10 -translate-y-10 text-md font-bold p-3">Best Offer !</Badge>
                 )}
                 
-                <div className="flex flex-col">
+                <div className="flex flex-col h-full justify-between">
+                    <div className="flex flex-col gap-2">
                     <h2 className="text-3xl font-bold">
                         <span className="text-4xl">{euros}</span><span className="text-2xl">,{cents} € </span>
                         - <span className="text-secondary">{subscription.name}</span> Subscription
                     </h2>
-                    <div className="flex flex-col mt-5">
+                    <div className="flex flex-col mt-2">
                         <ul className="text-lg list-disc list-inside">
                             {featureList.map((feature: any, index: number) => (
                                 <li key={index}>{feature}</li>
                             ))}
                             <li className="text-sm">And more...</li>
                         </ul>
+                    </div>
                     </div>
                     <Button color="success" css="mt-10" onClick={() => { onSelect(subscription) }}>Subscribe here</Button>
                 </div>

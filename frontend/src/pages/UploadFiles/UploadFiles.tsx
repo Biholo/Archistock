@@ -35,6 +35,12 @@ const UploadFiles = () => {
     }, [progress]);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
+        setProgress(0);
+        setProgressColor("");
+        setSuccessfulFiles([]);
+        setFailedFiles([]);
+        setError(null);
+        
         if (!selectedStorage) {
             toast.error("Veuillez sélectionner un espace de stockage.");
             return;
@@ -63,6 +69,7 @@ const UploadFiles = () => {
 
                 if (unsaved.length > 0) {
                     setError("Un ou plusieurs fichiers ont été rejetés. Vérifiez les raisons ci-dessous.");
+                    setProgressColor("bg-red-500");
                     toast.error("Erreur lors de l'upload des fichiers.");
                 }
             })
@@ -80,13 +87,13 @@ const UploadFiles = () => {
         <Fragment>
             {storage && (
                 <div className='m-5'>
-                    <h1 className='text-3xl font-black mb-3'>Extending Storage</h1>
+                    <h1 className="text-2xl font-bold mb-3">Télécharger vos fichiers</h1>
                     <Card css="mt-10">
                         <div className="flex flex-col justify-center w-full gap-5">
-                            <Input type="select" label="Select Storage" onChange={(e: any) => setSelectedStorage(e.target.value)}>
-                                <option value="">Select Storage</option>
+                            <Input type="select" label="Selectionner votre abonnement" onChange={(e: any) => setSelectedStorage(e.target.value)}>
+                                <option value="">Selectionner votre abonnement</option>
                                 {storage.map((item: any, index: number) => (
-                                    <option key={index} value={item.id}>{item.name} - {(parseInt(item.totalSize) / 1000).toFixed(2)} / {item.subscription.size.toFixed(2)} Go</option>
+                                    <option key={index} value={item.id}>{item.name} - {(parseInt(item.totalSize) / 1000).toFixed(2)} / {item.subscription.size.toFixed(2) / 1000} Go</option>
                                 ))}
                             </Input>
 
@@ -112,7 +119,7 @@ const UploadFiles = () => {
                                                 {error ? (
                                                     <p className="font-semibold text-red-500">{error}</p>
                                                 ) : (
-                                                    <p className="font-semibold">{progress === 100 ? "Files uploaded!" : "Uploading files..."}</p>
+                                                    <p className="font-semibold">{progress === 100 ? "Fichiers téléchargés !" : "Téléchargement des fichiers..."}</p>
                                                 )}
                                                 {successfulFiles.length > 0 && (
                                                     <div>

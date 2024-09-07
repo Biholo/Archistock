@@ -60,7 +60,7 @@ const Assistant = () => {
 
       {/* Sliding menu */}
       <div
-        className={`fixed z-10 bottom-5 right-5 bg-white rounded-lg shadow-lg transition-transform duration-300 transform ${
+        className={`fixed z-10 bottom-5 transition right-5 bg-white rounded-lg shadow-lg transition-transform duration-300 transform ${
           isMenuOpen ? 'translate-y-0' : 'translate-y-full'
         } w-[500px] p-4`}
         style={{ display: isMenuOpen ? 'block' : 'none' }}

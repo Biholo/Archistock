@@ -3,7 +3,7 @@
       "model": "Subscription",
       "data": {
         "name": "Basique",
-        "size": 20.0,
+        "size": 20000.0,
         "price": 20.0,
         "features": "Accès aux fonctionnalités basique, 20Go stockage, Email support",
         "duration": 30
@@ -13,7 +13,7 @@
       "model": "Subscription",
       "data": {
         "name": "Standard",
-        "size": 40.0,
+        "size": 40000.0,
         "price": 40.0,
         "features": "Accès à toutes les fonctionnalités, 40Go stockage, Prioritaire email support",
         "duration": 30
@@ -23,7 +23,7 @@
       "model": "Subscription",
       "data": {
         "name": "Premium",
-        "size": 60.0,
+        "size": 60000.0,
         "price": 60.0,
         "features": "Accès à toutes les fonctionnalités, 60GB stockage, 24/7 support",
         "duration": 30

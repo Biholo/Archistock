@@ -190,13 +190,22 @@ exports.update = async (req, res) => {
     const result = await UserSubscription.findByPk(idP);
     if (result) {
       await result.update(userSubscription);
-      res.status(201).json({ status: 201, message: "User subscription updated successfully" });
+      res
+        .status(201)
+        .json({
+          status: 201,
+          message: "User subscription updated successfully",
+        });
     } else {
-      res.status(404).json({ status: 404, error: "User subscription not found" });
+      res
+        .status(404)
+        .json({ status: 404, error: "User subscription not found" });
     }
   } catch (error) {
     console.error("Error updating user subscription: ", error);
-    res.status(500).json({ status: 500, error: "Error updating user subscription" });
+    res
+      .status(500)
+      .json({ status: 500, error: "Error updating user subscription" });
   }
 };
 
@@ -206,8 +215,8 @@ exports.getById = async (req, res) => {
   try {
     const result = await UserSubscription.findByPk(idP, {
       include: [
-        { model: User, as: 'user' },
-        { model: Subscription, as: 'subscription' },
+        { model: User, as: "user" },
+        { model: Subscription, as: "subscription" },
       ],
     });
     if (result) {
@@ -226,8 +235,8 @@ exports.getAll = async (req, res) => {
   try {
     const result = await UserSubscription.findAll({
       include: [
-        { model: User, as: 'user' },
-        { model: Subscription, as: 'subscription' },
+        { model: User, as: "user" },
+        { model: Subscription, as: "subscription" },
       ],
     });
     res.status(200).json(result);
@@ -242,14 +251,14 @@ exports.getByUserId = async (req, res) => {
   setTimeout(() => {
     console.log("Timeout completed");
   }, 5000);
-  
+
   let token = req.headers.authorization;
   let email = null;
-  
+
   if (token && token.startsWith("Bearer ")) {
     token = token.split(" ")[1];
   }
-  
+
   if (token) {
     email = jwt.verify(token, process.env.SECRET_KEY).email;
   }
@@ -262,15 +271,17 @@ exports.getByUserId = async (req, res) => {
         status: ["active", "inactive"]
       },
       include: [
-        { model: User, as: 'user' },
-        { model: Subscription, as: 'subscription' },
+        { model: User, as: "user" },
+        { model: Subscription, as: "subscription" },
       ],
     });
 
     // for erach userSubscription, get the files size. (Files are store in Mo)
     for (let i = 0; i < result.length; i++) {
       let userSubscription = result[i];
-      let files = await File.findAll({ where: { userSubscriptionId: userSubscription.id } });
+      let files = await File.findAll({
+        where: { userSubscriptionId: userSubscription.id },
+      });
       let totalSize = 0;
       for (let j = 0; j < files.length; j++) {
         totalSize += files[j].size;
@@ -278,8 +289,7 @@ exports.getByUserId = async (req, res) => {
       userSubscription.dataValues.totalSize = totalSize;
     }
 
-    console.log(result);  // Log the result directly
-    res.status(200).json(result);  // Send the result as a JSON response
+    res.status(200).json(result); // Send the result as a JSON response
   } catch (error) {
     console.error("Error retrieving the user subscriptions:", error);
     res.status(500).json({ error: "Error retrieving the user subscriptions" });
@@ -294,14 +304,14 @@ exports.getByUserIdWithFiles = async (req, res) => {
   setTimeout(() => {
     console.log("Timeout completed");
   }, 5000);
-  
+
   let token = req.headers.authorization;
   let email = null;
-  
+
   if (token && token.startsWith("Bearer ")) {
     token = token.split(" ")[1];
   }
-  
+
   if (token) {
     email = jwt.verify(token, process.env.SECRET_KEY).email;
   }
@@ -370,8 +380,6 @@ router.post(
 
 exports.addFile = async (req, res) => {
   const fs = require('fs').promises;
-  const crypto = require('crypto');
-  const path = require('path');
 
   let files = req.files;
   let userSubscriptionId = req.body.userSubscriptionId;
@@ -394,30 +402,30 @@ exports.addFile = async (req, res) => {
       return res.status(404).json({ error: "Souscription introuvable." });
     }
 
-    // Calculer la taille totale utilisée par les fichiers existants
-    const totalUsedStorage = userSubscription.files.reduce((acc, file) => acc + parseFloat(file.size) * 1048576, 0); // Taille en octets
-    const totalStorage = userSubscription.subscription.size * 1073741824; // Go en octets
+    // Calculer la taille totale utilisée par les fichiers existants (en Mo)
+    const totalUsedStorage = userSubscription.files.reduce((acc, file) => acc + parseFloat(file.size), 0); // Taille en Mo
+    const totalStorage = userSubscription.subscription.size; // Stockage total déjà en Mo
     let remainingStorage = totalStorage - totalUsedStorage;
 
     for (let i = 0; i < files.length; i++) {
       try {
-        const fileSize = files[i].size;
+        // Taille du fichier en Mo
+        const fileSizeInMo = (files[i].size / 1048576).toFixed(2); // Conversion octets -> Mo et formatage à 2 décimales
 
-        // Vérifier si la taille du fichier est > 2 Go
-        if (fileSize > 2147483648) {
+        // Vérifier si la taille du fichier est > 2 Go (2048 Mo)
+        if (parseFloat(fileSizeInMo) > 2048) {
           await fs.unlink(`src/files/${files[i].filename}`);
           unsavedFiles.push({ name: files[i].originalname, reason: "Le fichier dépasse la taille maximale de 2 Go." });
           continue;
         }
 
         // Vérifier si le fichier peut être stocké dans l'espace restant
-        if (fileSize > remainingStorage) {
+        if (parseFloat(fileSizeInMo) > remainingStorage) {
           unsavedFiles.push({ name: files[i].originalname, reason: "Espace de stockage insuffisant." });
           continue;
         }
 
         let hash = crypto.randomBytes(20).toString("hex");
-
         const extension = path.extname(files[i].filename);
 
         // Renommer le fichier
@@ -432,14 +440,14 @@ exports.addFile = async (req, res) => {
         await File.create({
           name: files[i].originalname.split('.')[0],
           pathName: hash,
-          size: (fileSize / 1048576).toFixed(2), // Convertir la taille en Mo
+          size: parseFloat(fileSizeInMo), // Taille en Mo, stockée sous forme numérique avec 2 décimales
           format: extension.slice(1), // Retirer le point de l'extension
           parentId: null,
           userSubscriptionId: userSubscriptionId,
         });
 
         // Mettre à jour le stockage restant
-        remainingStorage -= fileSize;
+        remainingStorage -= parseFloat(fileSizeInMo);
 
         // Ajouter à la liste des fichiers sauvegardés
         savedFiles.push(files[i].originalname);
@@ -461,6 +469,8 @@ exports.addFile = async (req, res) => {
     res.status(500).json({ error: "Erreur lors de l'ajout des fichiers à l'abonnement" });
   }
 };
+
+
 
 exports.renewSubscription = async (req, res) => {
   let token = req.headers.authorization;

@@ -19,7 +19,7 @@ const File = sequelize.define(
             allowNull: false,
         },
         size: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.FLOAT,
             allowNull: false,
         },
         name: {

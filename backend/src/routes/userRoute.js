@@ -48,9 +48,8 @@ router.get("/invoices", middleware.authenticator, UserController.getInvoices);
 
 router.get(
   "/files/:userId",
-  middleware.authenticator,
+  // middleware.authenticator,
   UserController.getFilesByUserId
 );
-
 
 module.exports = router;

@@ -14,7 +14,7 @@ const { createInvoice } = require("./src/controllers/userSubscriptionController"
 const cron = require('node-cron');
 
 app.use(express.json());
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(cookieParser());
 
 const databaseRoute = require("./src/routes/databaseRoute");
@@ -41,63 +41,13 @@ app.use("/invitation-request", invitationRequestRoute);
 app.use("/sharedstorage-space", sharedStorageSpaceRoute);
 app.use("/right", rightRoute);
 app.use("/country", countryRoute);
-app.use('/user-invitation', userInvitationRoute);
-
+app.use("/user-invitation", userInvitationRoute);
 
 app.use("/files", express.static("src/files"));
 app.use("/invoices", express.static("src/files/invoices"));
 app.use('/Images', express.static('./Images'));
 
-const httpServer = require('http').createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-  }
-});
-
-const waitingClients = [];
-const supports = new Map();
-
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
-
-  // Rejoindre une salle basée sur le rôle
-  socket.on('joinRoom', ({ role, room }) => {
-    socket.join(room);
-    console.log(`${role} joined room: ${room}`);
-  });
-
-  // Contacter le support
-  socket.on('contactSupport', () => {
-    waitingClients.push(socket.id);
-    io.emit('clientsWaiting', waitingClients.map(id => ({ id })));
-  });
-
-  // Répondre à un client
-  socket.on('answerClient', ({ clientId }) => {
-    if (waitingClients.includes(clientId)) {
-      // Suppression du client de la liste d'attente
-      waitingClients.splice(waitingClients.indexOf(clientId), 1);
-      io.to(clientId).emit('supportAssigned', { supportId: socket.id });
-      socket.emit('connected', { clientId });
-    }
-  });
-
-  // Envoyer un message
-  socket.on('sendMessage', ({ recipientId, message }) => {
-    io.to(recipientId).emit('receiveMessage', { message, senderId: socket.id });
-  });
-
-  // Déconnexion
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-    // Nettoyer les clients en attente et les supports
-    const index = waitingClients.indexOf(socket.id);
-    if (index > -1) waitingClients.splice(index, 1);
-    supports.delete(socket.id);
-    io.emit('clientsWaiting', waitingClients.map(id => ({ id })));
-  });
-});
+const httpServer = require("http").createServer(app);
 
 // check if 'src/files' directory exists, if not create it
 if (!fs.existsSync(path.join(__dirname, "src/files"))) {

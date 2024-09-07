@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react"; 
+import React, { useEffect, useState, useCallback, Fragment } from "react"; 
 import { useAuth } from '../../contexts/AuthContext';
 import ArchistockApiService from '../../services/ArchistockApiService';
 import Button from "../Button/Button";
@@ -38,50 +38,52 @@ const UserInvoices = () => {
     }, []);
 
     return (
-        <>
-            <table className="table">
-                <thead>
-                <tr className='text-black'>
-                    <th>N°</th>
-                    <th>Nom</th>
-                    <th>Date de facturation</th>
-                    <th>Montant TTC</th>
-                    <th>Objet</th>
-                    <th>Actions</th>
+      <Fragment>
+        <table className="table w-full overflow-x-auto">
+            <thead>
+                <tr className='text-black bg-blue-100 rounded'>
+                    <th className="px-4 py-2 text-lg ">N°</th>
+                    <th className="px-4 py-2 text-lg ">Nom</th>
+                    <th className="px-4 py-2 text-lg ">Date de facturation</th>
+                    <th className="px-4 py-2 text-lg ">Montant TTC</th>
+                    <th className="px-4 py-2 text-lg ">Objet</th>
+                    <th className="px-4 py-2 text-lg ">Actions</th>
                 </tr>
-                </thead>
-                <tbody>
-                    {invoices && invoices.map((invoice: any, index: number) => (
-                        <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{invoice.name}</td>
-                            <td>{invoice.invoiceDate.split('T')[0]}</td>
-                            <td>{invoice.usersubscription.subscription.price.toFixed(2)}€</td>
-                            <td>{invoice.usersubscription.name}</td>
-                            <td>
-                                <ul className="flex flex-row gap-5">
-                                    <li>
-                                        <Button color="primary" onClick={() => handleDownload(invoice.name)}>
-                                            <Download size={16} />
-                                        </Button>
-                                    </li>
-                                    <li>
-                                        <Button color="info" onClick={() => handleModalOpen(invoice)}>
-                                            <Eye size={16} />
-                                        </Button>
-                                    </li>
-                                </ul>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            
-            {/* Modal pour afficher plus de détails sur la facture */}
-            {selectedInvoice && (
-                <InvoiceModal show={modalOpen} invoice={selectedInvoice} onClose={handleModalClose} />
-            )}
-        </>
+            </thead>
+            <tbody>
+                {invoices && invoices.map((invoice: any, index: number) => (
+                    <tr key={index} className={index % 2 === 0 ? '' : 'bg-blue-100'}>
+                        <td className="px-4 py-2 text-lg ">{index + 1}</td>
+                        <td className="px-4 py-2 text-lg ">{invoice.name}</td>
+                        <td className="px-4 py-2 text-lg ">{invoice.invoiceDate.split('T')[0]}</td>
+                        <td className="px-4 py-2 text-lg ">{invoice.usersubscription.subscription.price.toFixed(2)}€</td>
+                        <td className="px-4 py-2 text-lg ">{invoice.usersubscription.name}</td>
+                        <td className="px-4 py-2 text-lg ">
+                            <ul className="flex flex-row gap-5">
+                                <li>
+                                    <Button color="primary" onClick={() => handleDownload(invoice.name)}>
+                                        <Download size={16} />
+                                    </Button>
+                                </li>
+                                <li>
+                                    <Button color="info" onClick={() => handleModalOpen(invoice)}>
+                                        <Eye size={16} />
+                                    </Button>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+
+        {/* Modal pour afficher plus de détails sur la facture */}
+        {selectedInvoice && (
+            <InvoiceModal show={modalOpen} invoice={selectedInvoice} onClose={handleModalClose} />
+        )}
+
+      </Fragment>
+    
     )
 }
 

@@ -7,7 +7,7 @@ import Card from '../../components/Card/Card';
 import HardDriveStorage from '../../components/HardDrive/HardDrive';
 import PreviewFileModal from '../../components/Modals/PreviewFileModal';
 import Button from '../../components/Button/Button';
-import { Download, Eye, FolderSimplePlus, Funnel, Trash } from '@phosphor-icons/react';
+import { ChartDonut, Database, Download, Eye, File, FolderSimplePlus, Funnel, HardDrive, StandardDefinition, Trash } from '@phosphor-icons/react';
 import FolderCreate from '../../components/FolderIcon/FolderCreate';
 import { toast } from 'react-toastify';
 import FolderSkeleton from '../../components/FolderSkeleton/FolderSkeleton';
@@ -15,6 +15,8 @@ import DroppableFolder from '../../components/Draggable/DroppableFolder';
 import DraggableFile from '../../components/Draggable/DraggableFile';
 import DebouncedInput from '../../components/Input/DebouncedInput';
 import FileIcon from '../../components/FileIcon/FileIcon';
+import UserStatistics from '../../components/UserStatistics/UserStatistics';
+import { useNavigate } from 'react-router-dom';
 
 // Services
 const archistockApiService = new ArchistockApiService();
@@ -28,7 +30,7 @@ const UserSubscriptions = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Gestion de la navigation
-  const [breadcrumb, setBreadcrumb] = useState<{ name: string, id: string | null }[]>([{ name: 'Subscriptions', id: null }]);
+  const [breadcrumb, setBreadcrumb] = useState<{ name: string, id: string | null }[]>([{ name: 'Abonnements', id: null }]);
 
   // Gestion des dossiers et fichiers
   const [selectedStorage, setSelectedStorage] = useState<any>(null);
@@ -39,6 +41,8 @@ const UserSubscriptions = () => {
   const [search, setSearch] = useState<string>('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [filter, setFilter] = useState<string>('');
+
+  const navigate = useNavigate();
 
   // Récupération des données
   useEffect(() => {
@@ -160,7 +164,7 @@ const UserSubscriptions = () => {
 
   // Récupération de la taille totale du stockage
   const getTotalStorageSize = (storages: any[]) => {
-    return storages.reduce((totalSize, storage) => totalSize + parseFloat(storage.subscription.size), 0);
+    return storages.reduce((totalSize, storage) => totalSize + parseFloat(storage.subscription.size), 0) / 1000;
   };
 
   // Gestion des événements
@@ -168,7 +172,7 @@ const UserSubscriptions = () => {
     setSelectedStorage(storage);
     setDisplayStorage(false);
     setParentId(null);
-    setBreadcrumb([{ name: 'Subscriptions', id: null }, { name: storage.name, id: storage.id }]);
+    setBreadcrumb([{ name: 'Abonnements', id: null }, { name: storage.name, id: storage.id }]);
     setUpdated(!updated);
   };
 
@@ -184,11 +188,11 @@ const UserSubscriptions = () => {
       setDisplayStorage(true);
       setSelectedStorage(null);
       setParentId(null);
-      setBreadcrumb([{ name: 'Subscriptions', id: null }]);
+      setBreadcrumb([{ name: 'Abonnements', id: null }]);
     } else if (index === 1) {
       setDisplayStorage(false);
       setParentId(null);
-      setBreadcrumb([{ name: 'Subscriptions', id: null }, { name: selectedStorage.name, id: selectedStorage.id }]);
+      setBreadcrumb([{ name: 'Abonnements', id: null }, { name: selectedStorage.name, id: selectedStorage.id }]);
     } else {
       setParentId(breadcrumb[index].id);
       setBreadcrumb(breadcrumb.slice(0, index + 1));
@@ -199,11 +203,11 @@ const UserSubscriptions = () => {
   const handleCreateFolder = (folderName: string) => {
     archistockApiService.createFolder({ name: folderName, parentId, userSubscriptionId: selectedStorage.id }).then((res) => {
       if (res.status === 201) {
-        toast.success("Folder created successfully");
+        toast.success("Dossier créé avec succès");
         setCreateFolder(false);
         setUpdated(!updated);
       } else {
-        toast.error("An error occurred while creating the folder. Please retry.");
+        toast.error("Une erreur est survenue lors de la création du dossier. Veuillez réessayer.");
       }
     });
   };
@@ -211,10 +215,10 @@ const UserSubscriptions = () => {
   const onDeleteFolder = (folder: any) => {
     archistockApiService.deleteFolder(folder.id).then((res) => {
       if (res.status === 201) {
-        toast.success("Folder deleted successfully");
+        toast.success("Dossier supprimé avec succès");
         setUpdated(!updated);
       } else {
-        toast.error("An error occurred while deleting the folder. Please retry.");
+        toast.error("Une erreur est survenue lors de la suppression du dossier. Veuillez réessayer.");
       }
     });
   };
@@ -228,11 +232,11 @@ const UserSubscriptions = () => {
 
     archistockApiService.updateFile(file.id, data).then((res) => {
       if (res.status === 201) {
-        toast.success("File moved successfully");
+        toast.success("Fichier déplacé avec succès");
         setUpdated(!updated);
       } else {
         console.log(res);
-        toast.error("An error occurred while moving the file. Please retry.");
+        toast.error("Une erreur est survenue lors du déplacement du fichier. Veuillez réessayer.");
       }
     })
   };
@@ -247,17 +251,23 @@ const UserSubscriptions = () => {
     <Fragment>
         <DndProvider backend={HTML5Backend}>
         <Fragment>
-          {storages.length > 0 && (
+          {storages && (
             <div className="m-5">
-              <h1 className="text-xl font-bold mb-3">Your storage</h1>
-              <div className="flex flex-wrap justify-between mt-5">
-                <StatsCard name="Storage" stat={storages.length} color="#FFA800" />
-                <StatsCard name="Files" stat={files.length} color="#E757B6" />
-                <StatsCard name="Go" stat={getAllFilesSize(files)} color="#24B34C" />
-                <StatsCard name="Total Go" stat={getTotalStorageSize(storages)} color="#7C57E7" />
+              <h1 className="text-2xl font-bold mb-3">Vos abonnements</h1>
+              <div className="flex flex-wrap justify-center xl:justify-between items-center gap-5 mt-5">
+                <StatsCard name={storages.length > 1 ? "Abonnements" : "Abonnement"} stat={storages.length} color="#FFA800" icon={<HardDrive size={32} />} />
+                <StatsCard name="Fichiers stockés" stat={files.length} color="#E757B6" icon={<File size={32} />} />
+                <StatsCard name="Go occupé" stat={getAllFilesSize(files)} color="#24B34C" icon={<ChartDonut size={32} />}/>
+                <StatsCard name="Go total" stat={getTotalStorageSize(storages)} color="#7C57E7" icon={<Database size={32} />} />
               </div>
-
-              <Card css="mt-10">
+              <div className="collapse">
+                <input type="checkbox" className='p-0' />
+                <div className="collapse-title text-md font-medium">Voir détails</div>
+                <div className="collapse-content">
+                  <UserStatistics />
+                </div>
+              </div>
+              <Card css="mt-2">
                 <div className="flex justify-between">
                   <div className="breadcrumbs text-sm">
                     <ul>
@@ -281,20 +291,20 @@ const UserSubscriptions = () => {
                 <div className='flex flex-row'>
                 <DebouncedInput placeholder='Rechercher des fichiers' onChange={(e) => { setSearch(e); setUpdated(!updated) }} css='w-11/12' />
                 <details className="dropdown dropdown-bottom dropdown-end">
-                  <summary className="btn m-1">Filters <Funnel /></summary>
+                  <summary className="btn m-2">Filtres</summary>
                   <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow text-white">
-                    <li className="menu-title">Sort by</li>
+                    <li className="menu-title">Filter par</li>
                     <li className={filter == "" ? 'bg-gray-700 w-full rounded' : ''}>
-                      <a onClick={() => setFilter('')}>None</a>
+                      <a onClick={() => setFilter('')}>Aucun</a>
                     </li>
                     <li className={filter == "name" || filter == 'altname' ? 'bg-gray-700 w-full rounded' : ''}>
-                      <a onClick={() => filter === 'name' ? setFilter('altname') : setFilter("name")}>Name</a>
+                      <a onClick={() => filter === 'name' ? setFilter('altname') : setFilter("name")}>Nom</a>
                     </li>
                     <li className={filter == "date" || filter == 'altdate' ? 'bg-gray-700 w-full rounded' : ''}>
                       <a onClick={() => filter === 'date' ? setFilter('altdate') : setFilter("date")}>Date</a>
                     </li>
                     <li className={filter == "size" || filter == 'altsize' ? 'bg-gray-700 w-full rounded' : ''}>
-                      <a onClick={() => filter === 'size' ? setFilter('altsize') : setFilter("size")}>Size</a>
+                      <a onClick={() => filter === 'size' ? setFilter('altsize') : setFilter("size")}>Taille</a>
                     </li>
                     <li className={filter == "format" || filter == 'altformat' ? 'bg-gray-700 w-full rounded' : ''}>
                       <a onClick={() => filter === 'format' ? setFilter('altformat') : setFilter("format")}>Format</a>
@@ -323,7 +333,7 @@ const UserSubscriptions = () => {
                                   <p className="">{file.name}.{file.format}</p>
                                 </th>
                                 <td>{file.format}</td>
-                                <td>{(parseFloat(file.size) / 1000).toFixed(2)} Go</td>
+                                <td>{(parseFloat(file.size)).toFixed(2)} Mo</td>
                                 <td className='link'>{file.usersubscription.name}</td>
                                 <td>
                                   <ul className="flex flex-row gap-5">
@@ -360,6 +370,14 @@ const UserSubscriptions = () => {
                           <HardDriveStorage storage={storage} onStorageClick={onStorageClick} onUpdate={() => {setUpdated(!updated)}} />
                         </div>
                       ))}
+                      {storages.length === 0 && (
+                        <Fragment>
+                            <div className="flex flex-col items-center w-full flex-wrap gap-3 mt-5">
+                              <p className="text-lg">Aucun abonnement trouvé</p>
+                              <a onClick={() => { navigate('/extend') }} className="btn btn-primary text-white">Acheter un abonnement</a>
+                            </div>
+                        </Fragment>
+                      )}
                     </div>
                   ) : (
                     selectedFolderContent && (

@@ -5,6 +5,7 @@
             "format": "csv",
             "size": 80,
             "name": "Tableau",
+            "pathName": "Tableau",
             "parentId": 1,
             "userSubscriptionId": 1
         }
@@ -15,6 +16,7 @@
             "format": "png",
             "size": 400,
             "name": "logo",
+            "pathName": "logo",
             "parentId": 2,
             "userSubscriptionId": 1
         }
@@ -25,6 +27,7 @@
             "format": "jpg",
             "size": 400,
             "name": "photo1",
+            "pathName": "photo1",
             "parentId": 5,
             "userSubscriptionId": 1
         }
@@ -35,6 +38,7 @@
             "format": "jpg",
             "size": 400,
             "name": "photo2",
+            "pathName": "photo2",
             "parentId": 5,
             "userSubscriptionId": 1
         }

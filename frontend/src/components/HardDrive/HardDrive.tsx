@@ -15,7 +15,7 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
     const handleRightClick = (e: any) => {
         e.preventDefault();
         setShowMenu(true);
-        setMenuPosition({ x: e.clientX - 300, y: e.clientY - 200 });
+        setMenuPosition({ x: e.clientX - 300, y: e.clientY - 650 });
     };
 
     const handleClickOutside = (e: any) => {
@@ -113,8 +113,8 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
                     ) : (
                         <p className="text-md font-semibold text-gray-600">{storageName}</p>
                     )}
-                    <progress className={`progress ${getStorageColor()} w-56 h-3.5`} value={getFilesSize()} max={storage.subscription.size}></progress>
-                    <p className="text-sm text-gray-400">{getFilesSize()} Go / {storage.subscription.size.toFixed(2)} Go</p>
+                    <progress className={`progress ${getStorageColor()} w-56 h-3.5`} value={getFilesSize()} max={storage.subscription.size / 1000}></progress>
+                    <p className="text-sm text-gray-400">{getFilesSize()} Go / {(storage.subscription.size / 1000).toFixed(2)} Go</p>
                 </div>
             </div>
 

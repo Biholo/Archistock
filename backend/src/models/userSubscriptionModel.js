@@ -36,10 +36,10 @@ const UserSubscription = sequelize.define(
             allowNull: true,
         },
     },
-    {
-        sequelize,
-        freezeTableName: true,
-    }
+  {
+    sequelize,
+    freezeTableName: true,
+  }
 );
 
 module.exports = UserSubscription;

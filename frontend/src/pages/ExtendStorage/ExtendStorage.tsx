@@ -47,8 +47,11 @@ const ExtendStorage = () => {
     return (
         <Fragment>
             <div className='m-5'>
-                <h1 className='text-xl font-bold mb-3'>Extending Storage</h1>
-                <p className="font-semibold">Currently, you are subscribed to : <span className="font-bold">{storage} storage(s)</span></p>
+                <h1 className="text-2xl font-bold mb-3">Nos offres</h1>
+                <p>
+                    Retrouvez ci-dessous les différentes offres d'abonnement que nous proposons. Vous pouvez souscrire à un abonnement pour augmenter votre espace de stockage.
+                </p>
+                <p className="font-semibold">Actuellement, vous possèdez <span className="font-bold">{storage} {storage > 1 ? "Abonnements" : "Abonnement"}</span></p>
                 <div className="flex flex-wrap flex-row justify-center mt-5">
                     {subscriptions.length > 0 && subscriptions.map((subscription: any) => (
                         <SubscriptionCard key={subscription.id} subscription={subscription} onSelect={onSelectSubscription} />
