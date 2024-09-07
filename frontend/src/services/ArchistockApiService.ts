@@ -695,6 +695,22 @@ class ArchistockApiService {
             throw error; 
         }
     }
+
+    async deleteUser(userId: number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user/account/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            })
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to delete user", error);
+            throw error; 
+        }
+    }
 }
 
 export default ArchistockApiService;
