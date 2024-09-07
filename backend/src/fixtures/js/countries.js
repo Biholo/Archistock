@@ -10,7 +10,7 @@ const generateCountryFixtures = () => {
     // Vérifier si le répertoire existe, sinon le créer
     if (!fs.existsSync(fixturesDir)) {
         fs.mkdirSync(fixturesDir, { recursive: true });
-    }
+    }    
 
     // Préparer les données des pays pour les fixtures
     const countryFixtures = worldCountries.map(country => ({
