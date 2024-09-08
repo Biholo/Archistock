@@ -20,7 +20,7 @@ const Administrator = () => {
       }
     };
     fetchData();
-  }, [archistockApiService]);
+  }, []);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);

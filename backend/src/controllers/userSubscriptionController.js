@@ -528,3 +528,61 @@ exports.renewSubscription = async (req, res) => {
   }
 }
 
+exports.getAllUsersWithStorage = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      include: [
+        {
+          model: UserSubscription,
+          as: "userSubscriptions",
+          include: [
+            { model: Subscription, as: "subscription" },
+            { model: File, as: "files" },
+            {
+              model: Folder,
+              as: "folders",
+              include: [{ model: File, as: "files" }],
+            },
+          ],
+        },
+      ],
+    });
+
+    const usersWithStorage = await Promise.all(
+      users.map(async (user) => {
+        let usedStorage = 0;
+        let availableStorage = 0;
+
+        for (let subscription of user.userSubscriptions) {
+          let subscriptionSize = subscription.subscription
+            ? subscription.subscription.size
+            : 0;
+          availableStorage += subscriptionSize;
+
+          let files = await File.findAll({
+            where: { userSubscriptionId: subscription.id },
+          });
+          for (let file of files) {
+            usedStorage += parseFloat(file.size);
+          }
+        }
+
+        return {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          usedStorage,
+          availableStorage,
+        };
+      })
+    );
+
+    res.status(200).json(usersWithStorage);
+  } catch (error) {
+    console.error("Error retrieving users with storage info:", error);
+    res
+      .status(500)
+      .json({ error: "Error retrieving users with storage info." });
+  }
+};
+

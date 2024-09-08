@@ -38,6 +38,14 @@ router.delete(
 // Get all subscription (GET)
 router.get("/all", middleware.authenticator, UserSubscriptionController.getAll);
 
+// Get all subscription with user (GET)
+router.get(
+  '/users-with-storage',
+  middleware.authenticator,
+  UserSubscriptionController.getAllUsersWithStorage
+)
+
+
 // Get subscription by ID (GET)
 router.get(
   "/get/:id",
@@ -78,7 +86,6 @@ router.post(
   middleware.authenticator,
   UserSubscriptionController.renewSubscription
 )
-
 
 
 module.exports = router;
