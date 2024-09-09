@@ -12,6 +12,7 @@ class ArchistockApiService {
         this.url = "http://localhost:8000";
     }
 
+    // POST /user/register - Créer un utilisateur
     async registerUser(user: User, address: Address): Promise<UserAndTokens> {
         const response = await fetch(`${this.url}/user/register`, {
             method: "POST",
@@ -33,6 +34,7 @@ class ArchistockApiService {
         return jsonResponse;
     }
 
+    // POST /user/login - Connecter un utilisateur
     async loginUser(user: LoginUser): Promise<UserAndTokens> {
         const response = await fetch(`${this.url}/user/login`, {
             method: "POST",
@@ -53,10 +55,8 @@ class ArchistockApiService {
     }
 
    
-    async updatePassword(
-        password: string,
-        jwtToken: string | undefined
-    ): Promise<{ message: string }> {
+    // POST /user/update-password - Mettre à jour le mot de passe de l'utilisateur
+    async updatePassword( password: string, jwtToken: string | undefined ): Promise<{ message: string }> {
         const response = await fetch(`${this.url}/user/update-password`, {
             method: "POST",
             headers: {
@@ -68,6 +68,7 @@ class ArchistockApiService {
         return jsonResponse;
     }
 
+    // POST /user/reset-password - Réinitialiser le mot de passe de l'utilisateur
     async resetPassword(email: string): Promise<boolean> {
         const response = await fetch(`${this.url}/user/reset-password`, {
             method: "POST",
@@ -82,7 +83,8 @@ class ArchistockApiService {
         return true;
     }
 
-     async isEmailAvailable(email: string): Promise<boolean> {
+    // GET /user/email-available/{email} - Vérifier si un email est disponible
+    async isEmailAvailable(email: string): Promise<boolean> {
     const response = await fetch(`${this.url}/user/email-available/${email}`, {
       method: "GET",
       headers: {
@@ -93,28 +95,27 @@ class ArchistockApiService {
     return jsonResponse
   }
 
-  async getUserByToken(accessToken: string): Promise<User | null> {
-    if (!accessToken) {
-      return null; 
-        }
+  // GET /user/profile - Obtenir le profil de l'utilisateur
+    async getUserByToken(accessToken: string): Promise<User | null> {
+        if (!accessToken) {
+        return null; 
+            }
 
-    const response = await fetch(`${this.url}/user/profile`, {
-      method: "GET",
-      headers: {
-        Authorization: accessToken,
-      },
-    });
-    const jsonResponse = await response.json();
-    return jsonResponse;
-  }        
+        const response = await fetch(`${this.url}/user/profile`, {
+        method: "GET",
+        headers: {
+            Authorization: accessToken,
+        },
+        });
+        const jsonResponse = await response.json();
+        return jsonResponse;
+    }        
 
     private setCookie(name: string, value: string) {
         document.cookie = `${name}=${value}; Secure; SameSite=Strict; Path=/;`;
     }
 
-    private getCookie(name: string): string | null {
-        return getCookie(name);
-    }
+    // PUT /user/update - Mettre à jour le profil de l'utilisateur
     async updateProfile(user: User) : Promise<any> {
         console.log("user", user);
         try {
@@ -133,52 +134,73 @@ class ArchistockApiService {
             throw error;  // rethrow the error if you want to handle it further up in your components
         }
     }
-
-  async getNewAccessToken(refreshToken: string): Promise<AccessTokenResponse> {
-    const response = await fetch(`${this.url}/user/refreshToken`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ refreshToken }),
-    });
-    const jsonResponse = await response.json();
-    return jsonResponse;
-  }
-
-  async getUserStorage(): Promise<any> {
-      try {
-          const response = await fetch(`${this.url}/user-subscription/me`, {
-              method: 'GET',
-              headers: {
-                  Authorization: `${getCookie('accessToken')}`,
-              },
-          });
-          
-          const jsonResponse = await response.json();
-          return jsonResponse;
-      } catch (error) {
-          console.error("Failed to fetch user storage:", error);
-          throw error;  // rethrow the error if you want to handle it further up in your components
-      }
-  }
-
-  async getUserStorageWithFiles(): Promise<any> {
-    try {
-        const response = await fetch(`${this.url}/user-subscription/files/me`, {
-            method: 'GET',
+    
+    // POST /user/refreshToken - Obtenir un nouveau jeton d'accès
+    async getNewAccessToken(refreshToken: string): Promise<AccessTokenResponse> {
+        const response = await fetch(`${this.url}/user/refreshToken`, {
+            method: "POST",
             headers: {
-                Authorization: `${getCookie('accessToken')}`,
+                "Content-Type": "application/json",
             },
+            body: JSON.stringify({ refreshToken }),
         });
         const jsonResponse = await response.json();
         return jsonResponse;
-    } catch (error) {
-        console.error("Failed to fetch user storage:", error);
-        throw error;  // rethrow the error if you want to handle it further up in your components
+    }
+
+    // GET /user-subscription/me - Obtenir l'abonnement de l'utilisateur
+    async getUserStorage(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user-subscription/me`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to fetch user storage:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
         }
     }
 
+    // GET /user-subscription/files/:id - Obtenir le stockage de l'utilisateur
+    async findUserStorageById(id: number): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user-subscription/files/${id}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to fetch user storage:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
+    // GET /user-subscription/files/me - Obtenir le stockage de l'utilisateur avec les fichiers
+    async getUserStorageWithFiles(): Promise<any> {
+        try {
+            const response = await fetch(`${this.url}/user-subscription/files/me`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                },
+            });
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to fetch user storage:", error);
+            throw error;  // rethrow the error if you want to handle it further up in your components
+        }
+    }
+
+    // GET /subscription/all - Obtenir toutes les souscriptions
     async getSubscriptions(): Promise<any> {
         try {
             const response = await fetch(`${this.url}/subscription/all`, {
@@ -196,6 +218,7 @@ class ArchistockApiService {
         }
     }
 
+    // POST /user-subscription/add - Acheter un abonnement
     async purchaseSubscription(subscriptionId: number): Promise<any> {
         try {
             const response = await fetch(`${this.url}/user-subscription/add`, {
@@ -214,6 +237,7 @@ class ArchistockApiService {
         }
     }
 
+    // GET /folder/root/{storageId} - Obtenir le dossier racine du stockage
     async getStorageRoot(storageId: number): Promise<any> {
         try {
             const response = await fetch(`${this.url}/folder/root/${storageId}`, {
@@ -230,6 +254,7 @@ class ArchistockApiService {
         }
     }
 
+    // PUT user-subscription/update/{storageId} - Mettre à jour le stockage de l'utilisateur
     async updateStorage(storageId: number, storage: any): Promise<any> {
         try {
             const response = await fetch(`${this.url}/user-subscription/update/${storageId}`, {
@@ -248,6 +273,7 @@ class ArchistockApiService {
         }
     }
 
+    // POST /folder/add - Créer un dossier
     async createFolder(folder: any): Promise<any> {
         try {
             const response = await fetch(`${this.url}/folder/add`, {
@@ -266,6 +292,7 @@ class ArchistockApiService {
         }
     }
 
+    // GET /folder/{folderId} - Obtenir un dossier
     async getFolder(folderId: number): Promise<any> {
         try {
             const response = await fetch(`${this.url}/folder/${folderId}`, {
@@ -282,6 +309,7 @@ class ArchistockApiService {
         }
     }
 
+    // PUT /folder/update/{folderId} - Mettre à jour un dossier
     async updateFolder(id: number, folder: any): Promise<any> {
         try {
             const response = await fetch(`${this.url}/folder/update/${id}`, {
@@ -300,6 +328,7 @@ class ArchistockApiService {
         }
     }
 
+    // DELETE /folder/delete/{folderId} - Supprimer un dossier
     async deleteFolder(folderId: number): Promise<any> {
         try {
             const response = await fetch(`${this.url}/folder/delete/${folderId}`, {
@@ -316,22 +345,7 @@ class ArchistockApiService {
         }
     }
 
-    async renewSubscription(userSubscriptionId: number): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/user-subscription/renew/${userSubscriptionId}`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse;
-        } catch (error) {
-            console.error("Failed to renew subscription:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
-        }
-    }
-
+    // POST /user-subscription/add-files - Ajouter des fichiers
     async uploadFileWithProgress(formData: FormData, onProgress: (progress: number) => void): Promise<any> {
         const token = getCookie('accessToken');
         if (!token) {
@@ -361,10 +375,11 @@ class ArchistockApiService {
 
             xhr.onerror = () => reject(new Error("Network error"));
 
-          xhr.send(formData);
-      });
-  }
+            xhr.send(formData);
+        });
+    }
 
+    // GET /user-subscription/files/me?searchTerm - Obtenir les fichiers de l'utilisateur
     async searchFiles(searchTerm:string): Promise<any> {
         try {
             const response = await fetch(`${this.url}/user-subscription/files/me?searchTerm=${searchTerm}`, {
@@ -382,8 +397,7 @@ class ArchistockApiService {
         }
     }
   
-
-
+    // GET /file/update/{fileId} - Obtenir un fichier
     async updateFile(fileId: number, file: any): Promise<any> {
         try {
             const response = await fetch(`${this.url}/file/update/${fileId}`, {
@@ -402,6 +416,7 @@ class ArchistockApiService {
         }
     }
     
+    // GET /file/download/{filename} - Télécharger un fichier
     async downloadFile(filename: string) {
         try {
           const response = await fetch(`${this.url}/file/download/${filename}`, {
@@ -431,6 +446,7 @@ class ArchistockApiService {
         }
     }
 
+    // DELETE /file/delete/{filename} - Supprimer un fichier
     async deleteFile(filename: string): Promise<any> {
         try {
             const response = await fetch(`${this.url}/file/delete/${filename}`, {
@@ -447,6 +463,7 @@ class ArchistockApiService {
         }
     }
 
+    // GET /user/invoices - Obtenir les factures de l'utilisateur
     async getUserInvoices(): Promise<any> {
         try {
             const response = await fetch(`${this.url}/user/invoices`, {
@@ -463,7 +480,7 @@ class ArchistockApiService {
         }
     }
       
-
+    // GET /country/all - Obtenir tous
     async findAllCountries(): Promise<any> {
         try {
             const response = await fetch(`${this.url}/country/all`, {
@@ -479,248 +496,7 @@ class ArchistockApiService {
             throw error;
         }
     }
-
-    async findAllCompanies(): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/company/all`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse.data;
-        } catch (error) {
-            console.error("Failed to fetch companies:", error);
-            throw error;
-        }
-    }
-
-    async askToJoinCompany(companyId: number, userId: number): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/invitation-request/ask-to-join`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ companyId, userId }),
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse;
-        } catch (error) {
-            console.error("Failed to join company:", error);
-            throw error;
-        }
-    }
-
-    async findInvitationsByUserId(userId: number): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/invitation-request/all/user/${userId}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse.data;
-        } catch (error) {
-            console.error("Failed to fetch invitations:", error);
-            throw error;
-        }
-    }
-
-    async findCompaniesByUserId(userId: number): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/company/all/user/${userId}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse.data;
-        } catch (error) {
-            console.error("Failed to fetch companies:", error);
-            throw error;
-        }
-    }
-
-    async createCompany(company: any, userId: number): Promise<any> {
-        try {
-            const formData = new FormData();
-
-            formData.append('name', company.name);
-            formData.append('city', company.city);
-            formData.append('countryId', company.countryId);
-            formData.append('street', company.street);
-            formData.append('postalCode', company.postalCode);
-            formData.append('userId', userId.toString());
-
-            if (company.image) {
-                formData.append('image', company.image);
-            }
-
-            const response = await fetch(`${this.url}/company/create`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-                body: formData,
-            });
-
-            const jsonResponse = await response.json();
-            return jsonResponse;
-        } catch (error) {
-            console.error("Failed to create company:", error);
-            throw error;
-        }
-    }
-
-
-    async findOneCompanyById(companyId: string, userId: number): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/company/one/${companyId}?userId=${userId}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse.data;
-        } catch (error) {
-            console.error("Failed to fetch company:", error);
-            throw error;
-        }
-    }
-
-    async findAllInfosByCompanyId(companyId: string, userId: number): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/company/informations/one/${companyId}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse.data;
-        } catch (error) {
-            console.error("Failed to fetch company infos:", error);
-            throw error;
-        }
-    }
-
-    async submitInvitationsToCompany(inviterId: number, users: any[], companyId: string): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/invitation-request/many-person`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${getCookie('accessToken')}`, // Assuming Bearer token
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    users,
-                    companyId,
-                    inviterId
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const jsonResponse = await response.json();
-            return jsonResponse;
-        } catch (error) {
-            console.error("Failed to submit invitations:", error);
-            throw error;
-        }
-    }
-
-
-    async registerInvitation(uuid: string, user: any): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/user/register-invitation/${uuid}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(user),
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse;
-        } catch (error) {
-            console.error("Failed to register invitation:", error);
-            throw error;
-        }
-    }
-
-    //invitation request
-    async getInvitationRequestByUserId(userId: number): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/invitation-request/all/user/${userId}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse.data;
-        } catch (error) {
-            console.error("Failed to fetch invitation request:", error);
-            throw error;
-        }
-    }
-
-    async acceptInvitationRequest(invitationId: number): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/invitation-request/accept/${invitationId}`, {
-                method: 'PUT',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse.data;
-        } catch (error) {
-            console.error("Failed to accept invitation request:", error);
-            throw error;
-        }
-    }
-
-    async declineInvitationRequest(invitationId: number): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/invitation-request/decline/${invitationId}`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse.data;
-        } catch (error) {
-            console.error("Failed to decline invitation request:", error);
-            throw error;
-        }
-    }
-
-    async cancelInvitationRequest(invitationId: number): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/invitation-request/cancel/${invitationId}`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                },
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse.data;
-        } catch (error) {
-            console.error("Failed to cancel invitation request:", error);
-            throw error;
-        }
-
-    }
-
+    
     //Stripe
     async createPaiementSubscription(subscriptionId: number, userId: string): Promise < any > {
         try {
@@ -740,6 +516,7 @@ class ArchistockApiService {
         }
     }
 
+    // POST /user/confirm-account - Confirmer le compte de l'utilisateur
     async confirmAccount(token: string): Promise<any> {
         try {
             const response = await fetch(`${this.url}/user/confirm-account`, {
@@ -757,6 +534,7 @@ class ArchistockApiService {
         }
     }
        
+    // GET /user-subscription/me - Obtenir l'abonnement de l'utilisateur
     async findAllSubscriptionByUserId(): Promise<any> {
         try {
             const response = await fetch(`${this.url}/user-subscription/me`, {
@@ -773,6 +551,7 @@ class ArchistockApiService {
         }
     }
 
+    // GET /user/all - Obtenir tous les utilisateurs
     async findAllUsers(): Promise<any> {
         try {
             const response = await fetch(`${this.url}/user/all`, {
@@ -789,6 +568,7 @@ class ArchistockApiService {
         }
     }
 
+    // GET /user-subscription/all - Obtenir tous les abonnements
     async findAllSubscriptions(): Promise<any> {
         try {
             const response = await fetch(`${this.url}/user-subscription/all`, {
@@ -805,6 +585,7 @@ class ArchistockApiService {
         }
     }
 
+    // GET /user-subscription/users-with-storage - Obtenir tous les utilisateurs avec un stockage
     async findAllUserStorages(): Promise<any> {
         try {
             const response = await fetch(`${this.url}/user-subscription/users-with-storage`, {
@@ -821,6 +602,7 @@ class ArchistockApiService {
         }
     }
 
+    // DELETE /user/account/{userId} - Supprimer un utilisateur
     async deleteUser(userId: number): Promise<any> {
         try {
             const response = await fetch(`${this.url}/user/account/${userId}`, {

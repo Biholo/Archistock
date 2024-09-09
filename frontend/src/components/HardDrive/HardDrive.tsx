@@ -48,24 +48,6 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
         };
     }, [showMenu]);
 
-    const handleRenewStorage = () => {
-        archistockApiService.renewSubscription(storage.id).then((res) => {
-            console.log(res.status);
-            if(res.status === 201) {
-                if(storage.status == "active") {
-                    toast.success("Votre abonnement ne sera plus renouvelé.");
-                } else {
-                    toast.success("Votre abonnement sera renouvelé.");
-                }
-                setEditStorage(false);
-                setShowMenu(false);
-                onUpdate();
-            } else {
-                toast.error("An error occured while renewing storage. Please retry.");
-            }
-        });
-    }
-
     const getFilesSize = () => {
         let totalSize = 0;
         storage.files.forEach((file: any) => {
@@ -134,13 +116,6 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
                                 }}
                             >
                                 <p className="text-sm">Renommer</p>
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                onClick={handleRenewStorage}
-                            >
-                                {storage.status === "active" ? 'Ne plus renouveler' : 'Renouveler'}
                             </button>
                         </li>
                     </ul>
