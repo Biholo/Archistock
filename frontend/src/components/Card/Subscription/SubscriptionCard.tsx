@@ -20,7 +20,7 @@ const SubscriptionCard = ({ subscription, onSelect }: any) => {
   return (
     <Fragment>
       <Card title={""} css="w-auto min-h-[400px]">
-        {subscription.name === "Basic" && (
+        {subscription.name === "Basique" && (
           <Badge
             color="success"
             css="absolute text-white fw-black -translate-x-10 -translate-y-10 text-md font-bold p-3"
@@ -35,7 +35,7 @@ const SubscriptionCard = ({ subscription, onSelect }: any) => {
               <span className="text-4xl">{euros}</span>
               <span className="text-2xl">,{cents} € </span>-{" "}
               <span className="text-secondary">{subscription.name}</span>{" "}
-              Abonnement
+              Tier
             </h2>
             <div className="flex flex-col mt-2">
               <ul className="text-lg list-disc list-inside">

@@ -65,6 +65,7 @@ const PreviewFileModal = ({ show, file, onClose }: any) => {
                 file.format === "png" ||
                 file.format === "jpeg" ||
                 file.format === "gif" ||
+                file.format === "webp" ||
                 file.format === "svg" ? (
                   <img
                     src={`${archistockApiService.url}/files/${file.pathName}.${file.format}`}

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 const archistockApiService = new ArchistockApiService();
 
-const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: any) => {
+const FileDetails = ({ file, onClick, onDelete, onUpdate }: any) => {
     const [showMenu, setShowMenu] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
     const [editFile, setEditFile] = useState(false);
@@ -88,17 +88,6 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
                     style={{ top: menuPosition.y, left: menuPosition.x }}
                 >
                     <ul className="menu bg-base-100 rounded-box text-white">
-                        <li>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowMenu(false);
-                                    onViewProperties(file);  // Par exemple pour afficher les propriétés
-                                }}
-                            >
-                                <p className="text-sm">Propriétés</p>
-                            </button>
-                        </li>
                         <li>
                             <button
                                 onClick={(e) => {

@@ -523,8 +523,6 @@ exports.getAllUsersWithStorage = async (req, res) => {
       })
     )
 
-    console.log("userStorage", userStorage);
-
     res.status(200).json(userStorage);
   } catch (error) {
     console.error("Error retrieving users with storage info:", error);

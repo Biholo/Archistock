@@ -15,7 +15,7 @@ const HardDriveStorage = ({ storage, onStorageClick, onUpdate}: { storage: any, 
     const handleRightClick = (e: any) => {
         e.preventDefault();
         setShowMenu(true);
-        setMenuPosition({ x: e.clientX - 300, y: e.clientY - 650 });
+        setMenuPosition({ x: e.clientX - 300, y: e.clientY - 250 });
     };
 
     const handleClickOutside = (e: any) => {

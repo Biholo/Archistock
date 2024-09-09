@@ -24,7 +24,7 @@ const CustomLabel = ({
       textAnchor={x > cx ? "start" : "end"}
       dominantBaseline="central"
     >
-      {`${data[index].name}: ${data[index].value}`}
+      {`${data[index].name}: ${data[index].value.toFixed(2)} Mo`}
     </text>
   );
 };

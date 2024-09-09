@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Register.scss";
 import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import ArchistockApiService from "../../services/ArchistockApiService";
 import { useAuth, setCookie } from "../../contexts/AuthContext";
+import { loadStripe } from '@stripe/stripe-js';
 import Card from "../../components/Card/Card";
 import { toast } from "react-toastify";
 
@@ -46,9 +47,6 @@ const Register = () => {
     }
   }, [loggedIn]);
 
-  const handleRegisterClick = () => {
-    navigate("/");
-  };
 
   const validateEmail = (email: string): boolean => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -76,7 +74,6 @@ const Register = () => {
       }
       if(!validEmail) {
         setMsgError("Le mail est déjà utilisé.");
-        toast.error("Le mail est déjà utilisé.");
         return;
       }
       if (!validatePhone(newUser.phoneNumber)) {
@@ -180,6 +177,46 @@ const Register = () => {
            });
       }
  };
+
+ const stripePaiement = async () => {
+  
+  try {
+    const { email, password, firstName, lastName, phoneNumber } = newUser;
+    const { street, city, postalCode, country } = address;
+
+    const res = await archistockApiService.createCheckoutSession(
+      email,
+      password,
+      firstName,
+      lastName,
+      phoneNumber,
+      street,
+      city,
+      postalCode,
+      country
+    );
+
+    if (res && res.sessionId) {
+      const stripe = await loadStripe('pk_test_51PkQcSHd2aOqf2wDsKlTprSgIOj9DYEb5pVvKFPPoIas5fYFnVQWEnbuuxNOeKF6xu6ErlbLAGqrUCQSQExcrq7R003IrgqXYI'); // Remplacez par votre clé publique Stripe
+
+      if(!stripe) {
+        console.error("Failed to load Stripe");
+        return;
+      }
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: res.sessionId,
+      });
+
+      if (error) {
+        console.error("Stripe Checkout redirection error:", error);
+      }
+    }
+  } catch (error) {
+    console.error("Failed to create checkout session", error);
+    // Handle error as needed
+  }
+};
+
 
   return (
     <div className="flex flex-row justify-center items-center w-full h-full">
@@ -313,9 +350,9 @@ const Register = () => {
             Paiement
           </h2>
           <p className="text-black text-center">Pour terminer votre inscription, vous devez souscrire à notre abonnement de 20 Go. Après l'inscription, vous aurez la possibilité d'étendre votre stockage.</p>
-          <form className="mt-3 text-center sm:mt-0 sm:text-left w-full">
+          <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
             <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                Purchase Basic Subscription <span className='text-xl font-bold'>(20 GB)</span> - <span className='text-xl font-bold'>20€/month</span>
+                Abonnement Basic <span className='text-xl font-bold'>(20 GB)</span> - <span className='text-xl font-bold'>20€/month</span>
             </h3>
             <hr className='m-3'/>
             <div className='flex flex-col mt-3'>
@@ -324,7 +361,7 @@ const Register = () => {
                     type='text' 
                     placeholder='John Doe' 
                     css='mt-2 w-full' 
-                    label='Full Name' 
+                    label='Nom' 
                     name='fullName'
                     value={formData.fullName}
                     onChange={handlePaymentChange}
@@ -334,7 +371,7 @@ const Register = () => {
                     type='text' 
                     placeholder='1234 5678 9101 1121' 
                     css='mt-2 w-full' 
-                    label='Card Number' 
+                    label='Numéro de carte' 
                     name='cardNumber'
                     value={formData.cardNumber}
                     onChange={handlePaymentChange}
@@ -343,9 +380,9 @@ const Register = () => {
                 <div className='flex flex-row flex-wrap gap-2 w-full'>
                     <Input 
                         type='text' 
-                        placeholder='MM/YY' 
+                        placeholder='MM/AA' 
                         css='mt-2 w-full' 
-                        label='Expiration Date' 
+                        label='Date expiration' 
                         name='expirationDate'
                         value={formData.expirationDate}
                         onChange={handlePaymentChange}
@@ -363,16 +400,13 @@ const Register = () => {
                     />
                 </div>
             </div>
-            <div className="divider">OR</div>
-            <div className='flex justify-between mt-3 gap-2'>
-              <Button color="warning" css="w-1/2">Pay with <img className='-ml-1.5 w-14 mb-0 mt-1' src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/PayPal2007.svg/300px-PayPal2007.svg.png' /></Button>
-              <Button color="danger" css="w-1/2">Pay with <img className='-ml-2.5 w-14 mb-0' src='https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg' /></Button>
-            </div>
+            
             <div className='flex flex-row items-center mt-3'>
               <input type='checkbox' className='mr-2' onChange={() => setConditionsAccepted(!conditionsAccepted)} />
-              <label className='text-sm text-black'>I accept the general conditions</label>
+              <label className='text-sm text-black'>J'accepte les conditions générales</label>
             </div>
-          </form>
+            
+          </div>
         </>
       )}
       {msgError && <p className="text-red-400">{msgError}</p>}
@@ -397,10 +431,22 @@ const Register = () => {
           </Button>
         )}
       </div>
+      {currentStep === 3 && (
+        <Fragment>
+          <div className="divider">OR</div>
+          <div className='flex justify-between mt-3 gap-2'>
+            <Button onClick={() => stripePaiement()} color="warning" css="w-full">Payer avec <img className='ml-1 w-14 mb-0' src='https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg' /></Button>
+          </div>
+        </Fragment>
+      )}
+      
       <hr className="w-full h-[1px] mx-auto my-4 bg-slate-400 border-0 rounded md:my-5" />
-      <a href="/login" className="text-md text-slate-400 text-center">
-        Je possède déjà un compte
-      </a>
+      
+      {currentStep < 3 && (
+          <a href="/login" className="text-md text-slate-400 text-center">
+          Je possède déjà un compte
+        </a>
+        )}
       <p className="text-xs mt-3 text-slate-400 text-center">© 2024 Archistock. Tous droits réservés.</p>
       
       </Card>

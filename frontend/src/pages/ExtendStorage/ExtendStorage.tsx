@@ -52,7 +52,7 @@ const ExtendStorage = () => {
                     Retrouvez ci-dessous les différentes offres d'abonnement que nous proposons. Vous pouvez souscrire à un abonnement pour augmenter votre espace de stockage.
                 </p>
                 <p className="font-semibold">Actuellement, vous possèdez <span className="font-bold">{storage} {storage > 1 ? "Abonnements" : "Abonnement"}</span></p>
-                <div className="flex flex-wrap flex-row justify-center mt-5">
+                <div className="flex flex-wrap flex-row justify-center gap-5 mt-8">
                     {subscriptions.length > 0 && subscriptions.map((subscription: any) => (
                         <SubscriptionCard key={subscription.id} subscription={subscription} onSelect={onSelectSubscription} />
                     ))}

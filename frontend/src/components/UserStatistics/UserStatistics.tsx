@@ -119,7 +119,7 @@ const UserStatistics = () => {
         const sizesArray = Object.entries(sizesByCategory).map(
           ([key, value]) => ({
             name: key,
-            value: value,
+            value: parseFloat(value.toFixed(2)),
           })
         );
 
@@ -129,11 +129,11 @@ const UserStatistics = () => {
         const userSubscriptions =
           await archistockApiService.findAllSubscriptionByUserId();
         const totalSubscriptionSize = userSubscriptions.reduce(
-          (total: number, item) => total + item.subscription.size,
+          (total: number, item: any) => total + item.subscription.size,
           0
         );
 
-        setSubscriptionSize(totalSubscriptionSize);
+        setSubscriptionSize(totalSubscriptionSize.toFixed(2));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
