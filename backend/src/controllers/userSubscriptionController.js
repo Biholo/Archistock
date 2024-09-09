@@ -351,7 +351,6 @@ exports.getByUserIdWithFiles = async (req, res) => {
           { model: File, as: 'files' },
           { model: Folder, as: 'folders', include: [{ model: File, as: 'files' }] },
         ],
-        limit: 10,
       });
     }
     res.status(200).json(result);  // Send the result as a JSON response
