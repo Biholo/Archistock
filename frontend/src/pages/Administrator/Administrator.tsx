@@ -11,16 +11,16 @@ const Administrator = () => {
   const archistockApiService = new ArchistockApiService();
 
   useEffect(() => {
-    try {
-      archistockApiService.findAllUserStorages().then((data) => {
-        console.log("Data received:", data); // Check the structure of data
-        setUsers(Object.values(data)); // Convert the object to an array
-      });
-    } catch (error) {
-      console.error("Erreur lors de la récupération des données:", error);
-    }
+    const fetchData = async () => {
+      try {
+        const data = await archistockApiService.findAllUserStorages();
+        setUsers(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des données:", error);
+      }
+    };
+    fetchData();
   }, []);
-  
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -28,15 +28,12 @@ const Administrator = () => {
 
   const filteredUsers = useMemo(() => {
     const query = searchQuery.toLowerCase();
-    return Array.isArray(users)
-      ? users.filter(
-          (user) =>
-            user.firstName.toLowerCase().includes(query) ||
-            user.lastName.toLowerCase().includes(query)
-        )
-      : [];
+    return users.filter(
+      (user) =>
+        (user.firstName && user.firstName.toLowerCase().includes(query)) ||
+        (user.lastName && user.lastName.toLowerCase().includes(query))
+    );
   }, [users, searchQuery]);
-  
 
   return (
     <div className="m-5">
@@ -94,13 +91,15 @@ const Administrator = () => {
             />
           </div>
 
-          <div className="flex flex-row flex-wrap justify-between m-5">
+          <div className="flex flex-row flex-wrap justify-around m-5">
             {filteredUsers.length > 0 ? (
-              filteredUsers.map((userStorage, index) => (
-                <CardUser key={index} userStorage={userStorage} />
+              filteredUsers.map((user) => (
+                <div className="col-md-4" key={user.id}>
+                  <CardUser user={user} />
+                </div>
               ))
             ) : (
-              <p>Aucun utilisateur trouvé</p>
+              <p>Aucun utilisateur trouvé.</p>
             )}
           </div>
         </div>

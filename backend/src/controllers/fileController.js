@@ -5,6 +5,7 @@ const UserSubscription = require("../models/userSubscriptionModel");
 const fs = require("fs");
 const path = require("path");
 const jwt = require("jsonwebtoken");
+const { where } = require("sequelize");
 require("dotenv").config();
 
 // Create a file (POST)
@@ -184,7 +185,7 @@ exports.download = async (req, res) => {
       ],
     });
 
-    if (!fileOwner && user.role !== "admin") {
+    if (!fileOwner) {
       return res.status(403).json({ status: 403, error: "You are not authorized to download this file" });
     }
 

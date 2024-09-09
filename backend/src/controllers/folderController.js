@@ -2,6 +2,7 @@ const sequelize = require("../database/database");
 const Folder = require("../models/folderModel");
 const UserSubscription = require("../models/userSubscriptionModel");
 const File = require("../models/fileModel");
+const { where } = require("sequelize");
 
 // Create a folder (POST)
 exports.add = async (req, res) => {

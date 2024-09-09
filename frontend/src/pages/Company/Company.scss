@@ -1,0 +1,53 @@
+.company {
+
+    h2 {
+        font-size: 30px;
+    }
+    .no-company {
+        margin-bottom: 50px;
+    }
+
+    .parameter {
+        ul {
+            .selected {
+                border-bottom: solid 1px black;
+            }
+            li {
+                padding-bottom: 5px;
+                cursor: pointer;
+            }
+        }
+        .bg-card-invitation {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.3);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+
+            .close-icon {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                color: black;
+                cursor: pointer;
+            }
+        }
+        
+    }
+
+    .index-companies {
+        .company-card {
+         
+            width: 350px;
+            .image-container {
+                width: 80%;
+                img {
+                    max-height: 100px;
+                }
+            }
+        }
+    }
+    
+}
