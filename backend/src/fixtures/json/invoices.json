@@ -1,0 +1,65 @@
+[
+    {
+      "model": "Invoices",
+      "data": {
+        "name": "Athena",
+        "invoiceDate": "2024-09-01",
+        "userId": 1,
+        "userSubscriptionId": 1
+      }
+    },
+    {
+        "model": "Invoices",
+        "data": {
+          "name": "Athena",
+          "invoiceDate": "2024-08-01",
+          "userId": 1,
+          "userSubscriptionId": 2
+        }
+    },
+    {
+        "model": "Invoices",
+        "data": {
+          "name": "Athena",
+          "invoiceDate": "2024-07-01",
+          "userId": 1,
+          "userSubscriptionId": 1
+        }
+    },
+    {
+        "model": "Invoices",
+        "data": {
+          "name": "Athena",
+          "invoiceDate": "2024-06-04",
+          "userId": 1,
+          "userSubscriptionId": 2
+        }
+    },
+    {
+        "model": "Invoices",
+        "data": {
+          "name": "Aphrodite",
+          "invoiceDate": "2024-08-01",
+          "userId": 2,
+          "userSubscriptionId": 1
+        }
+    },
+    {
+        "model": "Invoices",
+        "data": {
+          "name": "Aphrodite",
+          "invoiceDate": "2024-07-01",
+          "userId": 2,
+          "userSubscriptionId": 2
+        }
+    },
+    {
+        "model": "Invoices",
+        "data": {
+          "name": "Aphrodite",
+          "invoiceDate": "2024-06-01",
+          "userId": 2,
+          "userSubscriptionId": 1
+        }
+    }
+  ]
