@@ -4,12 +4,15 @@ const fixtures = require("sequelize-fixtures");
 const sequelize = require("../database/database");
 const Country = require("../models/countryModel");
 const Address = require("../models/addressModel");
+const Company = require("../models/companyModel");
+const SharedStorageSpace = require("../models/sharedStorageSpaceModel");
 const Subscription = require("../models/subscriptionModel");
 const User = require("../models/userModel");
 const UserSubscription = require("../models/userSubscriptionModel");
 const Folder = require("../models/folderModel");
 const File = require("../models/fileModel");
-const Invoices = require("../models/invoicesModel");
+const Right = require("../models/rightModel");
+const InvitationRequest = require("../models/invitationRequestModel");
 require("dotenv").config();
 
 // Fonction pour charger les fixtures
@@ -38,6 +41,18 @@ const loadFixtures = async () => {
     );
 
     await fixtures.loadFiles(
+      [path.join(__dirname, "../fixtures/json/company.json")],
+      { Company },
+      { sequelize }
+    );
+
+    await fixtures.loadFiles(
+      [path.join(__dirname, "../fixtures/json/sharedStorageSpace.json")],
+      { SharedStorageSpace },
+      { sequelize }
+    );
+
+    await fixtures.loadFiles(
       [path.join(__dirname, "../fixtures/json/subscription.json")],
       { Subscription },
       { sequelize }
@@ -56,14 +71,20 @@ const loadFixtures = async () => {
     );
 
     await fixtures.loadFiles(
-      [path.join(__dirname, "../fixtures/json/folder.json")],
-      { Folder },
+      [path.join(__dirname, "../fixtures/json/right.json")],
+      { Right },
       { sequelize }
     );
 
     await fixtures.loadFiles(
-      [path.join(__dirname, "../fixtures/json/invoices.json")],
-      { Invoices },
+      [path.join(__dirname, "../fixtures/json/invitationRequest.json")],
+      { InvitationRequest },
+      { sequelize }
+    );
+
+    await fixtures.loadFiles(
+      [path.join(__dirname, "../fixtures/json/folder.json")],
+      { Folder },
       { sequelize }
     );
 

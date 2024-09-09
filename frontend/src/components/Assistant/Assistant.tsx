@@ -9,7 +9,7 @@ const Assistant = () => {
 
   const handleContactBot = () => {
     setBotAssigned(true);
-    setMessages((prevMessages) => [...prevMessages, { sender: 'ArchiBot', message: 'Bonjour 👋 ! Je suis Archi, votre assistant virtuel. En quoi puis-je vous aider ?' }]);
+    setMessages((prevMessages) => [...prevMessages, { sender: 'Bot', message: 'Hello! How can I assist you today?' }]);
   };
 
   const handleSendMessage = async () => {
@@ -20,23 +20,22 @@ const Assistant = () => {
 
       try {
         // Send message to Flask backend
-        const response = await fetch('http://localhost:8000/ai/generate', {
+        const response = await fetch('http://localhost:5000/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: messageInput }),
         });
 
         const data = await response.json();
-        console.log('Data:', data);
         if (data.response) {
           // Add bot response to chat
-          setMessages((prevMessages) => [...prevMessages, { sender: 'ArchiBot', message: data.response }]);
+          setMessages((prevMessages) => [...prevMessages, { sender: 'Bot', message: data.response }]);
         } else {
-          setMessages((prevMessages) => [...prevMessages, { sender: 'ArchiBot', message: 'Notre robot est parti en vacances... Contactez nous dès maintenant: archistock@fiddle.fr' }]);
+          setMessages((prevMessages) => [...prevMessages, { sender: 'Bot', message: 'Something went wrong!' }]);
         }
       } catch (error) {
         console.error('Error:', error);
-        setMessages((prevMessages) => [...prevMessages, { sender: 'ArchiBot', message: 'Notre robot est parti en vacances... Contactez nous dès maintenant: archistock@fiddle.fr' }]);
+        setMessages((prevMessages) => [...prevMessages, { sender: 'Bot', message: 'Failed to connect to the bot!' }]);
       } finally {
         setLoading(false);
         setMessageInput('');
@@ -89,9 +88,8 @@ const Assistant = () => {
             type="text"
             className="input input-bordered text-white w-full"
             value={messageInput}
-            onChange={(e) => { 
-              if (e.target.value.length <= 120) setMessageInput(e.target.value);}}
-            placeholder="Ectivez votre message... (max 120 caractères)"
+            onChange={(e) => setMessageInput(e.target.value)}
+            placeholder="Type your message"
             disabled={loading}
           />
           <button className="btn btn-primary w-full mt-2 text-white" onClick={handleSendMessage} disabled={loading}>

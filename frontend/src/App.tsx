@@ -17,15 +17,19 @@ import UploadFiles from './pages/UploadFiles/UploadFiles';
 import EGModal from './components/Modals/EG';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmAccount from './pages/ConfirmAccount/ConfirmAccount';
+
+import Company from './pages/Company/Company';
+import RegisterInvitation from './pages/RegisterInvitation/RegisterInvitation';
 import Administrator from './pages/Administrator/Administrator';
+
 import Pricing from './pages/Pricing/Pricing';
 import Homepage from './pages/Homepage/Homepage';
 import ApiPage from './pages/ApiPage/ApiPage';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
 import Assistant from './components/Assistant/Assistant';
+import AdminStatistics from './components/AdminStatistics/AdminStatistics';
 import UserStatistics from './components/UserStatistics/UserStatistics';
-import UserStorage from './pages/UserStorage/UserStorage';
 
 const App = () => {
   return (
@@ -49,10 +53,13 @@ const AuthRoutes = () => {
     <Routes>
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+
+      <Route path="/register-invitation/:uuid" element={<RegisterInvitation />} />
       <Route path="/temp/reset-password/:jwt" element={<ResetPassword />} />
       <Route path="/temp/confirm-account/:jwt" element={<ConfirmAccount />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/*" element={loggedIn ? <UserLogged /> : <Login />} />
+
+      <Route path="/*" element={loggedIn ? <UserLogged /> : <PublicRoutes />} />
       <Route path="/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
     </Routes>
   );
@@ -116,10 +123,10 @@ const UserLogged = () => {
           <Route path="/storage" element={
               <Usersubscriptions />
           } />
-          <Route path="/storage/user/:id" element={<UserStorage />} />
           <Route path="/extend" element={<ExtendStorage />} />
-          <Route path="/*" element={<Usersubscriptions />} />
+          <Route path="/*" element={<Company />} />
           <Route path="/upload" element={<UploadFiles />} />
+          <Route path="/settings" element={<div>Settings</div>} />
           <Route path="/profile" element={<Profil />} />
           <Route path="/profile/change-password" element={<NewPassword />} />
           <Route path="/statistics" element={<UserStatistics />} />

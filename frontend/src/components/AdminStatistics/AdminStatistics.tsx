@@ -14,6 +14,7 @@ import ArchistockApiService from "../../services/ArchistockApiService";
 
 interface Stats {
   accountsCount: number;
+  companiesCount: number;
 }
 
 interface LicenseStats {
@@ -38,6 +39,7 @@ const OPTIONS = [
   { value: "yearly", label: "Annuel" },
 ];
 
+// Regroupement des données en fonction de l'intervalle sélectionné
 const groupDataByInterval = (
   data: FileData[],
   interval: string
@@ -82,6 +84,7 @@ const AdminStatistics = () => {
   const [selectedInterval, setSelectedInterval] = useState("monthly");
   const [accountStats, setAccountStats] = useState<Stats>({
     accountsCount: 0,
+    companiesCount: 0,
   });
   const [licenseStats, setLicenseStats] = useState<LicenseStats>({
     currentLicenses: 0,
@@ -96,19 +99,26 @@ const AdminStatistics = () => {
   const [accountStatsByMonth, setAccountStatsByMonth] = useState<MonthlyStats>(
     []
   );
+  const [companyStatsByMonth, setCompanyStatsByMonth] = useState<MonthlyStats>(
+    []
+  );
 
   const archistockApiService = new ArchistockApiService();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Récupération des informations pour les adminitrateurs
         const accounts = await archistockApiService.findAllUsers();
+        const companies = await archistockApiService.findAllCompanies();
         const licenses = await archistockApiService.findAllSubscriptions();
 
         setAccountStats({
           accountsCount: accounts.length,
+          companiesCount: companies.length,
         });
 
+        // Faire le paréto entre les licences actives et les licences résiliés
         const canceledLicenses = licenses.filter(
           (license) => license.status === "canceled"
         );
@@ -121,6 +131,7 @@ const AdminStatistics = () => {
           canceledLicenses: canceledLicenses.length,
         });
 
+        // Récupère les données de souscriptions par mois
         const currentLicensesByMonth = groupDataByInterval(
           currentLicenses,
           selectedInterval
@@ -135,8 +146,15 @@ const AdminStatistics = () => {
           canceled: canceledLicensesByMonth,
         });
 
+        // Récupération des stats par mois pour les comptes et les entreprises
         const accountsByMonth = groupDataByInterval(accounts, selectedInterval);
+        const companiesByMonth = groupDataByInterval(
+          companies,
+          selectedInterval
+        );
+
         setAccountStatsByMonth(accountsByMonth);
+        setCompanyStatsByMonth(companiesByMonth);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -163,6 +181,11 @@ const AdminStatistics = () => {
           color="#FFA800"
         />
         <StatsCard
+          stat={accountStats.companiesCount}
+          name="Entreprises inscrites"
+          color="#E757B6"
+        />
+        <StatsCard
           stat={licenseStats.currentLicenses}
           name="Licences en cours"
           color="#24B34C"
@@ -173,11 +196,16 @@ const AdminStatistics = () => {
           color="#7C57E7"
         />
       </div>
-      <h2 style={{ textAlign: "center" }}>Nombre de comptes</h2>
+      <h2 style={{ textAlign: "center" }}>
+        Nombre de comptes et d'entreprises
+      </h2>
       <div style={{ display: "flex", width: "100%", height: 250 }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={accountStatsByMonth}
+            data={accountStatsByMonth.map((item, index) => ({
+              ...item,
+              companiesCount: companyStatsByMonth[index]?.count || 0,
+            }))}
             margin={{ top: 5, right: 50, left: 50, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
@@ -190,6 +218,13 @@ const AdminStatistics = () => {
               stroke="#00C49F"
               activeDot={{ r: 4 }}
               name="Comptes"
+            />
+            <Line
+              type="monotone"
+              dataKey="companiesCount"
+              stroke="#FF1963"
+              activeDot={{ r: 4 }}
+              name="Entreprises"
             />
           </LineChart>
         </ResponsiveContainer>
