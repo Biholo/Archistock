@@ -12,6 +12,8 @@
   "dependencies": {
     "@cyntler/react-doc-viewer": "^1.17.0",
     "@phosphor-icons/react": "^2.1.5",
+    "@stripe/react-stripe-js": "^2.8.0",
+    "@stripe/stripe-js": "^4.4.0",
     "flag-icons": "^7.2.3",
     "frontend": "file:",
     "js-cookie": "^3.0.5",

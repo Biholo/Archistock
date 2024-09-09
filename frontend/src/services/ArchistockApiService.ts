@@ -618,6 +618,44 @@ class ArchistockApiService {
             throw error; 
         }
     }
+
+    async createCheckoutSession(email: string, password: string, firstName: string, lastName: string, phoneNumber: string, street: string, city: string, postalCode: string, countryId: string) {
+
+        try{
+            const response = await fetch(`https://4bed-2a02-8440-3110-25cd-5cd-f6e7-cbff-b1e.ngrok-free.app/stripe/create-subscription`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `${getCookie('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    email,
+                    password,
+                    firstName,
+                    lastName,
+                    phoneNumber,
+                    street,
+                    city,
+                    postalCode,
+                    countryId,
+                    subscriptionId: '1'
+
+                 }),
+
+            })
+
+            const jsonResponse = await response.json();
+            return jsonResponse;
+        } catch (error) {
+            console.error("Failed to delete user", error);
+            throw error; 
+        }
+    }
+
+    
+
+
+
 }
 
 export default ArchistockApiService;
