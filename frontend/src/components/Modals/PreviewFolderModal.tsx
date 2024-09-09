@@ -44,29 +44,29 @@ const PreviewFolderModal = ({ show, folder, onClose } : any) => {
                         <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div className="flex flex-col">
                                 <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                                    Folder Properties
+                                    Propriétés du dossier
                                 </h3>
                                 {folder && (
                                     // using tailwind col 
                                     <div className='flex flex-col gap-5 mt-5'>
                                         <div className='grid grid-cols-2 gap-4'>
-                                            <p className='text-sm text-gray-600'>Folder Name:</p>
+                                            <p className='text-sm text-gray-600'>Nom dossier:</p>
                                             <p className='text-sm font-semibold ml-2'>{folder.name}</p>
                                         </div>
                                         <div className='grid grid-cols-2 gap-4'>
-                                            <p className='text-sm text-gray-600'>Folder Size:</p>
+                                            <p className='text-sm text-gray-600'>Taille dossier:</p>
                                             <p className='text-sm font-semibold ml-2'>{getFolderSize(folder)} Go</p>
                                         </div>
                                         <div className='grid grid-cols-2 gap-4'>
-                                            <p className='text-sm text-gray-600'>Files:</p>
+                                            <p className='text-sm text-gray-600'>Fichiers:</p>
                                             <p className='text-sm font-semibold ml-2'>{folder.files.length}</p>
                                         </div>
                                         <div className='grid grid-cols-2 gap-4'>
-                                            <p className='text-sm text-gray-600'>Created At:</p>
+                                            <p className='text-sm text-gray-600'>Créer:</p>
                                             <p className='text-sm font-semibold ml-2'>{refactorDate(folder.createdAt)}</p>
                                         </div>
                                         <div className='grid grid-cols-2 gap-4'>
-                                            <p className='text-sm text-gray-600'>Updated At:</p>
+                                            <p className='text-sm text-gray-600'>Mis à jour:</p>
                                             <p className='text-sm font-semibold ml-2'>{refactorDate(folder.updatedAt)}</p>
                                         </div>
                                     </div>

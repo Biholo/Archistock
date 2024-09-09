@@ -518,9 +518,7 @@ exports.deleteUserAccount = async (req, res) => {
       await Folder.destroy({ where: { userSubscriptionId: subscription.id } });
     }
 
-    await InvitationRequest.destroy({ where: { userId: user.id } });
     await UserSubscription.destroy({ where: { userId: user.id } });
-    await Right.destroy({ where: { userId: user.id } });
     await user.destroy();
 
     res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: 'strict' });
