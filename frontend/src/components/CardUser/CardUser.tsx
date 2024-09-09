@@ -1,28 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const CardUser = ({ user }) => {
+const CardUser = ({ userStorage }) => {
   const navigate = useNavigate();
 
   const handleButtonClick = () => {
-    navigate(`/storage/user/${user.id}`);
+    navigate(`/storage/user/${userStorage.id}`);
   };
 
   return (
-    <div className="card card-background m-3">
-      <div className="card-body">
-        <h5 className="card-title">{`${user.firstName} ${user.lastName}`}</h5>
-        <p className="card-text">
-          <strong>Stockage utilisé :</strong> {user.usedStorage} Mo
-        </p>
-        <p className="card-text">
-          <strong>Stockage disponible :</strong> {user.availableStorage} Mo
-        </p>
-        <button className="btn btn-primary" onClick={handleButtonClick}>
-          Voir les fichiers
-        </button>
+    userStorage && (
+      <div className="card card-background m-3">
+        <div className="card-body">
+          <h5 className="card-title">{`${userStorage.firstName} ${userStorage.lastName}`}</h5>
+          <p className="card-text">
+            <strong>Nombre d'abonnements :</strong> {userStorage.nbSubs}
+          </p>
+          <p className="card-text">
+            <strong>Stockage utilisé :</strong> {(userStorage.usedStorage / 1000).toFixed(2)} Go
+          </p>
+          <p className="card-text">
+            <strong>Stockage disponible :</strong> {(userStorage.totalStorage / 1000).toFixed(2)} Go
+          </p>
+          <p className="card-text">
+            <strong>Nombre de fichiers :</strong> {userStorage.nbFiles}
+          </p>
+          <button className="btn btn-primary text-white" onClick={handleButtonClick}>
+            Voir les fichiers
+          </button>
+        </div>
       </div>
-    </div>
+    )
   );
 };
 

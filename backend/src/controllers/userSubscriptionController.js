@@ -248,9 +248,6 @@ exports.getAll = async (req, res) => {
 
 // Get user subscriptions by user Id (GET)
 exports.getByUserId = async (req, res) => {
-  setTimeout(() => {
-    console.log("Timeout completed");
-  }, 5000);
 
   let token = req.headers.authorization;
   let email = null;
@@ -268,7 +265,6 @@ exports.getByUserId = async (req, res) => {
     const result = await UserSubscription.findAll({
       where: {
         userId: user.id,
-        status: ["active", "inactive"]
       },
       include: [
         { model: User, as: "user" },
@@ -336,7 +332,6 @@ exports.getByUserIdWithFiles = async (req, res) => {
                 as: 'usersubscription',
                 where: {
                   userId: user.id,
-                  status: ["active", "inactive"]
                 },
                 include: [
                     { model: Subscription, as: 'subscription' }
@@ -349,7 +344,6 @@ exports.getByUserIdWithFiles = async (req, res) => {
       result = await UserSubscription.findAll({
         where: {
           userId: user.id,
-          status: ["active", "inactive"]
         },
         include: [
           { model: User, as: 'user' },
@@ -470,64 +464,6 @@ exports.addFile = async (req, res) => {
   }
 };
 
-
-
-exports.renewSubscription = async (req, res) => {
-  let token = req.headers.authorization;
-  let email = null;
-  
-  if (token && token.startsWith("Bearer ")) {
-    token = token.split(" ")[1];
-  }
-  
-  if (token) {
-    email = jwt.verify(token, process.env.SECRET_KEY).email;
-  }
-  
-  try {
-    // check if user exists
-    const user = await User.findOne({ where: { email: email } });
-    if (!user) {
-      return res.status(404).json({ error: "Utilisateur introuvable." });
-    }
-
-    // check if userSubscription belongs to the user and userSubscriptionId
-    const userSubscription = await UserSubscription.findOne({
-      where: { userId: user.id, id: req.params.userSubscriptionId },
-      include: [
-        { model: User, as: 'user' },
-        { model: Subscription, as:'subscription' },
-        { model: File, as: 'files' },
-      ],
-    });
-
-    if(!userSubscription) {
-      return res.status(404).json({ error: "Souscription introuvable ou non appartenant à l'utilisateur." });
-    }
-    
-    setTimeout(() => {
-      console.log("Timeout completed");
-    }, 1000)
-
-    // switch renew 
-    if (userSubscription.status === "active") {
-      userSubscription.status = "inactive";
-    } else if(userSubscription.status === "inactive") {
-      userSubscription.status = "active";
-    }
-      
-
-    // save changes
-    await userSubscription.save();
-    res.status(201).json({status: 201, storage: userSubscription});
-    return;
-  } catch (error) {
-    console.error("Erreur lors de la récupération des informations de l'utilisateur ou de la souscription:", error);
-    res.status(500).json({ error: "Erreur lors de la récupération des informations de l'utilisateur ou de la souscription" });
-    return;
-  }
-}
-
 exports.getAllUsersWithStorage = async (req, res) => {
   try {
     const users = await User.findAll({
@@ -548,36 +484,49 @@ exports.getAllUsersWithStorage = async (req, res) => {
       ],
     });
 
-    const usersWithStorage = await Promise.all(
+    // contains the user with storage info + ...
+    const userStorage = {};
+
+    await Promise.all(
       users.map(async (user) => {
+        let totalStorage = 0;
         let usedStorage = 0;
-        let availableStorage = 0;
+        let nbFiles = 0;
+        let nbSubs = user.userSubscriptions.length;
 
-        for (let subscription of user.userSubscriptions) {
-          let subscriptionSize = subscription.subscription
-            ? subscription.subscription.size
-            : 0;
-          availableStorage += subscriptionSize;
+        user.userSubscriptions.forEach((sub) => {
+          totalStorage += sub.subscription.size;
+          usedStorage += sub.files.reduce((acc, file) => acc + parseFloat(file.size), 0);
+          nbFiles += sub.files.length;
+          nbFiles += sub.folders.reduce((acc, folder) => acc + folder.files.length, 0);
+        });
 
-          let files = await File.findAll({
-            where: { userSubscriptionId: subscription.id },
-          });
-          for (let file of files) {
-            usedStorage += parseFloat(file.size);
-          }
+        // if user.id exists in userStorage, update the stats
+        if (userStorage[user.id]) {
+          userStorage[user.id].totalStorage += totalStorage;
+          userStorage[user.id].usedStorage += usedStorage;
+          userStorage[user.id].nbFiles += nbFiles;
+          userStorage[user.id].nbSubs += nbSubs;
+        } else {
+          userStorage[user.id] = {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            totalStorage: totalStorage,
+            usedStorage: usedStorage,
+            nbFiles: nbFiles,
+            nbSubs: nbSubs,
+          };
         }
-
-        return {
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          usedStorage,
-          availableStorage,
-        };
+        
+        
       })
-    );
+    )
 
-    res.status(200).json(usersWithStorage);
+    console.log("userStorage", userStorage);
+
+    res.status(200).json(userStorage);
   } catch (error) {
     console.error("Error retrieving users with storage info:", error);
     res
@@ -586,3 +535,23 @@ exports.getAllUsersWithStorage = async (req, res) => {
   }
 };
 
+exports.getByIdWithFiles = async (req, res) => {
+  const userId = req.params.id;
+  // get files from userSubscription where userId = userId
+  try {
+    const Files = await File.findAll({
+      include: [
+        {
+          model: UserSubscription,
+          as: "usersubscription",
+          where: { userId: userId },
+        },
+      ],
+    });
+
+    res.status(200).json(Files);
+  } catch (error) {
+    console.error("Error retrieving user subscriptions with files:", error);
+    res.status(500).json({ error: "Error retrieving user subscriptions with files." });
+  }
+}

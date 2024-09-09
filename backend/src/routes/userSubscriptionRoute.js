@@ -42,6 +42,7 @@ router.get("/all", middleware.authenticator, UserSubscriptionController.getAll);
 router.get(
   '/users-with-storage',
   middleware.authenticator,
+  middleware.isAdmin,
   UserSubscriptionController.getAllUsersWithStorage
 )
 
@@ -50,6 +51,7 @@ router.get(
 router.get(
   "/get/:id",
   middleware.authenticator,
+  middleware.isAdmin,
   UserSubscriptionController.getById
 );
 
@@ -72,6 +74,13 @@ router.get(
   UserSubscriptionController.getByUserIdWithFiles
 );
 
+router.get(
+  "/files/:id",
+  middleware.authenticator,
+  middleware.isAdmin,
+  UserSubscriptionController.getByIdWithFiles
+);
+
 // add file to subscription
 router.post(
   "/add-files",
@@ -80,12 +89,6 @@ router.post(
   UserSubscriptionController.addFile
 );
 
-// renew subscription
-router.post(
-  "/renew/:userSubscriptionId",
-  middleware.authenticator,
-  UserSubscriptionController.renewSubscription
-)
 
 
 module.exports = router;
