@@ -51,10 +51,10 @@ export default function Profil() {
       .then((response) => {
         setProfileUser(response.data);
         setUser(response.data); // Update the AuthContext with the new user data
-        toast.success("Profile updated successfully");
+        toast.success("Profile mis à jour avec succès");
       })
       .catch((error) => {
-        toast.error("An error occurred while updating your profile");
+        toast.error("Une erreur est survenue lors de la mise à jour du profile");
       });
   };
 
@@ -75,7 +75,7 @@ export default function Profil() {
 
   return (
     <div className="m-5">
-      <h1 className="text-3xl font-black mb-3">Your Profile</h1>
+      <h1 className="text-3xl font-black mb-3">Votre compte</h1>
       <div role="tablist" className="tabs tabs-bordered ">
         <a
           role="tab"

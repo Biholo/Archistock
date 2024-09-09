@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import ArchistockApiService from '../../services/ArchistockApiService';
+
+const archistockApiService = new ArchistockApiService();
 
 const Assistant = () => {
   const [botAssigned, setBotAssigned] = useState<boolean>(false);
@@ -15,25 +18,19 @@ const Assistant = () => {
   const handleSendMessage = async () => {
     if (messageInput) {
       // Add user message to chat
-      setMessages((prevMessages) => [...prevMessages, { sender: 'You', message: messageInput }]);
+      setMessages((prevMessages) => [...prevMessages, { sender: 'Vous', message: messageInput }]);
       setLoading(true);
 
       try {
-        // Send message to Flask backend
-        const response = await fetch('http://localhost:8000/ai/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: messageInput }),
-        });
-
-        const data = await response.json();
-        console.log('Data:', data);
-        if (data.response) {
-          // Add bot response to chat
-          setMessages((prevMessages) => [...prevMessages, { sender: 'ArchiBot', message: data.response }]);
-        } else {
-          setMessages((prevMessages) => [...prevMessages, { sender: 'ArchiBot', message: 'Notre robot est parti en vacances... Contactez nous dès maintenant: archistock@fiddle.fr' }]);
-        }
+        archistockApiService.generateAiResponse(messageInput).then((data) => {
+          if (data.response) {
+            // Add bot response to chat
+            setMessages((prevMessages) => [...prevMessages, { sender: 'ArchiBot', message: data.response }]);
+          } else {
+            setMessages((prevMessages) => [...prevMessages, { sender: 'ArchiBot', message: 'Notre robot est parti en vacances... Contactez nous dès maintenant: archistock@fiddle.fr' }]);
+          }
+        })
+        
       } catch (error) {
         console.error('Error:', error);
         setMessages((prevMessages) => [...prevMessages, { sender: 'ArchiBot', message: 'Notre robot est parti en vacances... Contactez nous dès maintenant: archistock@fiddle.fr' }]);
@@ -51,15 +48,12 @@ const Assistant = () => {
 
   return (
     <div>
-      {/* Button to toggle the assistant menu */}
       <button
         className="fixed z-10 bottom-5 right-5 w-16 h-16 bg-primary text-white rounded-lg flex items-center justify-center shadow-lg"
         onClick={handleOpenMenu}
       >
         🤖
       </button>
-
-      {/* Sliding menu */}
       <div
         className={`fixed z-10 bottom-5 transition right-5 bg-white rounded-lg shadow-lg transition-transform duration-300 transform ${
           isMenuOpen ? 'translate-y-0' : 'translate-y-full'
@@ -67,15 +61,15 @@ const Assistant = () => {
         style={{ display: isMenuOpen ? 'block' : 'none' }}
       >
         <div className="flex flex-row">
-          <h1 className="text-2xl font-bold mb-4">Chat with Assistant</h1>
+          <h1 className="text-2xl font-bold">Parler à ArchiBot</h1>
           <button className="btn bg-white border-none text-black hover:bg-slate-200 rounded-full ml-auto" onClick={handleOpenMenu}>
             X
           </button>
         </div>
-
+        <p className='text-xs text-slate-500'>Archibot est un bot API propulsé par l'IA Google Gemini.</p>
         <div>
           <div>
-            <h2 className="mt-5 text-xl font-bold">Messages:</h2>
+            <h2 className="mt-1 text-xl font-bold">Messages:</h2>
             <ul className="overflow-auto h-32 mb-4">
               {messages.map((msg, index) => (
                 <li key={index} className="mb-2">
@@ -95,7 +89,7 @@ const Assistant = () => {
             disabled={loading}
           />
           <button className="btn btn-primary w-full mt-2 text-white" onClick={handleSendMessage} disabled={loading}>
-            {loading ? 'Sending...' : 'Send'}
+            {loading ? 'Envoi...' : 'Envoyer'}
           </button>
         </div>
       </div>

@@ -30,10 +30,10 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
         archistockApiService.updateFile(file.id, { name: fileName }).then((res) => {
             console.log(res.status);
             if(res.status === 201) {
-                toast.success("File updated successfully");
+                toast.success("Fichier mis à jour avec succès.");
                 onUpdate();
             } else {
-                toast.error("An error occured while updating file. Please retry.");
+                toast.error("Une erreur est survenue lors de la mise à jour du fichier.");
             }
         });
     }
@@ -42,10 +42,10 @@ const FileDetails = ({ file, onClick, onDelete, onViewProperties, onUpdate }: an
         archistockApiService.deleteFile(file.name).then((res) => {
             console.log(res.status);
             if(res.status === 201) {
-                toast.success("File deleted successfully");
+                toast.success("Fichier supprimé avec succès.");
                 onDelete(file);
             } else {
-                toast.error("An error occured while deleting file. Please retry.");
+                toast.error("Une erreur est survenue lors de la suppression du fichier.");
             }
         });
     }

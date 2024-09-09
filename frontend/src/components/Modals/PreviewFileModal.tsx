@@ -67,7 +67,7 @@ const PreviewFileModal = ({ show, file, onClose }: any) => {
                 file.format === "gif" ||
                 file.format === "svg" ? (
                   <img
-                    src={`http://localhost:8000/files/${file.pathName}.${file.format}`}
+                    src={`${archistockApiService.url}/files/${file.pathName}.${file.format}`}
                     alt={file.pathName}
                     className="w-full h-auto"
                   />
@@ -76,7 +76,7 @@ const PreviewFileModal = ({ show, file, onClose }: any) => {
                   file.format === "mov" ||
                   file.format === "wmv" ? (
                   <video
-                    src={`http://localhost:8000/files/${file.pathName}.${file.format}`}
+                    src={`${archistockApiService.url}/files/${file.pathName}.${file.format}`}
                     className="w-full h-auto"
                     controls
                   ></video>
@@ -85,12 +85,12 @@ const PreviewFileModal = ({ show, file, onClose }: any) => {
                   file.format === "flac" ||
                   file.format === "aac" ? (
                   <audio
-                    src={`http://localhost:8000/files/${file.pathName}.${file.format}`}
+                    src={`${archistockApiService.url}/files/${file.pathName}.${file.format}`}
                     controls
                   ></audio>
                 ) : file.format === "pdf" ? (
                   <embed
-                    src={`http://localhost:8000/files/${file.pathName}.${file.format}`}
+                    src={`${archistockApiService.url}/files/${file.pathName}.${file.format}`}
                     type="application/pdf"
                     width="100%"
                     height="600px"

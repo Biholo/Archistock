@@ -23,7 +23,7 @@ const UserInvoices = () => {
     }, []);
 
     const handleDownload = useCallback((invoiceName: string) => {
-        const downloadUrl = `http://localhost:8000/files/invoices/${invoiceName}`;
+        const downloadUrl = `${archistockApiService.url}/files/invoices/${invoiceName}`;
         window.open(downloadUrl, '_blank');
     }, []);
 

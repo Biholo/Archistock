@@ -17,7 +17,7 @@ export default function RemoveProfileModal({ isVisible, onClose, onConfirm }: Mo
         <p>Vous perdrez l'ensemble de vos documents et votre compte sera supprimé.</p>
         <div className="modal-actions">
           <button className="btn confirm" onClick={onConfirm}>
-            Confirmé
+            Confirmer
           </button>
           <button className="btn cancel" onClick={onClose}>
             Annulé

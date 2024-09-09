@@ -28,10 +28,10 @@ const FolderDetails = ({ folder, onFolderClick, onDelete, onViewProperties, onUp
         setEditFolder(false);
         archistockApiService.updateFolder(folder.id, { name: folderName }).then((res) => {
             if(res.status === 201) {
-                toast.success("Folder updated successfully");
+                toast.success("Dossier créé avec succès.");
                 onUpdate();
             } else {
-                toast.error("An error occured while updating folder. Please retry.");
+                toast.error("Une erreur est survenue lors de la création du dossier.");
             }
         });
     }

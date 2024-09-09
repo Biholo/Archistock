@@ -6,7 +6,7 @@ import Address from "../models/AddressModel";
 import { getCookie } from "../contexts/AuthContext";
 
 class ArchistockApiService {
-    private readonly url: string;
+    public readonly url: string;
 
     constructor() {
         this.url = "http://localhost:8000";
@@ -617,6 +617,27 @@ class ArchistockApiService {
             console.error("Failed to delete user", error);
             throw error; 
         }
+    }
+
+    async getInvoiceUrl(invoiceName: string) {
+        return `${this.url}/files/invoices/${invoiceName}`;
+    }
+
+    async generateAiResponse(message: string): Promise<any> {
+        try {
+            const response = await fetch('http://localhost:8000/ai/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message }),
+            });
+    
+            const data = await response.json();
+            return data;
+        } catch(e) {
+            console.error("Failed to generate AI response:", e);
+            throw e;
+        }
+
     }
 }
 

@@ -8,6 +8,7 @@ interface User {
     firstName: string;
     lastName: string;
     phoneNumber: string;
+    role?: string;
     address?: Address;
     password?: string | null;
     passwordConfirm?: string | null;

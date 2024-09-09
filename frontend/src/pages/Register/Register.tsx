@@ -6,6 +6,7 @@ import Button from "../../components/Button/Button";
 import ArchistockApiService from "../../services/ArchistockApiService";
 import { useAuth, setCookie } from "../../contexts/AuthContext";
 import Card from "../../components/Card/Card";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const archistockApiService = new ArchistockApiService();
@@ -69,23 +70,28 @@ const Register = () => {
         newUser.password === "" ||
         newUser.passwordConfirm === ""
       ) {
-        setMsgError("Veuillez renseigner tous les champs");
+        setMsgError("Veuillez renseigner tous les champs.");
+        toast.error("Veuillez renseigner tous les champs.");
         return;
       }
       if(!validEmail) {
-        setMsgError("Email already in use");
+        setMsgError("Le mail est déjà utilisé.");
+        toast.error("Le mail est déjà utilisé.");
         return;
       }
       if (!validatePhone(newUser.phoneNumber)) {
-        setMsgError("Veuillez entrer un numéro de téléphone valide");
+        setMsgError("Veuillez entrer un numéro de téléphone valide.");
+        toast.error("Veuillez entrer un numéro de téléphone valide.");
         return;
       }
-      if (newUser.password.length < 6) {
-        setMsgError("Le mot de passe doit contenir au moins 6 caractères");
+      if (newUser.password.length < 8) {
+        setMsgError("Le mot de passe doit contenir au moins 8 caractères.");
+        toast.error("Le mot de passe doit contenir au moins 8 caractères.");
         return;
       }
       if (newUser.password !== newUser.passwordConfirm) {
-        setMsgError("Les mots de passe ne correspondent pas");
+        setMsgError("Les mots de passe ne correspondent pas.");
+        toast.error("Les mots de passe ne correspondent pas.");
         return;
       }
       setMsgError(""); // Clear error message if all validations pass
@@ -98,12 +104,14 @@ const Register = () => {
         address.country === ""
       ) {
         setMsgError("Veuillez renseigner tous les champs");
+        toast.error("Veuillez renseigner tous les champs");
         return;
       }
       setCurrentStep(currentStep + 1);
     } else if (currentStep === 3) {
       if(currentStep === 3 && !conditionsAccepted) {
         setMsgError("Veuillez accepter les conditions générales");
+        toast.error("Veuillez accepter les conditions générales");
         return;
       }
       archistockApiService.registerUser(newUser, address).then((res) => {
@@ -112,6 +120,7 @@ const Register = () => {
           setCookie("refreshToken", res.refreshToken, 1);
           setUser(res.user);
           navigate("/storage");
+          toast.success("Inscription réussie.");
         }
       });
     }
@@ -125,7 +134,8 @@ const Register = () => {
             console.log(e.target.value);
             archistockApiService.isEmailAvailable(e.target.value).then((res:any) => {
               if(!res.unique) {
-                  setMsgError("Email already in use");
+                  setMsgError("L'email est déjà utilisé.");
+                  toast.error("L'email est déjà utilisé.");
                   setValidEmail(false);
               } else {
                   setValidEmail(true);

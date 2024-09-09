@@ -65,13 +65,6 @@ export default function Aside() {
               active={active === "upload"}
               onClick={() => handleChangeItem("upload")}
             ></AsideItem>
-            <AsideItem
-              title="Components"
-              icon={<Cube size={26} />}
-              link="components"
-              active={active === "components"}
-              onClick={() => handleChangeItem("components")}
-            ></AsideItem>
             {
               user && user.role === 'admin' && (
                 <AsideItem

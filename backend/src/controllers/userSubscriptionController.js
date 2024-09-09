@@ -132,7 +132,7 @@ exports.createInvoice = async (user, subscription, userSubscription) => {
     doc.text(header, columnPositions[i] + 5, tableTop + 7); 
   });
 
-  const itemName = `${subscription.name} - ${subscription.size} Go`;
+  const itemName = `${subscription.name} - ${subscription.size / 1000} Go`;
   const itemData = [itemName, "1", `${subscription.price} €`];
 
   doc.setFont("helvetica", "normal");

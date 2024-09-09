@@ -47,6 +47,7 @@ app.post("/ai/generate", async (req, res) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Origin": "http://localhost:5173",
       Authorization: "Bearer " + process.env.SECRET_GOOGLE_AI,
     },
     body: JSON.stringify(req.body),

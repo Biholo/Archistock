@@ -1,11 +1,17 @@
-import React, { useEffect, Fragment } from 'react';
+import React, { useEffect, Fragment, useState } from 'react';
 import ArchistockApiService from '../../services/ArchistockApiService';
 
 const archistockApiService = new ArchistockApiService();
 
 const InvoiceModal = ({ show, invoice, onClose }: any) => {
 
+    const [invoiceUrl, setInvoiceUrl] = useState('');
+
     useEffect(() => {
+        archistockApiService.getInvoiceUrl(invoice.name).then((response) => {
+            setInvoiceUrl(response);
+        });
+        
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 onClose();
@@ -21,8 +27,6 @@ const InvoiceModal = ({ show, invoice, onClose }: any) => {
        // open url
         window.open(invoiceUrl, '_blank');
     };
-
-    const invoiceUrl = `http://localhost:8000/files/invoices/${invoice.name}`;
 
     return (
         <Fragment>
