@@ -32,7 +32,7 @@ exports.register = async (req, res) => {
     });
     
     // create user and get address 
-    const createUser = await User.create({
+    await User.create({
       email,
       password,
       firstName,
