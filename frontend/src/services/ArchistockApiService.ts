@@ -3,7 +3,13 @@ import AccessTokenResponse from "../models/AccessTokenResponseModel";
 import UserAndTokens from "../models/UserAndTokens";
 import LoginUser from "../models/LoginUserModel";
 import Address from "../models/AddressModel";
+import UserUpdateResponse from "../models/UserUpdateResponse";
 import { getCookie } from "../contexts/AuthContext";
+import UserSubscription from "../models/UserSubscription";
+import AiResponse from "../models/AiResponse";
+import UserResponse from "../models/UserResponse";
+import Subscription from "../models/Subscription";
+import CountriesResponse from "../models/CountriesResponse";
 
 class ArchistockApiService {
     public readonly url: string;
@@ -19,7 +25,7 @@ class ArchistockApiService {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ user, address }), // Combine user and address into one object
+            body: JSON.stringify({ user, address }),
         });
 
         const jsonResponse = await response.json();
@@ -116,7 +122,7 @@ class ArchistockApiService {
     }
 
     // PUT /user/update - Mettre à jour le profil de l'utilisateur
-    async updateProfile(user: User) : Promise<any> {
+    async updateProfile(user: User) : Promise<UserUpdateResponse> {
         console.log("user", user);
         try {
             const response = await fetch(`${this.url}/user/update`, {
@@ -131,7 +137,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to update profile:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
     
@@ -149,7 +155,7 @@ class ArchistockApiService {
     }
 
     // GET /user-subscription/me - Obtenir l'abonnement de l'utilisateur
-    async getUserStorage(): Promise<any> {
+    async getUserStorage(): Promise<UserSubscription[]> {
         try {
             const response = await fetch(`${this.url}/user-subscription/me`, {
                 method: 'GET',
@@ -162,12 +168,12 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to fetch user storage:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
 
     // GET /user-subscription/files/:id - Obtenir le stockage de l'utilisateur
-    async findUserStorageById(id: number): Promise<any> {
+    async findUserStorageById(id: number): Promise<File[]> {
         try {
             const response = await fetch(`${this.url}/user-subscription/files/${id}`, {
                 method: 'GET',
@@ -179,7 +185,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to fetch user storage:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
 
@@ -196,12 +202,12 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to fetch user storage:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
 
     // GET /subscription/all - Obtenir toutes les souscriptions
-    async getSubscriptions(): Promise<any> {
+    async getSubscriptions(): Promise<Subscription[]> {
         try {
             const response = await fetch(`${this.url}/subscription/all`, {
                 method: 'GET',
@@ -214,7 +220,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to fetch subscriptions:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
 
@@ -233,12 +239,12 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to purchase subscription:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
 
     // GET /folder/root/{storageId} - Obtenir le dossier racine du stockage
-    async getStorageRoot(storageId: number): Promise<any> {
+    async getStorageRoot(storageId: number): Promise<> {
         try {
             const response = await fetch(`${this.url}/folder/root/${storageId}`, {
                 method: 'GET',
@@ -250,7 +256,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to fetch root folder:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
 
@@ -269,7 +275,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to update storage:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
 
@@ -288,7 +294,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to create folder:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
 
@@ -305,7 +311,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to fetch folder:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
 
@@ -324,7 +330,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to update folder:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
 
@@ -341,7 +347,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to delete folder:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
 
@@ -393,7 +399,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to search files:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
   
@@ -412,7 +418,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to update file:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error; 
         }
     }
     
@@ -459,7 +465,7 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to delete file:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;  
         }
     }
 
@@ -476,12 +482,12 @@ class ArchistockApiService {
             return jsonResponse;
         } catch (error) {
             console.error("Failed to fetch user invoices:", error);
-            throw error;  // rethrow the error if you want to handle it further up in your components
+            throw error;
         }
     }
       
-    // GET /country/all - Obtenir tous
-    async findAllCountries(): Promise<any> {
+    // GET /country/all - Obtenir tous les pays
+    async findAllCountries(): Promise<CountriesResponse> {
         try {
             const response = await fetch(`${this.url}/country/all`, {
                 method: 'GET',
@@ -518,24 +524,20 @@ class ArchistockApiService {
 
     // POST /user/confirm-account - Confirmer le compte de l'utilisateur
     async confirmAccount(token: string): Promise<any> {
-        try {
-            const response = await fetch(`${this.url}/user/confirm-account`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `${getCookie('accessToken')}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ token }),
-            });
-            const jsonResponse = await response.json();
-            return jsonResponse;
-        } catch (error) {
-            throw error;
-        }
+        const response = await fetch(`${this.url}/user/confirm-account`, {
+            method: 'POST',
+            headers: {
+                Authorization: `${getCookie('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token }),
+        });
+        const jsonResponse = await response.json();
+        return jsonResponse;
     }
        
-    // GET /user-subscription/me - Obtenir l'abonnement de l'utilisateur
-    async findAllSubscriptionByUserId(): Promise<any> {
+    // GET /user-subscription/me - Obtenir tous les abonnements de l'utilisateur
+    async findAllSubscriptionByUserId(): Promise<UserSubscription[] | null> {
         try {
             const response = await fetch(`${this.url}/user-subscription/me`, {
                 method: 'GET',
@@ -552,7 +554,7 @@ class ArchistockApiService {
     }
 
     // GET /user/all - Obtenir tous les utilisateurs
-    async findAllUsers(): Promise<any> {
+    async findAllUsers(): Promise<User[] | null> {
         try {
             const response = await fetch(`${this.url}/user/all`, {
                 method: 'GET',
@@ -569,7 +571,7 @@ class ArchistockApiService {
     }
 
     // GET /user-subscription/all - Obtenir tous les abonnements
-    async findAllSubscriptions(): Promise<any> {
+    async findAllSubscriptions(): Promise<Subscription[] | null> {
         try {
             const response = await fetch(`${this.url}/user-subscription/all`, {
                 method: 'GET',
@@ -586,7 +588,7 @@ class ArchistockApiService {
     }
 
     // GET /user-subscription/users-with-storage - Obtenir tous les utilisateurs avec un stockage
-    async findAllUserStorages(): Promise<any> {
+    async findAllUserStorages(): Promise<UserResponse | null> {
         try {
             const response = await fetch(`${this.url}/user-subscription/users-with-storage`, {
                 method: 'GET',
@@ -623,9 +625,10 @@ class ArchistockApiService {
         return `${this.url}/files/invoices/${invoiceName}`;
     }
 
-    async generateAiResponse(message: string): Promise<any> {
+    // POST /ai/generate - Avoir une réponse de Gemini pour le chatbot
+    async generateAiResponse(message: string): Promise<AiResponse> {
         try {
-            const response = await fetch('http://localhost:8000/ai/generate', {
+            const response = await fetch(`${this.url}/ai/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: message }),
@@ -672,11 +675,6 @@ class ArchistockApiService {
             throw error; 
         }
     }
-
-    
-
-
-
 }
 
 export default ArchistockApiService;

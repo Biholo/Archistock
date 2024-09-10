@@ -14,14 +14,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { userApi } from "../../services/apiService.js";
 import ArchistockApiService from "../../services/ArchistockApiService";
 import Card from "../Card/Card.js";
-
-// Interface pour typer les données de l'Api
-interface FileData {
-  id: string;
-  createdAt: string;
-  format: string;
-  size: number;
-}
+import File from "../../models/File.js";
 
 // Les couleurs pour les graphiques
 const COLORS = [
@@ -100,7 +93,7 @@ const UserStatistics = () => {
     const fetchData = async () => {
       try {
         // Récupère les données de l'utilisateur connecté
-        const data: FileData[] = await userApi.getFilesByUserId(user.id);
+        const data: File[] = await userApi.getFilesByUserId(user.id);
 
         // Calcule la taille des fichiers par catégorie pour les graphiques
         const sizesByCategory: Record<string, number> = {};
@@ -112,6 +105,7 @@ const UserStatistics = () => {
             (sizesByCategory[category] || 0) + file.size;
           totalFileSize += file.size;
         });
+        
 
         setTotalSize(parseFloat(totalFileSize.toFixed(2)));
 
@@ -122,6 +116,9 @@ const UserStatistics = () => {
             value: parseFloat(value.toFixed(2)),
           })
         );
+
+        console.log(sizesArray);
+        
 
         setFileSizesByCategory(sizesArray);
 
