@@ -11,26 +11,13 @@ import {
 import StatsCard from "../../components/StatsCard/StatsCard";
 import Select from "../Select/Select";
 import ArchistockApiService from "../../services/ArchistockApiService";
+import Stats from "../../models/Stats";
+import LicenseStats from "../../models/LicenseStats";
+import MonthlyStats from "../../models/MonthlyStats";
+import LicenseStatsByMonth from "../../models/LicenseStatsByMonth";
+import File from "../../models/File";
 
-interface Stats {
-  accountsCount: number;
-}
-
-interface LicenseStats {
-  currentLicenses: number;
-  canceledLicenses: number;
-}
-
-interface MonthlyStats {
-  month: string;
-  count: number;
-}
-
-interface LicenseStatsByMonth {
-  current: MonthlyStats[];
-  canceled: MonthlyStats[];
-}
-
+// Définition des options disponibles dans le Select
 const OPTIONS = [
   { value: "daily", label: "Journalier" },
   { value: "weekly", label: "Hebdomadaire" },
@@ -38,12 +25,14 @@ const OPTIONS = [
   { value: "yearly", label: "Annuel" },
 ];
 
+// Fonction qui regroupe les données par intervalle (daily, weekly, monthly, yearly)
 const groupDataByInterval = (
-  data: FileData[],
+  data: File[],
   interval: string
 ): MonthlyStats[] => {
   const countsByInterval: Record<string, number> = {};
 
+  // Selon l'intervalle, génère une clé pour regrouper les données
   data.forEach((file) => {
     const date = new Date(file.createdAt);
     let key: string;
@@ -105,6 +94,7 @@ const AdminStatistics = () => {
         const accounts = await archistockApiService.findAllUsers();
         const licenses = await archistockApiService.findAllSubscriptions();
 
+        // Met à jour le nombre total de comptes
         setAccountStats({
           accountsCount: accounts.length,
         });
@@ -116,11 +106,13 @@ const AdminStatistics = () => {
           (license) => license.status === "active"
         );
 
+        // Met à jour les statistiques des licences
         setLicenseStats({
           currentLicenses: currentLicenses.length,
           canceledLicenses: canceledLicenses.length,
         });
 
+        // Groupement des licences en cours et résiliées par l'intervalle sélectionné
         const currentLicensesByMonth = groupDataByInterval(
           currentLicenses,
           selectedInterval
