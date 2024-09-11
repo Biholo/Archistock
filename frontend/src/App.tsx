@@ -52,7 +52,7 @@ const AuthRoutes = () => {
       <Route path="/temp/reset-password/:jwt" element={<ResetPassword />} />
       <Route path="/temp/confirm-account/:jwt" element={<ConfirmAccount />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/*" element={loggedIn ? <UserLogged /> : <Login />} />
+      <Route path="/*" element={loggedIn ? <UserLogged /> : <PublicRoutes />} />
       <Route path="/*" element={loggedIn ? <UserLogged /> : <Navigate to="/" />} />
     </Routes>
   );
@@ -60,8 +60,8 @@ const AuthRoutes = () => {
 
 const PublicRoutes = () => {
   return (
-    <div className='flex flex-col'>
-      <Navbar />
+    <div className='flex flex-col min-h-screen'>
+        <Navbar />
       <Routes>
         <Route path="/api" element={<ApiPage />} />
         <Route path="/pricing" element={<Pricing />} />

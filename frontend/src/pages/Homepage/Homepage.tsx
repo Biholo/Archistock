@@ -1,142 +1,143 @@
 import React, { useState } from 'react'
-import Button from '../../components/Button/Button'
+// import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import Button from '@/components/Button/Button'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { ChartNoAxesCombined, Shield, Smartphone, Users, Share2, MessageSquare, Link as LinkIcon } from "lucide-react"
 
-const cardsData = [
-    {
-        title: 'Sécurité de vos données',
-        text: 'Vos fichiers sont protégés par des protocoles de cryptage avancés, assurant une sécurité maximale à chaque étape, de la transmission au stockage.',
-        icon: '/images/icons/lock_icon.png'
-    },
-    {
-        title: 'Simplicité d\'utilisation',
-        text: 'Une interface intuitive vous permet de gérer et organiser vos documents en quelques clics, sans nécessiter de compétences techniques.',
-        icon: '/images/icons/mouse_icon.png'
-    },
-    {
-        title: 'Collaboration efficace',
-        text: 'Les espaces de stockage partagés facilitent la collaboration en permettant à chaque membre de l\'équipe d\'accéder et de modifier les fichiers en temps réel.',
-        icon: '/images/icons/handshake_icon.png'
-    },
-    {
-        title: 'Chatbot intelligent pour l\'assistance',
-        text: 'Un chatbot disponible 24/7 répond instantanément à vos questions, vous offrant une assistance continue et personnalisée.',
-        icon: '/images/icons/message_icon.png'
-    },
-    {
-        title: 'Suivi et statistiques détaillés',
-        text: 'Des outils de suivi offrent une visibilité complète sur l\'utilisation de l\'espace de stockage, avec des statistiques pour optimiser la gestion de vos documents.',
-        icon: '/images/icons/stats_icon.png'
-    },
-    {
-        title: 'Intégration facile avec d\'autres outils',
-        text: 'L\'API permet une intégration fluide avec vos logiciels existants, centralisant la gestion de vos fichiers pour plus d\'efficacité.',
-        icon: '/images/icons/link_icon.png'
-    }
+import { Link } from 'react-router-dom'
 
-]
-const faqs = [
-    {
-        id: 'answer-1',
-        question: 'What types of hosting plans do you offer?',
-        answer: 'We offer shared hosting, VPS hosting, dedicated server hosting, and cloud hosting plans.',
-    },
-    {
-        id: 'answer-2',
-        question: 'What is the uptime guarantee for your hosting services?',
-        answer: 'We guarantee an uptime of 99.9% for all our hosting services.',
-    },
-    {
-        id: 'answer-3',
-        question: 'Do you provide website migration assistance?',
-        answer: 'Yes, we offer free website migration assistance for new customers.',
-    },
-    {
-        id: 'answer-4',
-        question: 'What security measures do you have in place?',
-        answer: 'We employ advanced security measures including firewalls, DDoS protection, and regular security audits.',
-    }
-];
 export default function Homepage() {
 
-    const [activeId, setActiveId] = useState(null);
-
-    const toggleAnswer = (id) => {
-        setActiveId(activeId === id ? null : id);
-    };
     return (
-        <div className='flex flex-col'>
-            <div className='h-screen'>
-                <div className='bg-[#134461] h-full flex flex-col justify-between'>
-
-                    <div>
-                        <div className='h-[70px]'></div>
-                        <div className='flex flex-col items-center'>
-                            <h1 className='text-white text-4xl font-bold text-center mt-10'>Bienvenue sur Archistock <br /> Votre solution de gestion de fichiers sécurisée</h1>
-                            <p className='text-white my-8'>Conçue spécialement particulier et les entreprises, notre solution vous permet de stocker, partager et gérer vos documents en toute sérénité.</p>
-                            <Button css='ext-white'>Découvrir maintenant</Button>
-                        </div>
-                    </div>
-
-                    <img src="/images/bg-homepage.png" alt="" />
-
+        <main className="flex-1">
+        <section className="flex justify-center w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-[#CBE3FF]">
+          <div className="container px-4 md:px-6">
+            <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+              <div className="flex flex-col justify-center space-y-4">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                    Stockage Cloud Sécurisé pour Tous
+                  </h1>
+                  <p className="my-5 max-w-[600px] text-gray-500 md:text-xl">
+                    Stockez, synchronisez et partagez vos fichiers facilement. Accédez à vos données de n'importe où, à tout moment.
+                  </p>
                 </div>
-            </div>
-            <div className='bg-[#2F89B0] h-[30px]'></div>
-            <div className='h-screen flex flex-col items-center'>
-                <h2 className='text-2xl md:text-3xl lg:text-4xl font-bold text-white text-3xl py-10 text-[#15344E]'>Qu'est ce que Archistock ?</h2>
-
-            </div>
-            <div className='h-screen flex flex-col items-center bg-[#15344E]'>
-                <h2 className='text-2xl md:text-3xl lg:text-4xl font-bold text-white text-3xl py-10'>Pourquoi utiliser Archistock ?</h2>
-                <div className="grid grid-cols-3 gap-x-20 gap-y-0 h-full px-10">
-                    {cardsData.map((card, index) => (
-                        <div key={index} className='flex flex-col items-center justify-center w-[450px]'>
-                            <div className='w-[140px] h-[140px] flex items-center justify-center'>
-                                <img src={card.icon} alt="" className='w-full h-full object-contain' />
-                            </div>
-                            <h3 className='text-white text-xl mt-2'>{card.title}</h3>
-                            <p className='text-white text-sm text-center mt-1'>{card.text}</p>
-                        </div>
-                    ))}
+                <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                  <Button color="primary" css='w-[200px]'>
+                    Commencer
+                  </Button>
+                  <Button color="neutral" css='w-[200px]'>
+                    En savoir plus
+                  </Button>
                 </div>
-
+              </div>
+              <img
+                alt="Stockage Cloud"
+                className="mx-auto aspect-video  rounded-xl object-cover object-center sm:w-full lg:order-last shadow-md"
+                height="550"
+                src="/images/sky-cloud.png"
+                width="550"
+              />
             </div>
-            <div className='h-80 flex flex-col items-center'>
-                <h2 className='text-2xl md:text-3xl lg:text-4xl font-bold py-10 text-[#15344E]'>En savoir plus ?</h2>
-                <section className="max-w-5xl mx-auto py-10 sm:py-20">
-                    <div className="w-full px-7 md:px-10 xl:px-2 py-4">
-                        <div className="mx-auto w-full max-w-5xl border border-slate-400/20 rounded-lg bg-white">
-                            {faqs.map(({ id, question, answer }) => (
-                                <div key={id} className="border-b border-[#0A071B]/10">
-                                    <button
-                                        className="question-btn flex w-full items-start gap-x-5 justify-between rounded-lg text-left text-lg font-bold text-slate-800 focus:outline-none p-5"
-                                        onClick={() => toggleAnswer(id)}
-                                    >
-                                        <span>{question}</span>
-                                        <svg
-                                            stroke="currentColor"
-                                            fill="currentColor"
-                                            strokeWidth="0"
-                                            viewBox="0 0 24 24"
-                                            className={`mt-1.5 md:mt-0 flex-shrink-0 h-5 w-5 text-[#5B5675] transition-transform ${activeId === id ? 'rotate-180' : ''}`}
-                                            height="1em"
-                                            width="1em"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path d="M16.293 9.293 12 13.586 7.707 9.293l-1.414 1.414L12 16.414l5.707-5.707z"></path>
-                                        </svg>
-                                    </button>
-                                    {activeId === id && (
-                                        <div className="answer pt-2 pb-5 px-5 text-sm lg:text-base text-[#343E3A] font-medium">
-                                            {answer}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
+          </div>
+        </section>
+        <section className="flex justify-center w-full py-12 md:py-24 lg:py-32 bg-white">
+          <div className="container px-4 md:px-6">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mb-12">Pourquoi Nous Choisir</h2>
+            <div className="grid gap-6 lg:grid-cols-4">
+              <div className="flex flex-col items-center space-y-2 border-gray-200 p-4 rounded-lg">
+                <Shield className="h-12 w-12 text-primary" />
+                <h3 className="text-xl font-bold">Stockage Sécurisé</h3>
+                <p className="text-sm text-gray-500 text-center">Vos données sont cryptées et protégées à tout moment.</p>
+              </div>
+              <div className="flex flex-col items-center space-y-2 border-gray-200 p-4 rounded-lg">
+                <Smartphone className="h-12 w-12 text-primary" />
+                <h3 className="text-xl font-bold">Accès Partout</h3>
+                <p className="text-sm text-gray-500 text-center">Accédez à vos fichiers depuis n'importe quel appareil, où que vous soyez.</p>
+              </div>
+              <div className="flex flex-col items-center space-y-2 border-gray-200 p-4 rounded-lg">
+                <Users className="h-12 w-12 text-primary" />
+                <h3 className="text-xl font-bold">Facile à Utiliser</h3>
+                <p className="text-sm text-gray-500 text-center">Interface intuitive pour une gestion des fichiers sans effort.</p>
+              </div>
+              <div className="flex flex-col items-center space-y-2 border-gray-200 p-4 rounded-lg">
+                <ChartNoAxesCombined className="h-12 w-12 text-primary" />
+                <h3 className="text-xl font-bold">Analyses Détailées</h3>
+                <p className="text-sm text-gray-500 text-center">Suivi et statistiques complets de vos données.</p>
+              </div>
             </div>
-        </div>
+          </div>
+        </section>
+        <section className="flex justify-center w-full py-12 md:py-24 lg:py-32 bg-[#CBE3FF]">
+          <div className="container px-4 md:px-6">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mb-12">Fonctionnalités Clés</h2>
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="flex flex-col items-center space-y-2 border-gray-200 p-4 rounded-lg bg-white">
+                <Share2 className="h-12 w-12 text-primary" />
+                <h3 className="text-xl font-bold">Stockage Partagé</h3>
+                <p className="text-sm text-gray-500 text-center">
+                  Collaborez facilement avec vos collègues sur des fichiers et dossiers partagés.
+                </p>
+              </div>
+              <div className="flex flex-col items-center space-y-2 border-gray-200 p-4 rounded-lg bg-white">
+                <MessageSquare className="h-12 w-12 text-primary" />
+                <h3 className="text-xl font-bold">Chatbot Intelligent</h3>
+                <p className="text-sm text-gray-500 text-center">
+                  Obtenez une assistance instantanée grâce à notre chatbot alimenté par l'IA.
+                </p>
+              </div>
+              <div className="flex flex-col items-center space-y-2 border-gray-200 p-4 rounded-lg bg-white">
+                <LinkIcon className="h-12 w-12 text-primary" />
+                <h3 className="text-xl font-bold">Intégration Facile</h3>
+                <p className="text-sm text-gray-500 text-center">
+                  Intégrez facilement vos outils et applications préférés.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="flex justify-center w-full py-12 md:py-24 lg:py-32 bg-white">
+          <div className="container px-4 md:px-6">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mb-12">
+              Questions Fréquemment Posées
+            </h2>
+            <Accordion type="single" collapsible className="w-full max-w-3xl mx-auto">
+              <AccordionItem value="item-1">
+                <AccordionTrigger>Mes données sont-elles sécurisées ?</AccordionTrigger>
+                <AccordionContent>
+                  Vos données sont protégées par un cryptage AES 256 bits, tant en transit qu'au repos. Nous proposons également
+                  une authentification à deux facteurs pour une couche de sécurité supplémentaire.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-2">
+                <AccordionTrigger>Quels sont les plans tarifaires ?</AccordionTrigger>
+                <AccordionContent>
+                  Nous proposons un plan gratuit avec 5 Go de stockage et des plans payants à partir de 9,99 $/mois pour 1 To de stockage.
+                  Des plans d'entreprise avec un stockage illimité sont également disponibles.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-3">
+                <AccordionTrigger>Y a-t-il une limite de taille de fichier ?</AccordionTrigger>
+                <AccordionContent>
+                  Les fichiers individuels sont limités à 5 Go dans nos plans standards. Les plans d'entreprise n'ont pas de limite de taille de fichier.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-4">
+                <AccordionTrigger>Puis-je accéder à mes fichiers hors ligne ?</AccordionTrigger>
+                <AccordionContent>
+                  Oui, vous pouvez marquer des fichiers pour un accès hors ligne sur nos applications mobiles et de bureau. Ces fichiers seront
+                  disponibles même sans connexion Internet.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </section>
+      </main>
     )
 }

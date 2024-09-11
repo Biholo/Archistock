@@ -1,19 +1,72 @@
-import { Link } from "react-router-dom";
+import { useState } from 'react'
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Cloud, Menu } from "lucide-react"
+import { Link } from 'react-router-dom'
 
 export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const navItems = [
+    { name: 'Accueil', href: '/' },
+    { name: 'Prix', href: '/pricing' },
+  ]
+
   return (
-    <nav className='flex py-5 bg-[#CBE3FF] justify-between items-center px-10 w-full fixed'>
-      <div className='flex items-center'>
-        <img className='w-[30px]' src="/images/logo.png" alt="Archistock Logo" />
-        <h1 className='text-2xl font-bold ml-2'>Archistock</h1>
-      </div>
-      <ul className='flex space-x-4'>
-        <li><Link to="/">Accueil</Link></li>
-        <li><Link to="/pricing">Prix</Link></li>
-        <li><Link to="/api">API</Link></li>
-        <li><Link to="/login">Login</Link></li>
-        <li><Link to="/signup" className='bg-[#3794C5] py-1 px-3 rounded text-white'>Sign Up</Link></li>
-      </ul>
-    </nav>
-  );
+    <header className="px-4 lg:px-6 h-14 flex items-center">
+      <Link className="flex items-center justify-center" to="/">
+        <Cloud className="h-6 w-6 text-primary" />
+        <span className="ml-2 text-2xl font-bold text-gray-900">Archistock</span>
+      </Link>
+      
+      {/* Desktop Navigation */}
+      <nav className="ml-auto hidden md:flex items-center gap-4 sm:gap-6">
+        {navItems.map((item) => (
+          <Link 
+            key={item.name}
+            className="text-sm font-medium hover:underline underline-offset-4" 
+            to={item.href}
+          >
+            {item.name}
+          </Link>
+        ))}
+        <Button variant="ghost" size="sm">
+          Login
+        </Button>
+        <Button size="sm">
+          Register
+        </Button>
+      </nav>
+
+      {/* Mobile Navigation */}
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetTrigger asChild className="md:hidden ml-auto">
+          <Button variant="ghost" size="icon">
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="right">
+          <nav className="flex flex-col gap-4">
+            {navItems.map((item) => (
+              <Link 
+                key={item.name}
+                className="text-lg font-medium hover:underline underline-offset-4" 
+                to={item.href}
+                onClick={() => setIsOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
+            <Button variant="ghost" onClick={() => setIsOpen(false)}>
+              Login
+            </Button>
+            <Button onClick={() => setIsOpen(false)}>
+              Register
+            </Button>
+          </nav>
+        </SheetContent>
+      </Sheet>
+    </header>
+  )
 }

@@ -1,7 +1,9 @@
 import React from 'react';
 import { CheckCircle } from "@phosphor-icons/react";
-
+import { useNavigate } from 'react-router-dom';
 export default function CardPricing({ name, price, features, label, mainColor, secondaryColor, large=false }) {
+    const navigate = useNavigate();
+
     return (
         <div 
             className={`flex flex-col ${large ? 'px-[65px]' : 'px-[45px]'} ${large ? 'py-[55px]' : 'py-[40px]'}  items-center justify-center shadow-lg rounded-lg p-4 text-white`} 
@@ -25,8 +27,8 @@ export default function CardPricing({ name, price, features, label, mainColor, s
                 </ul>
             </div>
             {/* <button className="text-sm text-white w-full py-2 rounded-full" style={{ backgroundColor: secondaryColor, color: `${mainColor} === rgba(255, 255, 255, 0.4) ? white : ${mainColor}` }}> */}
-            <button className="text-sm text-white w-full py-2 rounded-full" style={{ backgroundColor: secondaryColor, color: mainColor }}>
-                Subscribe
+            <button onClick={() => navigate('/register')} className={`text-sm text-white w-full py-2 rounded-full `} style={{ backgroundColor: secondaryColor, color: large ?  mainColor : 'white'}}>
+                S'abonner maintenant
             </button>
         </div>
     )
